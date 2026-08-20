@@ -1,0 +1,23 @@
+{
+  "name": "howard-property-map",
+  "version": "0.1.0",
+  "description": "Interactive property map for 1320 Baldwin Rd, Ojai, CA (Howard Property)",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "node server-complete.js",
+    "start": "node server-complete.js",
+    "preview": "node server-complete.js",
+    "build": "echo 'No build needed - single file server'",
+    "vercel-build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}

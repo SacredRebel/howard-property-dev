@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "name": "howard-property-dev",
+  "builds": [
+    {
+      "src": "server-complete.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/images/(.*)",
+      "dest": "/server-complete.js",
+      "methods": ["GET"],
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/images/(.*)",
+      "status": 302,
+      "headers": {
+        "Location": "https://raw.githubusercontent.com/SacredRebel/howard-property-dev/main/images/$1",
+        "Cache-Control": "public, max-age=86400"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/server-complete.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
