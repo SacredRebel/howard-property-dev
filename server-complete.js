@@ -25,13 +25,362 @@ if (process.env.VERCEL !== '1') {
   console.log('🚀 Starting Howard Property Interactive Map...');
 }
 
-// Project Zones — intentionally EMPTY for the initial layout release.
-// Zones (markers + detail panels) will be added as the Howard Property plan is
-// defined. Each zone object follows the EcoVillage-map V1 shape:
-//   { id, name, emoji, position: [lat, lng], type, budget, timeline,
-//     monthlyRevenue, roi, description, features: [], revenueStreams: [],
-//     developmentTimeline: [{ phase, deliverables, investment, status }], ... }
-const PROJECT_ZONES = [];
+// Howard Property — 13 PROPOSED projects (proposal draft for John Ellis).
+// Positions are initial estimates placed inside the county parcel boundary.
+// Reposition flow: ⚙️ admin menu (top-right) → select zone → unlock → drag →
+// lock → "Capture All Positions" → copy the JSON → send it to Claude to make
+// the new positions permanent.
+const PROJECT_ZONES = [
+  {
+    id: "main-house",
+    name: "Main House",
+    emoji: "🏠",
+    position: [34.42610, -119.31945],
+    type: "residential",
+    budget: "Existing structure",
+    timeline: "Already established",
+    monthlyRevenue: "—",
+    roi: "Heart of the property",
+    description: "The existing main residence — home base of the property and the natural center that all proposed projects are designed around. Every idea on this map is placed to respect the privacy, views, and daily life of the main house.",
+    features: [
+      "Existing primary residence and operations home base",
+      "All proposed projects positioned around it, never on top of it",
+      "Privacy and quiet protected by design",
+      "Utilities hub — existing water and power connections radiate from here"
+    ]
+  },
+  {
+    id: "hugelkultur-project",
+    name: "Hugelkultur Project",
+    emoji: "⛰️",
+    position: [34.42480, -119.32030],
+    type: "landscape",
+    budget: "Ongoing — materials already on the land",
+    timeline: "Active & ongoing",
+    monthlyRevenue: "Long-term soil & land value",
+    roi: "Flatter, richer, water-holding land",
+    description: "The property's ongoing hugelkultur program (from the German 'Hügel' — hill): large raised beds built over buried logs, branches, and organic material. Bed by bed, the process is gradually terracing and flattening the hillsides while turning them into deep, self-fertilizing, water-holding growing ground.",
+    features: [
+      "Hugelkultur beds built from on-site wood and organic material",
+      "Progressively flattens and terraces the hillsides over time",
+      "Buried wood acts as a sponge — beds hold water through dry months",
+      "Decomposing wood feeds the soil for 10-20 years without fertilizer",
+      "Perfect planting ground for fruit trees, perennials, and vegetables",
+      "Ties directly into the nursery and compost operations",
+      "Part of the property's ongoing maintenance and improvement program"
+    ],
+    regenerativeFeatures: [
+      "Sequesters carbon in the soil instead of burning or hauling wood",
+      "Eliminates irrigation dependency as beds mature",
+      "Builds topsoil on eroding hillsides",
+      "Creates microclimates and habitat"
+    ]
+  },
+  {
+    id: "pauls-place",
+    name: "Paul's Place",
+    emoji: "🛖",
+    position: [34.42330, -119.31870],
+    type: "residential",
+    budget: "Self-funded by Paul — needs only a spot + water & electric access",
+    timeline: "Can start immediately",
+    monthlyRevenue: "Full-time hands on the land",
+    roi: "Every structure built stays with the property",
+    description: "A small, hidden live-in homestead spot for Paul — a raw, flat space in nature is enough to start, as long as water and electricity are reachable. From there the space grows into something truly regenerative and beautiful, built with natural materials and tucked into the hillside so it disappears into the land. Whatever gets built stays with the property afterward and keeps adding value.",
+    optionsTitle: "🏗️ Structure Options (flexible — whatever works best)",
+    options: [
+      {
+        name: "Hobbit-Style Earth Home",
+        details: "Built into the hillside with cob and natural materials — hidden, sculptural, and beautiful. A one-of-a-kind structure that becomes a permanent feature of the property."
+      },
+      {
+        name: "Cob Structure in the Hills",
+        details: "Hand-built cob dwelling placed discreetly in the landscape. Creative, fireproof-friendly natural building that can grow organically over time."
+      },
+      {
+        name: "Garden Shed Conversion",
+        details: "Paul already owns a basic 12×12 metal garden shed that can be brought in and transformed into a clean, tidy temporary living setup while the permanent structure takes shape."
+      },
+      {
+        name: "Trailer On-Site",
+        details: "If allowed, a trailer can be placed as the simplest immediate living solution — zero construction, fully reversible, gone whenever it needs to be."
+      },
+      {
+        name: "Support Structures",
+        details: "Compost toilet, outdoor shower, and small amenity structures added as needed — all built in the same hidden, natural, leave-it-better style."
+      }
+    ],
+    features: [
+      "Needs only: a raw flat spot + access to water and electricity",
+      "Hidden placement — invisible from the road and the main house",
+      "Built regeneratively with natural and salvaged materials",
+      "Everything constructed stays with the property when Paul moves on",
+      "Paul on-site = daily hands for every other project on this map"
+    ]
+  },
+  {
+    id: "community-workshop",
+    name: "Community Workshop",
+    emoji: "🛠️",
+    position: [34.42520, -119.31940],
+    type: "creative",
+    budget: "Starts as a shade structure — grows with the work",
+    timeline: "Phase 1 — early priority",
+    monthlyRevenue: "Products, collaborations & property value",
+    roi: "The engine room for every other project",
+    description: "The property's main workshop — it can begin as nothing more than a beautifully built shade structure in nature, housing an organized tool and materials setup. From there it becomes the engine room of the whole property: processing lumber and building supplies, organizing materials, and producing everything the other projects need.",
+    features: [
+      "Main tool workshop for the entire property",
+      "Can start as a nice open-air shade structure — walls come later",
+      "Organized storage for tools, materials, and building supplies",
+      "Processing station for lumber, cob, and salvaged materials",
+      "Shared/community workshop model with skilled collaborators",
+      "Andrew (talented woodworker) and Logan ready to plug in",
+      "Builds and maintains everything else on this map"
+    ],
+    revenueStreams: [
+      "Custom woodwork and artisan products made and sold from the shop",
+      "Collaborative builds with invited makers — shared revenue",
+      "Every hour in the shop beautifies the property and raises its value"
+    ]
+  },
+  {
+    id: "property-nursery",
+    name: "Nursery",
+    emoji: "🌱",
+    position: [34.42665, -119.31820],
+    type: "agriculture",
+    budget: "Lean start — beds, tables, irrigation, starter stock",
+    timeline: "Phase 1 — front-of-property priority",
+    monthlyRevenue: "Plant & tree sales + tree services",
+    roi: "Regreens the property AND pays for itself",
+    description: "A working nursery at the front of the property, close to the Baldwin Road entrance — growing fruit trees, plants, and vegetable starts in a year-round propagation cycle. First mission: make the property itself dramatically more vegetated, fruitful, and regenerative. Second mission: an official nursery the public can visit to buy trees and plants — with John's respected local tree services folded right in.",
+    features: [
+      "Located at the front entrance for easy public access",
+      "Year-round propagation cycle — seeds, sprouts, and saplings always going",
+      "Fruit trees, natives, herbs, and vegetable starts",
+      "Supplies the property first: food forest and hugel beds get planted free",
+      "Official retail nursery — neighbors come and buy",
+      "Natural home base for John's tree services and local reputation",
+      "Expands over time into deeper products and services"
+    ],
+    revenueStreams: [
+      "Fruit tree and plant sales to the local community",
+      "Tree services booked through the nursery front",
+      "Vegetable starts and seasonal plant sales",
+      "Future: grafting workshops, orchard consulting, delivery & planting services"
+    ],
+    developmentTimeline: [
+      {
+        phase: "Phase 1 — Setup",
+        deliverables: "Build propagation beds, potting tables, shade cloth, and simple irrigation near the entrance. Start the first propagation cycles with fruit trees and natives. Begin planting out the property.",
+        status: "Foundation"
+      },
+      {
+        phase: "Phase 2 — Open to the Public",
+        deliverables: "Signage at Baldwin Road, organized retail rows, regular open hours. Fold in tree services scheduling. Add compost and growing supplies from the on-site compost operation.",
+        status: "Operating nursery"
+      }
+    ]
+  },
+  {
+    id: "nature-gym",
+    name: "Outdoor Nature Gym",
+    emoji: "🏋️",
+    position: [34.42655, -119.31905],
+    type: "wellness",
+    budget: "Self-made equipment + smart secondhand finds",
+    timeline: "Phase 1-2",
+    monthlyRevenue: "Membership potential",
+    roi: "Movement space for the whole community",
+    description: "A beautifully designed outdoor gym set under the trees — real training equipment, but nature-styled: solid self-built stations combined with quality secondhand finds, laid out with enough space for a real workout community. Ping-pong table, possibly a small basketball court, climbing and play elements for kids — an all-ages movement space in nature, close to the street so members come and go easily.",
+    features: [
+      "Set under mature trees — shaded, beautiful, breathable",
+      "Real equipment: self-built rigs + curated secondhand finds",
+      "Space for group workouts and regular training",
+      "Ping-pong table (+ optional half-court basketball)",
+      "Climbing features and play elements for kids",
+      "All ages — kids, young adults, parents together",
+      "Near the street for simple member access"
+    ],
+    revenueStreams: [
+      "Monthly memberships — individuals and families",
+      "Day passes for visitors",
+      "Future: outdoor training sessions and kids' movement classes"
+    ]
+  },
+  {
+    id: "sacred-spaces",
+    name: "Ceremony & Sacred Spaces",
+    emoji: "🔥",
+    position: [34.42280, -119.31950],
+    type: "ceremonial",
+    budget: "Built by hand, space by space",
+    timeline: "Grows with the property",
+    monthlyRevenue: "Gatherings & community events",
+    roi: "Draws conscious community to the land",
+    description: "A collection of hand-built sacred and ceremonial spaces placed wherever the land feels strongest — a kiva, yoga decks, meditation spots, and ceremonial fire circles. Spaces for ceremony, gatherings, and community events that give people a reason to come to the land and a reason to care for it.",
+    features: [
+      "Kiva — earthen, in-ground ceremonial space",
+      "Yoga and meditation decks set in nature",
+      "Ceremonial fire circles for gatherings",
+      "Placed at the property's most powerful quiet spots",
+      "Built naturally: earth, stone, and local wood",
+      "Hosts ceremonies, gatherings, and community events"
+    ]
+  },
+  {
+    id: "mushroom-containers",
+    name: "Mushroom Growing Containers",
+    emoji: "🍄",
+    position: [34.42630, -119.31860],
+    type: "agriculture",
+    budget: "Investment project — can phase in later",
+    timeline: "Phase 2+ (after nursery is running)",
+    monthlyRevenue: "Restaurant + local sales potential",
+    roi: "High-margin crop in a tiny footprint",
+    description: "Shipping containers or trailers converted into controlled growing environments for organic culinary mushrooms — oyster, shiitake, lion's mane. Feeds the community first and supplies local restaurants and neighbors who want genuinely local, organic mushrooms. A real investment project, but one that can wait — and it slots naturally next to the nursery at the front.",
+    features: [
+      "Converted shipping containers or trailers — compact and contained",
+      "Organic culinary varieties: oyster, shiitake, lion's mane",
+      "Climate-controlled year-round production",
+      "Pairs with the nursery and compost operation at the front",
+      "Spent substrate feeds the compost and hugel beds",
+      "Can start with a single container and scale"
+    ],
+    revenueStreams: [
+      "Local restaurant supply — chefs love verified-local organic mushrooms",
+      "Direct sales to neighbors and community",
+      "Future: dried mushrooms, tinctures, and grow kits via the nursery"
+    ],
+    developmentTimeline: [
+      {
+        phase: "Phase 1 — First Container",
+        deliverables: "Source and convert one container or trailer: insulation, racks, humidity and airflow. First flushes for the community and test sales.",
+        status: "When the investment makes sense"
+      },
+      {
+        phase: "Phase 2 — Scale",
+        deliverables: "Add capacity, establish standing restaurant accounts, integrate sales through the nursery front.",
+        status: "Growth"
+      }
+    ]
+  },
+  {
+    id: "beekeeping",
+    name: "Beekeeping & Honey Production",
+    emoji: "🐝",
+    position: [34.42450, -119.31830],
+    type: "beekeeping",
+    budget: "$5,000 - $10,000",
+    timeline: "Phase 1 (0-3 months)",
+    monthlyRevenue: "$500+",
+    roi: "Starting phase",
+    description: "Collaborative beekeeping initiative with local beekeepers for honey production, bee products, and pollination services through partnership model.",
+    features: [
+      "Partnership with local beekeepers",
+      "10-20 hives with scaling potential",
+      "Dedicated processing shed and secure fencing",
+      "Honey extraction and processing facility",
+      "Value-added products: wax, skincare, soaps, tinctures",
+      "Online and farmers market sales",
+      "Pollination services for regenerative agriculture",
+      "Educational beekeeping experiences"
+    ],
+    revenueStreams: [
+      "Honey and bee products sharing: $800/month",
+      "Value-added wax products: $200/month",
+      "Revenue starts within 3 months"
+    ]
+  },
+  {
+    id: "pond-swimming-hole",
+    name: "Pond & Swimming Hole",
+    emoji: "🐟",
+    position: [34.42380, -119.31950],
+    type: "water",
+    budget: "One-time earthworks + ecosystem establishment",
+    timeline: "One-time build, then self-sustaining",
+    monthlyRevenue: "Protein + lifestyle + property value",
+    roi: "Catch a fish, have a meal — forever",
+    description: "A dug (or dammed, depending on the landscape) natural pond serving double duty: a beautiful swimming hole and a working fish pond. One-time setup of a healthy, self-maintaining ecosystem — the right water-cleaning plants and the right fish varieties keep the water clear and the system balanced. Grow-your-own protein and a massive quality-of-life upgrade for everyone on the land.",
+    features: [
+      "Natural swimming pond — no chlorine, plants do the filtering",
+      "Fish varieties chosen for a balanced, self-sustaining ecosystem",
+      "Grow-your-own protein: catch a fish, have a meal",
+      "Aquatic plants clean and maintain the water year-round",
+      "Wildlife habitat and on-property water storage",
+      "Placement follows the landscape — wherever water wants to sit",
+      "Major property value and community lifestyle addition"
+    ]
+  },
+  {
+    id: "growing-dome",
+    name: "Growing Dome Greenhouse",
+    emoji: "🌴",
+    position: [34.42595, -119.31880],
+    type: "agriculture",
+    budget: "Scales from hoop house to full dome",
+    timeline: "Hand in hand with the nursery",
+    monthlyRevenue: "Year-round growing power",
+    roi: "Tropical fruit in Ojai, all year",
+    description: "A growing dome or greenhouse working hand in hand with the nursery — sprouting and growing straight through winter, and bringing tropical fruit trees and plants into the property's ecosystem. Tropical fruits, veggies, and starts growing all year long, feeding both the nursery cycle and the property's food supply.",
+    features: [
+      "Year-round sprouting and propagation for the nursery cycle",
+      "Winter growing — no dead season",
+      "Tropical fruit trees and plants brought into the ecosystem",
+      "Climate buffer for sensitive starts and mother plants",
+      "Can start as a simple hoop house and grow into a full dome",
+      "Positioned to share water and workflow with the nursery"
+    ]
+  },
+  {
+    id: "livestock",
+    name: "Livestock & Animals",
+    emoji: "🐐",
+    position: [34.42430, -119.32090],
+    type: "agriculture",
+    budget: "Infrastructure first — fencing, shelter, water",
+    timeline: "Rebuild & expand at John's pace",
+    monthlyRevenue: "Land management + produce",
+    roi: "The hillside maintenance crew that feeds you",
+    description: "John has had goats on the land before — this project rebuilds and upgrades the livestock infrastructure properly (fencing, shelters, water lines) and helps bring more animals back to the property. Goats manage brush on the hillsides, chickens turn scraps into eggs, and every animal feeds the compost operation. Scaled entirely to what John wants.",
+    features: [
+      "Goats — natural brush and fire-fuel management on the hillsides",
+      "Chickens for eggs and pest control (optional expansion)",
+      "Proper fencing, shelters, and water lines built right once",
+      "Rotational grazing to regenerate the land",
+      "Manure feeds the compost operation directly",
+      "Fresh produce for the property — eggs, milk, more as desired",
+      "Sized and scaled entirely to John's comfort"
+    ]
+  },
+  {
+    id: "compost-operation",
+    name: "Compost Operation",
+    emoji: "♻️",
+    position: [34.42600, -119.31825],
+    type: "agriculture",
+    budget: "Bins, bays & a good pitchfork",
+    timeline: "Phase 1 — starts with the nursery",
+    monthlyRevenue: "Free fertility + bagged compost sales",
+    roi: "Turns waste streams into soil",
+    description: "A proper organic compost operation right next to the nursery — turning livestock manure, kitchen waste, and organic material from around the property into rich compost. Can also take in manure delivered by (or picked up from) neighboring farms and stables, turning the whole neighborhood's 'waste problem' into this property's fertility engine.",
+    features: [
+      "Sited next to the nursery — compost goes straight to the plants",
+      "Feeds on livestock manure, kitchen waste, and property trimmings",
+      "Manure pickup/drop-off from local neighbors, farms, and stables",
+      "Hot composting bays plus worm composting for fine material",
+      "Supplies the nursery, hugel beds, orchard, and gardens for free",
+      "Neighbors' waste stream becomes the property's soil bank"
+    ],
+    revenueStreams: [
+      "Bagged organic compost sold at the nursery stand",
+      "Worm castings — premium product for local gardeners",
+      "Possible pickup service fee from stables needing manure removal"
+    ]
+  }
+];
 
 // REAL Howard Property Boundary — APN 032-0-010-090 (1320 Baldwin Rd, Ojai)
 // Geometry sourced from Ventura County GIS parcel service (maps.ventura.org,
@@ -2132,7 +2481,7 @@ app.get('/', (req, res) => {
       background: rgba(0,0,0,0.8);
       color: white;
       border-radius: 50%;
-      display: none !important; /* HIDDEN - Remove this line to show admin tools */
+      display: flex; /* VISIBLE — reposition mode enabled for proposal review */
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -2600,7 +2949,7 @@ app.get('/', (req, res) => {
   
   <div class="admin-popup" id="admin-popup" style="display: none;">
     <div class="popup-header">
-      <h3>🎯 Zone Admin Controls</h3>
+      <h3>🎯 Move & Lock Icons</h3>
       <button class="close-popup" id="close-popup">&times;</button>
     </div>
     
@@ -2715,7 +3064,7 @@ app.get('/', (req, res) => {
   
   <!-- Footer -->
   <div class="map-footer">
-    © 2026 Howard Property | 1320 Baldwin Rd, Ojai, CA | 44-Acre Parcel | Interactive Property Map
+    © 2026 Howard Property | 1320 Baldwin Rd, Ojai | 44 Acres | 13 Proposed Projects | Interactive Proposal Map
   </div>
   
   <script>
@@ -3044,7 +3393,8 @@ app.get('/', (req, res) => {
       wellness: '#00BCD4',
       landscape: '#8BC34A',
       beekeeping: '#FFD700',  // Golden yellow for beekeeping
-      events: '#FF6B6B'  // Coral red for events and gatherings
+      events: '#FF6B6B',  // Coral red for events and gatherings
+      water: '#0288D1'   // Lake blue for pond & swimming hole
     };
     
     // Store original positions for reset functionality
@@ -3410,11 +3760,11 @@ app.get('/', (req, res) => {
       '</div>' +
 
       '<div class="property-info-section">' +
-        '<h4>🚧 Development Plan</h4>' +
+        '<h4>💡 About This Proposal</h4>' +
         '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">' +
-          '<div style="font-weight: 600; color: #667eea; margin-bottom: 10px; font-size: 14px;">🗺️ Coming Soon</div>' +
+          '<div style="font-weight: 600; color: #667eea; margin-bottom: 10px; font-size: 14px;">🌱 Proposed Projects</div>' +
           '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
-            '<p style="margin: 0;">Project zones, vision galleries, budgets, and development timelines will be added to this interactive map as the Howard Property plan is finalized. Tap the glowing boundary anytime to revisit these parcel details.</p>' +
+            '<p style="margin: 0;">This map shows <strong>13 proposed projects</strong> for the property — tap any icon to explore what it could become. Every position and every idea is flexible: this is a conversation starter, not a final plan. Photo galleries for each project are coming next.</p>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -4188,9 +4538,9 @@ app.get('/', (req, res) => {
           } else {
             container.innerHTML = '<div class="no-images-message">' +
               '<div style="font-size: 48px; opacity: 0.3; margin-bottom: 10px;">📷</div>' +
-              '<div>No images configured for this category</div>' +
+              '<div>No photos here yet</div>' +
               '<div style="font-size: 13px; opacity: 0.7; margin-top: 5px;">' +
-              'Add URLs to image-urls.js to display images' +
+              'Photos for this project are coming soon' +
               '</div></div>';
           }
         } catch (error) {
@@ -4908,6 +5258,18 @@ app.get('/', (req, res) => {
           </ul>
         </div>
         
+        \${zone.optionsTitle && zone.options ? \`
+          <div class="project-section">
+            <h3 style="color: \${zoneColor};">\${zone.optionsTitle}</h3>
+            \${zone.options.map(opt => \`
+              <div style="padding: 16px; background: linear-gradient(135deg, \${lightColor} 0%, \${mediumColor} 100%); border-radius: 10px; border-left: 4px solid \${zoneColor}; margin-bottom: 12px;">
+                <div style="font-weight: 700; color: \${zoneColor}; font-size: 15px; margin-bottom: 6px;">\${opt.name}</div>
+                <div style="color: #555; font-size: 13px; line-height: 1.5;">\${opt.details}</div>
+              </div>
+            \`).join('')}
+          </div>
+        \` : ''}
+        
         \${zone.membershipTiers ? \`
           <div class="project-section">
             <h3 style="color: \${zoneColor};">🎫 Membership Tiers</h3>
@@ -5590,9 +5952,9 @@ app.get('/', (req, res) => {
         <div class="project-section cta-section">
           <h3 style="color: \${zoneColor};">🤝 Get Involved</h3>
           <div style="background: linear-gradient(135deg, \${zoneColor} 0%, \${zoneColor}CC 100%); padding: 30px; border-radius: 16px; text-align: center; color: white; border: 2px solid \${zoneColor};">
-            <h4 style="color: white; margin: 0 0 15px 0; font-size: 20px;">Ready to Join This Vision?</h4>
+            <h4 style="color: white; margin: 0 0 15px 0; font-size: 20px;">Let's Talk About This Idea</h4>
             <p style="margin: 0 0 25px 0; opacity: 0.9; font-size: 15px; line-height: 1.5;">
-              Be part of creating a sustainable future at Howard Property. Whether you're an investor, partner, or future resident, we'd love to hear from you.
+              Everything on this map is a flexible proposal — a picture of what's possible on this land. If an idea speaks to you, belongs in a different spot, or sparks something better, let's talk.
             </p>
             
             <div class="contact-dropdown">
@@ -5610,33 +5972,20 @@ app.get('/', (req, res) => {
                   <span class="contact-name">Paul Muresan</span>
                   <a href="mailto:paulmuresan77@gmail.com" class="contact-email">paulmuresan77@gmail.com</a>
                 </div>
-                <div class="contact-item">
-                  <span class="contact-name">Johnatan Braniff</span>
-                  <a href="mailto:jbraniff1117@gmail.com" class="contact-email">jbraniff1117@gmail.com</a>
-                </div>
               </div>
             </div>
 
-            <div class="action-buttons">
-              <a href="https://sulphurmountainroad.vercel.app/" target="_blank" class="action-button website-button">
-                🌐 Visit Website
-              </a>
-              <div class="action-button onboarding-button">
-                � Member/Partner Onboarding Platform
-                <span style="font-size: 13px; margin-left: 5px;">(Coming Soon...)</span>
-              </div>
-            </div>
           </div>
         </div>
-        
+
         <div class="project-footer">
           <div class="footer-content">
             <div class="footer-title">🌿 Howard Property</div>
             <div class="footer-info">
-              <span>18 Project Zones</span> • 
-              <span>$3M Investment</span> • 
-              <span>10-Acre Property</span> • 
-              <span>Ojai Valley, CA</span>
+              <span>13 Proposed Projects</span> • 
+              <span>44 Acres</span> • 
+              <span>1320 Baldwin Rd</span> • 
+              <span>Upper Ojai, CA</span>
             </div>
             <div class="footer-tagline">Regenerative Living • Collaborative Design • Community Wellness</div>
           </div>
@@ -5896,64 +6245,53 @@ app.get('/', (req, res) => {
     // Bulletproof Capture Zone Positions functionality
     const captureZonesBtn = document.getElementById('capture-zones-btn');
     captureZonesBtn.addEventListener('click', () => {
-      console.log('\\n========== ZONE POSITIONS CAPTURED ==========');
-      console.log('Current marker positions for embedding:');
-      console.log('');
-      
       const capturedPositions = [];
-      let zoneCount = 0;
-      
-      // Get all zone markers from the map
       map.eachLayer(layer => {
         if (layer.options && layer.options.zoneId) {
-          const position = layer.getLatLng();
-          const zoneData = {
-            id: layer.options.zoneId,
-            name: layer.options.zoneName || layer.options.zoneId,
-            position: [position.lat, position.lng]
-          };
-          
-          capturedPositions.push(zoneData);
-          zoneCount++;
-          
-          // Log each position clearly
-          console.log(zoneCount + '. "' + zoneData.name + '"');
-          console.log('   position: [' + position.lat.toFixed(6) + ', ' + position.lng.toFixed(6) + '],');
-          console.log('');
+          const p = layer.getLatLng();
+          capturedPositions.push({ id: layer.options.zoneId, name: layer.options.zoneName || layer.options.zoneId, position: [ +p.lat.toFixed(6), +p.lng.toFixed(6) ] });
         }
       });
+      capturedPositions.sort(function(a, b) { return a.id.localeCompare(b.id); });
+      const lines = capturedPositions.map(function(z) { return '  "' + z.id + '": [' + z.position[0] + ', ' + z.position[1] + ']'; });
+      const jsonText = '{' + String.fromCharCode(10) + lines.join(',' + String.fromCharCode(10)) + String.fromCharCode(10) + '}';
       
-      // Show summary
-      console.log('Total zones captured: ' + zoneCount);
-      console.log('Copy the position coordinates above to update your PROJECT_ZONES array');
-      console.log('=============================================\\n');
-      
-      // Update status indicator  
-      statusIndicator.innerHTML = '<div>🎯</div><div class="status-text">Captured ' + zoneCount + ' Positions!</div>';
+      statusIndicator.innerHTML = '<div>🎯</div><div class="status-text">Captured ' + capturedPositions.length + ' positions</div>';
       statusIndicator.style.background = 'linear-gradient(135deg, #E8F5E8 0%, #A5D6A7 100%)';
       statusIndicator.style.borderLeftColor = '#4CAF50';
       
-      // Show user-friendly alert with instructions
-      alert('🎯 SUCCESS! Captured ' + zoneCount + ' zone positions!\\n\\n📋 Instructions:\\n1. Open browser console (F12)\\n2. Copy the coordinates shown\\n3. Update your PROJECT_ZONES array\\n\\n✅ All positions are now ready for embedding!');
-      
-      // Also create a downloadable text file with the positions
-      let positionsText = '';
-      capturedPositions.forEach(zone => {
-        positionsText += '"' + zone.id + '": position: [' + zone.position[0].toFixed(6) + ', ' + zone.position[1].toFixed(6) + ']\\n';
+      let overlay = document.getElementById('positions-overlay');
+      if (overlay) overlay.remove();
+      overlay = document.createElement('div');
+      overlay.id = 'positions-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:5000;display:flex;align-items:center;justify-content:center;padding:16px;';
+      overlay.innerHTML = '<div style="background:#fff;max-width:540px;width:100%;max-height:85vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.35);display:flex;flex-direction:column;overflow:hidden;">' +
+        '<div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:14px 18px;font-weight:700;display:flex;justify-content:space-between;align-items:center;">📍 Captured Icon Positions' +
+        '<button id="close-positions-overlay" style="background:rgba(255,255,255,0.25);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">&times;</button></div>' +
+        '<div style="padding:14px 18px 6px 18px;font-size:13px;color:#555;line-height:1.5;">These are the current positions of every icon. <strong>Copy this and paste it to Claude</strong> to lock the new positions into the map permanently.</div>' +
+        '<textarea id="positions-textarea" readonly style="margin:10px 18px 0 18px;height:240px;font-family:monospace;font-size:12px;border:2px solid #e0e0e0;border-radius:8px;padding:10px;resize:none;white-space:pre;"></textarea>' +
+        '<div style="padding:14px 18px;display:flex;gap:10px;">' +
+        '<button id="copy-positions-btn" style="flex:1;background:#4CAF50;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">📋 Copy to Clipboard</button>' +
+        '<button id="download-positions-btn" style="background:#607D8B;color:#fff;border:none;padding:12px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;">⬇️ Download</button>' +
+        '</div></div>';
+      document.body.appendChild(overlay);
+      document.getElementById('positions-textarea').value = jsonText;
+      document.getElementById('close-positions-overlay').addEventListener('click', function() { overlay.remove(); });
+      overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+      document.getElementById('copy-positions-btn').addEventListener('click', function() {
+        const ta = document.getElementById('positions-textarea');
+        ta.select(); ta.setSelectionRange(0, 999999);
+        const done = function() { const b = document.getElementById('copy-positions-btn'); if (b) { b.textContent = '✅ Copied! Now paste it to Claude'; setTimeout(function(){ b.textContent = '📋 Copy to Clipboard'; }, 2500); } };
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(jsonText).then(done).catch(function(){ try { document.execCommand('copy'); } catch(_) {} done(); }); }
+        else { try { document.execCommand('copy'); } catch(_) {} done(); }
       });
-      
-      const blob = new Blob([positionsText], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'zone-positions.txt';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      console.log('Positions also saved to zone-positions.txt file');
+      document.getElementById('download-positions-btn').addEventListener('click', function() {
+        const blob = new Blob([jsonText], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'howard-zone-positions.json';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      });
+      console.log('Captured positions:', jsonText);
     });
     
     // Zone movement controls - Carefully implemented
