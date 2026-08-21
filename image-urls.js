@@ -23,6 +23,11 @@ export const IMAGE_URLS = {
       current: []
     }
   },
+  'rose-valley': {
+    'property': {
+      current: []
+    }
+  },
   'black-mountain-ranch': {
     'property': {
       current: [

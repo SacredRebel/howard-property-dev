@@ -1,6 +1,6 @@
 # 🗺️ Ojai Valley Properties — Interactive Development Map
 
-**Multi-property platform** — one interactive map, multiple properties in the Ojai Valley: the **Howard Property** (1320 Baldwin Rd), the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), **Keri's Property** (14209 De La Garrigue Rd), **Cher's Property** (10622 Encino Dr, Oak View), and **Black Mountain Ranch** (8434 Ojai Santa Paula Rd — ~3,600 acres, 63 tax parcels).
+**Multi-property platform** — one interactive map, multiple properties in the Ojai Valley: the **Howard Property** (1320 Baldwin Rd), the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), **Keri's Property** (14209 De La Garrigue Rd), **Cher's Property** (10622 Encino Dr, Oak View), **Black Mountain Ranch** (8434 Ojai Santa Paula Rd — the 63-parcel Lemuria Headquarters), and the **Rose Valley Property** (7343 Rose Valley Rd — a 40-acre for-sale inholding surrounded by Los Padres National Forest).
 
 ## How it works
 
@@ -15,6 +15,7 @@ The map opens on an **overview** showing every property with its glowing rainbow
 | 🌸 Keri's Property | 3 places | ~34 acres | Starting points |
 | 🌹 Cher's Property | 2 places | 2 acres | Starting points |
 | ⛰️ Black Mountain Ranch | 63 real parcels · 6 vision zones | 3,380 county acres | Lemuria Headquarters — vision layer live |
+| 🌄 Rose Valley | Boundary + panel | 40 acres | For sale — $810K acquisition target |
 
 Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://github.com/SacredRebel/EcoVillage-map) via raw.githubusercontent.com — no image copies in this repo.
 
@@ -88,8 +89,9 @@ Drop images into `images/<property>/<project>/current/` (photos of how it looks 
 5. ✅ Black Mountain Ranch — all 63 county parcels drawn as individual lot territories (63rd confirmed by owner)
 6. ✅ 63rd parcel (APN 035-0-020-010, 610 ac North Ridge) confirmed and on the map
 7. ✅ V0.9 — Current ⇄ Vision toggle · Lemuria HQ vision layer (6 zones) · first vision galleries
-8. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
-9. ⬜ Custom UI theme · hide admin tools for public release
+8. ✅ V0.10 — Rose Valley Property added (for-sale acquisition target, real county boundary)
+9. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
+10. ⬜ Custom UI theme · hide admin tools for public release
 
 ---
 

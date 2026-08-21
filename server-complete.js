@@ -35,8 +35,9 @@ import { SULPHUR_PROPERTY } from './properties/sulphur-mountain.js';
 import { KERIS_PROPERTY } from './properties/keris-property.js';
 import { CHERS_PROPERTY } from './properties/chers-property.js';
 import { BMR_PROPERTY } from './properties/black-mountain-ranch.js';
+import { ROSE_VALLEY_PROPERTY } from './properties/rose-valley.js';
 
-const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY, KERIS_PROPERTY, CHERS_PROPERTY, BMR_PROPERTY];
+const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY, KERIS_PROPERTY, CHERS_PROPERTY, BMR_PROPERTY, ROSE_VALLEY_PROPERTY];
 PROPERTIES.forEach(p => p.zones.forEach(z => { z.propertyId = p.id; }));
 
 // Aggregates used by the API endpoints

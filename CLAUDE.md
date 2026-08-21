@@ -4,7 +4,7 @@ Guidance for AI coding assistants working in this repository.
 
 ## Overview
 
-**Multi-property interactive map** (V0.9): one Leaflet app serving several properties, each with its own boundary, project zones, panels, and photo galleries. Current properties: `howard` (1320 Baldwin Rd, Ojai — 13 proposal zones), `sulphur-mountain` (Eco-Village — 18 zones, V1 data from `SacredRebel/EcoVillage-map`), `keris-property` (3 zones), `chers-property` (2 zones), and `black-mountain-ranch` (63 real county parcels drawn as lot territories + 6 Lemuria vision zones).
+**Multi-property interactive map** (V0.9): one Leaflet app serving several properties, each with its own boundary, project zones, panels, and photo galleries. Current properties: `howard` (1320 Baldwin Rd, Ojai — 13 proposal zones), `sulphur-mountain` (Eco-Village — 18 zones, V1 data from `SacredRebel/EcoVillage-map`), `keris-property` (3 zones), `chers-property` (2 zones), `black-mountain-ranch` (63 real county parcels drawn as lot territories + 6 Lemuria vision zones), and `rose-valley` (40-acre for-sale acquisition target, boundary + panel only).
 
 ## Architecture
 
