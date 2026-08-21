@@ -25,472 +25,19 @@ if (process.env.VERCEL !== '1') {
   console.log('🚀 Starting Howard Property Interactive Map...');
 }
 
-// Howard Property — 13 PROPOSED projects (proposal draft for John Ellis).
-// Positions are initial estimates placed inside the county parcel boundary.
-// Reposition flow: ⚙️ admin menu (top-right) → select zone → unlock → drag →
-// lock → "Capture All Positions" → copy the JSON → send it to Claude to make
-// the new positions permanent.
-const PROJECT_ZONES = [
-  {
-    id: "main-house",
-    name: "Main House",
-    emoji: "🏠",
-    position: [34.42610, -119.31945],
-    type: "residential",
-    budget: "Existing structure",
-    timeline: "Already established",
-    monthlyRevenue: "—",
-    roi: "Heart of the property",
-    description: "The existing main residence — home base of the property and the natural center that all proposed projects are designed around. Every idea on this map is placed to respect the privacy, views, and daily life of the main house.",
-    features: [
-      "Existing primary residence and operations home base",
-      "All proposed projects positioned around it, never on top of it",
-      "Privacy and quiet protected by design",
-      "Utilities hub — existing water and power connections radiate from here"
-    ]
-  },
-  {
-    id: "hugelkultur-project",
-    name: "Hugelkultur Project",
-    emoji: "⛰️",
-    position: [34.42480, -119.32030],
-    type: "landscape",
-    budget: "Ongoing — materials already on the land",
-    timeline: "Active & ongoing",
-    monthlyRevenue: "Long-term soil & land value",
-    roi: "Flatter, richer, water-holding land",
-    description: "The property's ongoing hugelkultur program (from the German 'Hügel' — hill): large raised beds built over buried logs, branches, and organic material. Bed by bed, the process is gradually terracing and flattening the hillsides while turning them into deep, self-fertilizing, water-holding growing ground.",
-    features: [
-      "Hugelkultur beds built from on-site wood and organic material",
-      "Progressively flattens and terraces the hillsides over time",
-      "Buried wood acts as a sponge — beds hold water through dry months",
-      "Decomposing wood feeds the soil for 10-20 years without fertilizer",
-      "Perfect planting ground for fruit trees, perennials, and vegetables",
-      "Ties directly into the nursery and compost operations",
-      "Part of the property's ongoing maintenance and improvement program"
-    ],
-    regenerativeFeatures: [
-      "Sequesters carbon in the soil instead of burning or hauling wood",
-      "Eliminates irrigation dependency as beds mature",
-      "Builds topsoil on eroding hillsides",
-      "Creates microclimates and habitat"
-    ]
-  },
-  {
-    id: "community-hub",
-    name: "Community Hub",
-    emoji: "🛖",
-    position: [34.42330, -119.31870],
-    type: "community",
-    budget: "Self-funded by Paul — needs only a spot + water & electric access",
-    timeline: "Can start immediately",
-    monthlyRevenue: "Full-time hands on the land",
-    roi: "Every structure built stays with the property",
-    description: "Paul's live-in base on the land, designed to grow into the property's Community Hub. It starts with just a raw, flat space in nature with water and electricity within reach — and grows into a beautiful, hidden gathering place built from natural materials, tucked into the hillside. Whatever gets built stays with the property afterward and keeps adding value as a shared space for everyone on the land.",
-    optionsTitle: "🏗️ Structure Options (flexible — whatever works best)",
-    options: [
-      {
-        name: "Hobbit-Style Earth Home",
-        details: "Built into the hillside with cob and natural materials — hidden, sculptural, and beautiful. A one-of-a-kind structure that becomes a permanent feature of the property."
-      },
-      {
-        name: "Cob Structure in the Hills",
-        details: "Hand-built cob dwelling placed discreetly in the landscape. Creative, fireproof-friendly natural building that can grow organically over time."
-      },
-      {
-        name: "Garden Shed Conversion",
-        details: "Paul already owns a basic 12×12 metal garden shed that can be brought in and transformed into a clean, tidy temporary living setup while the permanent structure takes shape."
-      },
-      {
-        name: "Trailer On-Site",
-        details: "If allowed, a trailer can be placed as the simplest immediate living solution — zero construction, fully reversible, gone whenever it needs to be."
-      },
-      {
-        name: "Support Structures",
-        details: "Compost toilet, outdoor shower, and small amenity structures added as needed — all built in the same hidden, natural, leave-it-better style."
-      }
-    ],
-    features: [
-      "Needs only: a raw flat spot + access to water and electricity",
-      "Hidden placement — invisible from the road and the main house",
-      "Built regeneratively with natural and salvaged materials",
-      "Everything constructed stays with the property when Paul moves on",
-      "Paul on-site = daily hands for every other project on this map"
-    ]
-  },
-  {
-    id: "community-workshop",
-    name: "Community Workshop",
-    emoji: "🛠️",
-    position: [34.42520, -119.31940],
-    type: "creative",
-    budget: "Starts as a shade structure — grows with the work",
-    timeline: "Phase 1 — early priority",
-    monthlyRevenue: "Products, collaborations & property value",
-    roi: "The engine room for every other project",
-    description: "The property's main workshop — it can begin as nothing more than a beautifully built shade structure in nature, housing an organized tool and materials setup. From there it becomes the engine room of the whole property: processing lumber and building supplies, organizing materials, and producing everything the other projects need.",
-    features: [
-      "Main tool workshop for the entire property",
-      "Can start as a nice open-air shade structure — walls come later",
-      "Organized storage for tools, materials, and building supplies",
-      "Processing station for lumber, cob, and salvaged materials",
-      "Shared/community workshop model with skilled collaborators",
-      "Andrew (talented woodworker) and Logan ready to plug in",
-      "Builds and maintains everything else on this map"
-    ],
-    revenueStreams: [
-      "Custom woodwork and artisan products made and sold from the shop",
-      "Collaborative builds with invited makers — shared revenue",
-      "Every hour in the shop beautifies the property and raises its value"
-    ]
-  },
-  {
-    id: "property-nursery",
-    name: "Nursery",
-    emoji: "🌱",
-    position: [34.42665, -119.31820],
-    type: "agriculture",
-    budget: "Lean start — beds, tables, irrigation, starter stock",
-    timeline: "Phase 1 — front-of-property priority",
-    monthlyRevenue: "Plant & tree sales + tree services",
-    roi: "Regreens the property AND pays for itself",
-    description: "A working nursery at the front of the property, close to the Baldwin Road entrance — growing fruit trees, plants, and vegetable starts in a year-round propagation cycle. First mission: make the property itself dramatically more vegetated, fruitful, and regenerative. Second mission: an official nursery the public can visit to buy trees and plants — with John's respected local tree services folded right in.",
-    features: [
-      "Located at the front entrance for easy public access",
-      "Year-round propagation cycle — seeds, sprouts, and saplings always going",
-      "Fruit trees, natives, herbs, and vegetable starts",
-      "Supplies the property first: food forest and hugel beds get planted free",
-      "Official retail nursery — neighbors come and buy",
-      "Natural home base for John's tree services and local reputation",
-      "Expands over time into deeper products and services"
-    ],
-    revenueStreams: [
-      "Fruit tree and plant sales to the local community",
-      "Tree services booked through the nursery front",
-      "Vegetable starts and seasonal plant sales",
-      "Future: grafting workshops, orchard consulting, delivery & planting services"
-    ],
-    developmentTimeline: [
-      {
-        phase: "Phase 1 — Setup",
-        deliverables: "Build propagation beds, potting tables, shade cloth, and simple irrigation near the entrance. Start the first propagation cycles with fruit trees and natives. Begin planting out the property.",
-        status: "Foundation"
-      },
-      {
-        phase: "Phase 2 — Open to the Public",
-        deliverables: "Signage at Baldwin Road, organized retail rows, regular open hours. Fold in tree services scheduling. Add compost and growing supplies from the on-site compost operation.",
-        status: "Operating nursery"
-      }
-    ]
-  },
-  {
-    id: "nature-gym",
-    name: "Outdoor Nature Gym",
-    emoji: "🏋️",
-    position: [34.42655, -119.31905],
-    type: "wellness",
-    budget: "Self-made equipment + smart secondhand finds",
-    timeline: "Phase 1-2",
-    monthlyRevenue: "Membership potential",
-    roi: "Movement space for the whole community",
-    description: "A beautifully designed outdoor gym set under the trees — real training equipment, but nature-styled: solid self-built stations combined with quality secondhand finds, laid out with enough space for a real workout community. Ping-pong table, possibly a small basketball court, climbing and play elements for kids — an all-ages movement space in nature, close to the street so members come and go easily.",
-    features: [
-      "Set under mature trees — shaded, beautiful, breathable",
-      "Real equipment: self-built rigs + curated secondhand finds",
-      "Space for group workouts and regular training",
-      "Ping-pong table (+ optional half-court basketball)",
-      "Climbing features and play elements for kids",
-      "All ages — kids, young adults, parents together",
-      "Near the street for simple member access"
-    ],
-    revenueStreams: [
-      "Monthly memberships — individuals and families",
-      "Day passes for visitors",
-      "Future: outdoor training sessions and kids' movement classes"
-    ]
-  },
-  {
-    id: "sacred-spaces",
-    name: "Ceremony & Sacred Spaces",
-    emoji: "🔥",
-    position: [34.42280, -119.31950],
-    type: "ceremonial",
-    budget: "Built by hand, space by space",
-    timeline: "Grows with the property",
-    monthlyRevenue: "Gatherings & community events",
-    roi: "Draws conscious community to the land",
-    description: "A collection of hand-built sacred and ceremonial spaces placed wherever the land feels strongest — a kiva, yoga decks, meditation spots, and ceremonial fire circles. Spaces for ceremony, gatherings, and community events that give people a reason to come to the land and a reason to care for it.",
-    features: [
-      "Kiva — earthen, in-ground ceremonial space",
-      "Yoga and meditation decks set in nature",
-      "Ceremonial fire circles for gatherings",
-      "Placed at the property's most powerful quiet spots",
-      "Built naturally: earth, stone, and local wood",
-      "Hosts ceremonies, gatherings, and community events"
-    ]
-  },
-  {
-    id: "mushroom-containers",
-    name: "Mushroom Growing Containers",
-    emoji: "🍄",
-    position: [34.42630, -119.31860],
-    type: "agriculture",
-    budget: "Investment project — can phase in later",
-    timeline: "Phase 2+ (after nursery is running)",
-    monthlyRevenue: "Restaurant + local sales potential",
-    roi: "High-margin crop in a tiny footprint",
-    description: "Shipping containers or trailers converted into controlled growing environments for organic culinary mushrooms — oyster, shiitake, lion's mane. Feeds the community first and supplies local restaurants and neighbors who want genuinely local, organic mushrooms. A real investment project, but one that can wait — and it slots naturally next to the nursery at the front.",
-    features: [
-      "Converted shipping containers or trailers — compact and contained",
-      "Organic culinary varieties: oyster, shiitake, lion's mane",
-      "Climate-controlled year-round production",
-      "Pairs with the nursery and compost operation at the front",
-      "Spent substrate feeds the compost and hugel beds",
-      "Can start with a single container and scale"
-    ],
-    revenueStreams: [
-      "Local restaurant supply — chefs love verified-local organic mushrooms",
-      "Direct sales to neighbors and community",
-      "Future: dried mushrooms, tinctures, and grow kits via the nursery"
-    ],
-    developmentTimeline: [
-      {
-        phase: "Phase 1 — First Container",
-        deliverables: "Source and convert one container or trailer: insulation, racks, humidity and airflow. First flushes for the community and test sales.",
-        status: "When the investment makes sense"
-      },
-      {
-        phase: "Phase 2 — Scale",
-        deliverables: "Add capacity, establish standing restaurant accounts, integrate sales through the nursery front.",
-        status: "Growth"
-      }
-    ]
-  },
-  {
-    id: "beekeeping",
-    name: "Beekeeping & Honey Production",
-    emoji: "🐝",
-    position: [34.42450, -119.31830],
-    type: "beekeeping",
-    budget: "$5,000 - $10,000",
-    timeline: "Phase 1 (0-3 months)",
-    monthlyRevenue: "$500+",
-    roi: "Starting phase",
-    description: "Collaborative beekeeping initiative with local beekeepers for honey production, bee products, and pollination services through partnership model.",
-    features: [
-      "Partnership with local beekeepers",
-      "10-20 hives with scaling potential",
-      "Dedicated processing shed and secure fencing",
-      "Honey extraction and processing facility",
-      "Value-added products: wax, skincare, soaps, tinctures",
-      "Online and farmers market sales",
-      "Pollination services for regenerative agriculture",
-      "Educational beekeeping experiences"
-    ],
-    revenueStreams: [
-      "Honey and bee products sharing: $800/month",
-      "Value-added wax products: $200/month",
-      "Revenue starts within 3 months"
-    ]
-  },
-  {
-    id: "pond-swimming-hole",
-    name: "Pond & Swimming Hole",
-    emoji: "🐟",
-    position: [34.42380, -119.31950],
-    type: "water",
-    budget: "One-time earthworks + ecosystem establishment",
-    timeline: "One-time build, then self-sustaining",
-    monthlyRevenue: "Protein + lifestyle + property value",
-    roi: "Catch a fish, have a meal — forever",
-    description: "A dug (or dammed, depending on the landscape) natural pond serving double duty: a beautiful swimming hole and a working fish pond. One-time setup of a healthy, self-maintaining ecosystem — the right water-cleaning plants and the right fish varieties keep the water clear and the system balanced. Grow-your-own protein and a massive quality-of-life upgrade for everyone on the land.",
-    features: [
-      "Natural swimming pond — no chlorine, plants do the filtering",
-      "Fish varieties chosen for a balanced, self-sustaining ecosystem",
-      "Grow-your-own protein: catch a fish, have a meal",
-      "Aquatic plants clean and maintain the water year-round",
-      "Wildlife habitat and on-property water storage",
-      "Placement follows the landscape — wherever water wants to sit",
-      "Major property value and community lifestyle addition"
-    ]
-  },
-  {
-    id: "growing-dome",
-    name: "Growing Dome Greenhouse",
-    emoji: "🌴",
-    position: [34.42595, -119.31880],
-    type: "agriculture",
-    budget: "Scales from hoop house to full dome",
-    timeline: "Hand in hand with the nursery",
-    monthlyRevenue: "Year-round growing power",
-    roi: "Tropical fruit in Ojai, all year",
-    description: "A growing dome or greenhouse working hand in hand with the nursery — sprouting and growing straight through winter, and bringing tropical fruit trees and plants into the property's ecosystem. Tropical fruits, veggies, and starts growing all year long, feeding both the nursery cycle and the property's food supply.",
-    features: [
-      "Year-round sprouting and propagation for the nursery cycle",
-      "Winter growing — no dead season",
-      "Tropical fruit trees and plants brought into the ecosystem",
-      "Climate buffer for sensitive starts and mother plants",
-      "Can start as a simple hoop house and grow into a full dome",
-      "Positioned to share water and workflow with the nursery"
-    ]
-  },
-  {
-    id: "livestock",
-    name: "Livestock & Animals",
-    emoji: "🐐",
-    position: [34.42430, -119.32090],
-    type: "agriculture",
-    budget: "Infrastructure first — fencing, shelter, water",
-    timeline: "Rebuild & expand at John's pace",
-    monthlyRevenue: "Land management + produce",
-    roi: "The hillside maintenance crew that feeds you",
-    description: "John has had goats on the land before — this project rebuilds and upgrades the livestock infrastructure properly (fencing, shelters, water lines) and helps bring more animals back to the property. Goats manage brush on the hillsides, chickens turn scraps into eggs, and every animal feeds the compost operation. Scaled entirely to what John wants.",
-    features: [
-      "Goats — natural brush and fire-fuel management on the hillsides",
-      "Chickens for eggs and pest control (optional expansion)",
-      "Proper fencing, shelters, and water lines built right once",
-      "Rotational grazing to regenerate the land",
-      "Manure feeds the compost operation directly",
-      "Fresh produce for the property — eggs, milk, more as desired",
-      "Sized and scaled entirely to John's comfort"
-    ]
-  },
-  {
-    id: "compost-operation",
-    name: "Compost Operation",
-    emoji: "♻️",
-    position: [34.42600, -119.31825],
-    type: "agriculture",
-    budget: "Bins, bays & a good pitchfork",
-    timeline: "Phase 1 — starts with the nursery",
-    monthlyRevenue: "Free fertility + bagged compost sales",
-    roi: "Turns waste streams into soil",
-    description: "A proper organic compost operation right next to the nursery — turning livestock manure, kitchen waste, and organic material from around the property into rich compost. Can also take in manure delivered by (or picked up from) neighboring farms and stables, turning the whole neighborhood's 'waste problem' into this property's fertility engine.",
-    features: [
-      "Sited next to the nursery — compost goes straight to the plants",
-      "Feeds on livestock manure, kitchen waste, and property trimmings",
-      "Manure pickup/drop-off from local neighbors, farms, and stables",
-      "Hot composting bays plus worm composting for fine material",
-      "Supplies the nursery, hugel beds, orchard, and gardens for free",
-      "Neighbors' waste stream becomes the property's soil bank"
-    ],
-    revenueStreams: [
-      "Bagged organic compost sold at the nursery stand",
-      "Worm castings — premium product for local gardeners",
-      "Possible pickup service fee from stables needing manure removal"
-    ]
-  }
-];
+// ── Multi-property registry ─────────────────────────────────────────────────
+// Each property lives in its own module under properties/. To add a new
+// property: create a module with the same shape (id, name, center, zoom,
+// panel, cta, footer info, boundary segments, zones) and add it here.
+import { HOWARD_PROPERTY } from './properties/howard.js';
+import { SULPHUR_PROPERTY } from './properties/sulphur-mountain.js';
 
-// REAL Howard Property Boundary — APN 032-0-010-090 (1320 Baldwin Rd, Ojai)
-// Geometry sourced from Ventura County GIS parcel service (maps.ventura.org,
-// SDs/Parcels FeatureServer, WGS84). 13 vertices, ~44.06 acres, ~5,870 ft perimeter.
-const PERMANENT_PROPERTY_LINES = [
-  {
-    id: 'boundary_line_1',
-    coordinates: [[34.427313, -119.319499], [34.42734, -119.319654], [34.427361, -119.31981], [34.427318, -119.319841]],
-    thickness: 10,
-    gradientColors: ['#9C27B0', '#673AB7', '#3F51B5', '#2196F3'],
-    glowColor: '#9C27B0',
-    description: 'North Point at Baldwin Road',
-    name: 'North Point (Baldwin Rd Frontage)',
-    length: '114 ft',
-    features: ['Baldwin Road frontage', 'Property entrance area', 'Highway 150 corridor'],
-    permanent: true,
-    section: 'north-point'
-  },
-  {
-    id: 'boundary_line_2',
-    coordinates: [[34.427318, -119.319841], [34.424242, -119.322091]],
-    thickness: 10,
-    gradientColors: ['#2196F3', '#03A9F4', '#00BCD4', '#26C6DA'],
-    glowColor: '#00BCD4',
-    description: 'Northwest Boundary - Main Section',
-    name: 'Northwest Property Line',
-    length: '1,312 ft',
-    features: ['Long western descent', 'Oak woodland edge', 'Adjacent to Taft Gardens area'],
-    permanent: true,
-    section: 'northwest'
-  },
-  {
-    id: 'boundary_line_3',
-    coordinates: [[34.424242, -119.322091], [34.423299, -119.321376], [34.421954, -119.320357]],
-    thickness: 10,
-    gradientColors: ['#00BCD4', '#4CAF50', '#66BB6A', '#81C784'],
-    glowColor: '#4CAF50',
-    description: 'Southwest Boundary',
-    name: 'Southwest Property Line',
-    length: '985 ft',
-    features: ['West corner landmark', 'Hillside terrain', 'Orchard proximity'],
-    permanent: true,
-    section: 'southwest'
-  },
-  {
-    id: 'boundary_line_4',
-    coordinates: [[34.421954, -119.320357], [34.421004, -119.319137]],
-    thickness: 10,
-    gradientColors: ['#4CAF50', '#8BC34A', '#CDDC39', '#D4E157'],
-    glowColor: '#8BC34A',
-    description: 'South Boundary - West Section',
-    name: 'South Property Line (West)',
-    length: '505 ft',
-    features: ['Approach to southern tip', 'Native chaparral'],
-    permanent: true,
-    section: 'south-west'
-  },
-  {
-    id: 'boundary_line_5',
-    coordinates: [[34.421004, -119.319137], [34.421583, -119.318752], [34.423628, -119.317391]],
-    thickness: 10,
-    gradientColors: ['#CDDC39', '#FFEB3B', '#FDD835', '#FBC02D'],
-    glowColor: '#FDD835',
-    description: 'Southeast Boundary',
-    name: 'Southeast Property Line',
-    length: '1,093 ft',
-    features: ['Southern tip landmark', 'Rising eastern slope', 'Valley views'],
-    permanent: true,
-    section: 'southeast'
-  },
-  {
-    id: 'boundary_line_6',
-    coordinates: [[34.423628, -119.317391], [34.42511, -119.318304]],
-    thickness: 10,
-    gradientColors: ['#FFC107', '#FFB300', '#FFA000', '#FF8F00'],
-    glowColor: '#FFC107',
-    description: 'East Boundary',
-    name: 'East Property Line',
-    length: '607 ft',
-    features: ['Eastern ridge', 'Orchard rows', 'Morning sun exposure'],
-    permanent: true,
-    section: 'east'
-  },
-  {
-    id: 'boundary_line_7',
-    coordinates: [[34.42511, -119.318304], [34.426918, -119.317682]],
-    thickness: 10,
-    gradientColors: ['#FF8F00', '#FF6F00', '#E65100', '#FF5722'],
-    glowColor: '#FF6F00',
-    description: 'Northeast Boundary',
-    name: 'Northeast Property Line',
-    length: '686 ft',
-    features: ['Northeast slope', 'Oak groves', 'Neighboring estates'],
-    permanent: true,
-    section: 'northeast'
-  },
-  {
-    id: 'boundary_line_8',
-    coordinates: [[34.426918, -119.317682], [34.42715, -119.318667]],
-    thickness: 10,
-    gradientColors: ['#FF5722', '#E91E63', '#9C27B0', '#9C27B0'],
-    glowColor: '#E91E63',
-    description: 'North Boundary - East Section (closes at Baldwin Rd point)',
-    name: 'North Property Line (East)',
-    length: '309 ft',
-    features: ['Return to Baldwin Road', 'Upper plateau', 'Gate proximity'],
-    permanent: true,
-    section: 'north-east'
-  }
-];
+const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY];
+PROPERTIES.forEach(p => p.zones.forEach(z => { z.propertyId = p.id; }));
+
+// Aggregates used by the API endpoints
+const PROJECT_ZONES = PROPERTIES.flatMap(p => p.zones);
+const PERMANENT_PROPERTY_LINES = PROPERTIES.flatMap(p => p.boundary);
 
 // Updated Zone color mapping with unique representative colors
 const zoneColors = {
@@ -512,7 +59,7 @@ app.get('/', (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Howard Property — 1320 Baldwin Rd Interactive Map</title>
+  <title>Ojai Valley Properties — Interactive Development Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -2934,6 +2481,26 @@ app.get('/', (req, res) => {
       font-size: 12px;
       line-height: 1.4;
     }
+    /* ── Multi-property overview mode ── */
+    .overview-mode .zone-marker { display: none !important; }
+    .property-label-marker { display: none; }
+    .overview-mode .property-label-marker { display: block !important; }
+    .property-label-chip {
+      transform: translate(-50%, -50%);
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 9px 16px;
+      border-radius: 22px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      white-space: nowrap;
+      border: 2px solid rgba(255,255,255,0.55);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .property-label-chip:hover { transform: translate(-50%, -50%) scale(1.06); }
   </style>
 </head>
 <body>
@@ -3064,7 +2631,7 @@ app.get('/', (req, res) => {
   
   <!-- Footer -->
   <div class="map-footer">
-    © 2026 Howard Property | 1320 Baldwin Rd, Ojai | 44 Acres | 13 Proposed Projects | Interactive Proposal Map
+    © 2026 | Howard Property + Sulphur Mountain Eco-Village | 31 Projects Across 2 Properties | Interactive Map
   </div>
   
   <script>
@@ -3072,8 +2639,8 @@ app.get('/', (req, res) => {
     
     // Initialize map centered on Sulphur Mountain property
     const map = L.map('map', {
-      center: [34.424346, -119.319557],
-      zoom: 16.5,
+      center: [34.4287, -119.2375],
+      zoom: 13,
       zoomControl: true,
       scrollWheelZoom: true,
       doubleClickZoom: true,
@@ -3234,8 +2801,7 @@ app.get('/', (req, res) => {
     });
     
     // Add recenter control (jump back to property)
-    const propertyCenter = [34.424346, -119.319557];
-    const propertyZoom = 16.5;
+    // Recenter returns to the all-properties overview (bounds set once boundaries build)
     const recenterControl = L.control({ position: 'bottomright' });
     recenterControl.onAdd = function(m) {
       const div = L.DomUtil.create('div', 'leaflet-bar recenter-control');
@@ -3253,7 +2819,7 @@ app.get('/', (req, res) => {
       L.DomEvent.disableClickPropagation(div);
       L.DomEvent.on(btn, 'click', function(e) {
         L.DomEvent.stopPropagation(e);
-        map.flyTo(propertyCenter, propertyZoom, { animate: true, duration: 0.75 });
+        if (window.allPropertiesBounds) map.fitBounds(window.allPropertiesBounds, { padding: [40, 40] });
       });
       return div;
     };
@@ -3261,127 +2827,105 @@ app.get('/', (req, res) => {
 
     console.log('🛰️ Multi-layer satellite imagery system initialized');
     
-    // Load project zones data
-    const zones = ZONES_DATA_PLACEHOLDER;
-    const permanentLines = PERMANENT_LINES_PLACEHOLDER;
-    
-    console.log('📊 Loaded', zones.length, 'project zones and', permanentLines.length, 'property lines');
-    
-    // Create ONE continuous boundary path by ordering all coordinates in sequence
-    // This ensures smooth color flow with no visible endpoints
-    const boundaryCoordinates = [];
-    
-    // Add all coordinates in order to form complete perimeter
-    permanentLines.forEach(function(lineData) {
-      // Add all points except last (to avoid duplication with next segment's first point)
-      for (var i = 0; i < lineData.coordinates.length - 1; i++) {
-        boundaryCoordinates.push(lineData.coordinates[i]);
-      }
+    // Load multi-property data
+    const properties = PROPERTIES_PLACEHOLDER;
+    const propertiesById = {};
+    properties.forEach(function(p) {
+      propertiesById[p.id] = p;
+      p.zones.forEach(function(z) { z.propertyId = p.id; });
     });
-    
-    // Add the very last coordinate to close the loop
-    if (permanentLines.length > 0) {
-      var lastLine = permanentLines[permanentLines.length - 1];
-      var lastCoord = lastLine.coordinates[lastLine.coordinates.length - 1];
-      boundaryCoordinates.push(lastCoord);
-      // Connect back to start to close the boundary
-      boundaryCoordinates.push(boundaryCoordinates[0]);
-    }
-    
+    const zones = [].concat.apply([], properties.map(function(p) { return p.zones; }));
+
+    console.log('📊 Loaded', properties.length, 'properties |', zones.length, 'total zones');
+
     var propertyLines = [];
-    
-    // Create base golden glow line
-    var blurLine = L.polyline(boundaryCoordinates, {
-      color: '#FFD700',
-      weight: 10,
-      opacity: 0.52,
-      className: 'property-line-blur',
-      interactive: false,
-      lineCap: 'round',
-      lineJoin: 'round',
-      smoothFactor: 1.5
-    }).addTo(map);
-    
-    // Create ONE single continuous line (no segments, no endpoints!)
-    var mainLine = L.polyline(boundaryCoordinates, {
-      color: '#7C3AED',
-      weight: 8,
-      opacity: 0.88,
-      className: 'property-line-magical property-line-gradient',
-      interactive: true,
-      bubblingMouseEvents: true,
-      lineCap: 'round',
-      lineJoin: 'round',
-      smoothFactor: 1.5
-    }).addTo(map);
-    
-    mainLine._locked = true;
-    mainLine._permanent = true;
-    propertyLines.push(mainLine);
-    
-    mainLine.on('click', function(e) {
-      if (window.ignoreMapClicksUntil && Date.now() < window.ignoreMapClicksUntil) { L.DomEvent.stopPropagation(e); return; }
-      // Close zone panel if open to avoid overlap
-      const side = document.getElementById('side-panel');
-      if (side && side.classList.contains('open')) { side.classList.remove('open'); }
-      // If already open, do nothing
-      const pp = document.getElementById('property-panel');
-      if (pp && pp.classList.contains('open')) { L.DomEvent.stopPropagation(e); return; }
-      openPropertyPanel();
-      if (mainLine._path) { mainLine._path.classList.add('active'); }
-      L.DomEvent.stopPropagation(e);
+    var allBounds = null;
+
+    properties.forEach(function(prop) {
+      // Stitch this property's boundary segments into one closed loop
+      var boundaryCoordinates = [];
+      prop.boundary.forEach(function(lineData) {
+        for (var i = 0; i < lineData.coordinates.length - 1; i++) {
+          boundaryCoordinates.push(lineData.coordinates[i]);
+        }
+      });
+      if (prop.boundary.length > 0) {
+        var lastLine = prop.boundary[prop.boundary.length - 1];
+        boundaryCoordinates.push(lastLine.coordinates[lastLine.coordinates.length - 1]);
+        boundaryCoordinates.push(boundaryCoordinates[0]);
+      }
+
+      var blurLine = L.polyline(boundaryCoordinates, {
+        color: '#FFD700', weight: 10, opacity: 0.52,
+        className: 'property-line-blur', interactive: false,
+        lineCap: 'round', lineJoin: 'round', smoothFactor: 1.5
+      }).addTo(map);
+
+      var mainLine = L.polyline(boundaryCoordinates, {
+        color: '#7C3AED', weight: 8, opacity: 0.88,
+        className: 'property-line-magical property-line-gradient',
+        interactive: true, bubblingMouseEvents: true,
+        lineCap: 'round', lineJoin: 'round', smoothFactor: 1.5
+      }).addTo(map);
+      mainLine._locked = true; mainLine._permanent = true;
+      propertyLines.push(mainLine);
+
+      var openHandler = function(e) {
+        if (window.ignoreMapClicksUntil && Date.now() < window.ignoreMapClicksUntil) { L.DomEvent.stopPropagation(e); return; }
+        var side = document.getElementById('side-panel');
+        if (side && side.classList.contains('open')) { side.classList.remove('open'); }
+        var pp = document.getElementById('property-panel');
+        if (pp && pp.classList.contains('open') && window.currentPropertyId === prop.id) { L.DomEvent.stopPropagation(e); return; }
+        openPropertyPanel(prop.id);
+        if (mainLine._path) { mainLine._path.classList.add('active'); }
+        L.DomEvent.stopPropagation(e);
+      };
+      mainLine.on('click', openHandler);
+
+      var hitLine = L.polyline(boundaryCoordinates, {
+        color: '#000', weight: 30, opacity: 0.0001,
+        className: 'property-line-hit', interactive: true,
+        lineCap: 'round', lineJoin: 'round'
+      }).addTo(map);
+      hitLine.on('click', openHandler);
+
+      var b = mainLine.getBounds();
+      allBounds = allBounds ? allBounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+
+      // Property name chip — visible at overview zoom, click to fly in
+      var labelMarker = L.marker(prop.center, {
+        interactive: true,
+        zIndexOffset: 2000,
+        icon: L.divIcon({
+          className: 'property-label-marker',
+          html: '<div class="property-label-chip">' + prop.labelChip + '</div>',
+          iconSize: null,
+          iconAnchor: [0, 0]
+        })
+      }).addTo(map);
+      labelMarker.on('click', function(e) {
+        L.DomEvent.stopPropagation(e);
+        map.flyTo(prop.center, prop.zoom, { animate: true, duration: 1.0 });
+      });
     });
 
-    // Add a wide, invisible hit area to make tapping the boundary easier on mobile
-    var hitLine = L.polyline(boundaryCoordinates, {
-      color: '#000',
-      weight: 30,
-      opacity: 0.0001,
-      className: 'property-line-hit',
-      interactive: true,
-      lineCap: 'round',
-      lineJoin: 'round'
-    }).addTo(map);
-    hitLine.on('click', function(e) {
-      if (window.ignoreMapClicksUntil && Date.now() < window.ignoreMapClicksUntil) { L.DomEvent.stopPropagation(e); return; }
-      const side = document.getElementById('side-panel');
-      if (side && side.classList.contains('open')) { side.classList.remove('open'); }
-      const pp = document.getElementById('property-panel');
-      if (pp && pp.classList.contains('open')) { L.DomEvent.stopPropagation(e); return; }
-      openPropertyPanel();
-      if (mainLine._path) { mainLine._path.classList.add('active'); }
-      L.DomEvent.stopPropagation(e);
-    });
-    
-    // Apply CSS-based gradient animation
+    // Shared CSS rainbow animation for all boundary lines
     setTimeout(function() {
-      if (mainLine._path) {
-        // Inject CSS animation for smooth color flow
-        var style = document.createElement('style');
-        style.textContent = '@keyframes rainbow-flow {' +
-          '0% { stroke: #6366F1; }' +
-          '20% { stroke: #8B5CF6; }' +
-          '40% { stroke: #EC4899; }' +
-          '60% { stroke: #F59E0B; }' +
-          '80% { stroke: #10B981; }' +
-          '100% { stroke: #6366F1; }' +
-          '}' +
-          '.property-line-gradient {' +
-          'animation: rainbow-flow 10s ease-in-out infinite;' +
-          'stroke-linecap: round;' +
-          'stroke-linejoin: round;' +
-          '}';
-        document.head.appendChild(style);
-        
-        console.log('✨ CSS rainbow animation applied to single continuous line');
-      }
+      var style = document.createElement('style');
+      style.textContent = '@keyframes rainbow-flow {' +
+        '0% { stroke: #6366F1; } 20% { stroke: #8B5CF6; } 40% { stroke: #EC4899; }' +
+        '60% { stroke: #F59E0B; } 80% { stroke: #10B981; } 100% { stroke: #6366F1; }' +
+        '} .property-line-gradient { animation: rainbow-flow 10s ease-in-out infinite; stroke-linecap: round; stroke-linejoin: round; }';
+      document.head.appendChild(style);
     }, 200);
+
+    // Start at the all-properties overview
+    window.allPropertiesBounds = allBounds;
+    if (allBounds) map.fitBounds(allBounds, { padding: [40, 40] });
+
+    console.log('🌈 Rainbow boundaries created for', properties.length, 'properties');
     
-    console.log('🌈 Single continuous rainbow boundary line created');
-    
-    console.log('🌈 Continuous flowing rainbow boundary created');
-    
-    // Zone color mapping
+        // Zone color mapping
     const zoneColorMap = {
       agriculture: '#4CAF50',
       residential: '#2196F3', 
@@ -3436,6 +2980,7 @@ app.get('/', (req, res) => {
       const marker = L.marker(zone.position, {
         draggable: window.editMode || false,
         zoneId: zone.id, // Add zone ID for reset functionality
+        propertyId: zone.propertyId,
         zoneName: zone.name, // Add zone name for capture functionality
         icon: L.divIcon({
           className: 'zone-marker',
@@ -3491,6 +3036,8 @@ app.get('/', (req, res) => {
     // Smooth dynamic marker scaling for visibility and pixel definition
     function updateMarkerScale() {
       const zoom = map.getZoom();
+      const mapEl = document.getElementById('map');
+      if (mapEl) mapEl.classList.toggle('overview-mode', zoom < 15);
       const scaleBase = 1 + (zoom - 17) * 0.08;
       const scale = Math.max(0.9, Math.min(1.9, scaleBase)) * (window.devicePixelRatio >= 2 ? 1.05 : 1);
       const baseFont = 22;
@@ -3627,7 +3174,7 @@ app.get('/', (req, res) => {
       requestAnimationFrame(function() {
         content.innerHTML = generateProjectDetails(zone);
         setupImageGalleryTabs();
-        loadZoneImages(zone.id);
+        loadZoneImages(zone);
         
         // Fix timeline on mobile after content loads
         if (window.innerWidth <= 768 && typeof fixTimelineOnMobile === 'function') {
@@ -3689,109 +3236,37 @@ app.get('/', (req, res) => {
       console.log('❌ Closed side panel');
     });
     
-    // Property Panel Functions - Unified for entire property
-    function openPropertyPanel() {
+    // Property Panel — parameterized per property
+    function openPropertyPanel(propId) {
+      const prop = propertiesById[propId];
+      if (!prop) return;
       const panel = document.getElementById('property-panel');
       const titleEl = document.getElementById('property-title');
       const contentEl = document.getElementById('property-panel-content');
-      // Ensure zone side panel is closed so panels do not overlap
       const sidePanel = document.getElementById('side-panel');
       if (sidePanel && sidePanel.classList.contains('open')) {
         sidePanel.classList.remove('open', 'swiping');
         sidePanel.style.transform = '';
       }
-      
-      // Update title
-      titleEl.textContent = 'Howard Property — 1320 Baldwin Rd';
+      titleEl.textContent = prop.panel.title;
+      window.currentPropertyId = prop.id;
 
-      // Build unified property content HTML with County parcel data
-      const content = '<div class="image-gallery-section" style="margin-bottom: 20px;">' +
-        '<h4 style="margin-bottom: 12px; color: #7C3AED;">📸 Property Gallery</h4>' +
-        '<div class="carousel-container">' +
-          '<div class="carousel-main" id="property-carousel-main">' +
-            '<div class="carousel-loading">Loading images...</div>' +
-          '</div>' +
-          '<div class="carousel-thumbnails" id="property-carousel-thumbnails"></div>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="property-info-section">' +
-        '<h4>🏔️ Property Details</h4>' +
-        '<div class="property-detail-row">' +
-          '<span class="property-detail-label">APN:</span>' +
-          '<span class="property-detail-value">032-0-010-090 (Ventura County)</span>' +
-        '</div>' +
-        '<div class="property-detail-row">' +
-          '<span class="property-detail-label">Location:</span>' +
-          '<span class="property-detail-value">1320 Baldwin Rd, Ojai, CA 93023</span>' +
-        '</div>' +
-        '<div class="property-detail-row">' +
-          '<span class="property-detail-label">Jurisdiction:</span>' +
-          '<span class="property-detail-value">County Unincorporated — Ventura County</span>' +
-        '</div>' +
-        '<div class="property-detail-row">' +
-          '<span class="property-detail-label">Total Acreage:</span>' +
-          '<span class="property-detail-value">~44.1 acres (per County GIS parcel geometry)</span>' +
-        '</div>' +
-        '<div class="property-detail-row">' +
-          '<span class="property-detail-label">Zoning:</span>' +
-          '<span class="property-detail-value">OS-40 ac / SRP / TRU / DKS / HCWC (Open Space, 40-acre min.)</span>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="property-info-section">' +
-        '<h4>✨ Site Overview</h4>' +
-        '<ul class="property-features-list">' +
-          '<li><strong>Frontage:</strong> Baldwin Road (Highway 150 corridor) at the northern point</li>' +
-          '<li><strong>Boundary:</strong> ~5,870 ft perimeter traced from official County GIS parcel lines</li>' +
-          '<li><strong>Terrain:</strong> Oak woodland and hillside with orchard areas and internal ranch trails</li>' +
-          '<li><strong>Setting:</strong> Upper Ojai Valley — near Taft Gardens & Nature Preserve and Baldwin Ranch</li>' +
-        '</ul>' +
-      '</div>' +
-
-      '<div class="property-info-section">' +
-        '<h4>📋 Zoning Overlays</h4>' +
-        '<ul class="property-features-list">' +
-          '<li><strong>Scenic Resource Protection (SRP):</strong> Scenic Resource overlay area</li>' +
-          '<li><strong>Habitat Connectivity (HCWC):</strong> Habitat Connectivity & Wildlife Corridors overlay</li>' +
-          '<li><strong>Ojai Valley Dark Sky (DKS):</strong> Night-sky lighting protection overlay</li>' +
-          '<li><strong>Temporary Rental Units (TRU):</strong> TRU overlay area</li>' +
-        '</ul>' +
-      '</div>' +
-
-      '<div class="property-info-section">' +
-        '<h4>💡 About This Proposal</h4>' +
-        '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">' +
-          '<div style="font-weight: 600; color: #667eea; margin-bottom: 10px; font-size: 14px;">🌱 Proposed Projects</div>' +
-          '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
-            '<p style="margin: 0;">This map shows <strong>13 proposed projects</strong> for the property — tap any icon to explore what it could become. Every position and every idea is flexible: this is a conversation starter, not a final plan. Photo galleries for each project are coming next.</p>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-
-      // Open first for smooth animation, then inject heavy content
       panel.classList.add('open');
       if (typeof lockBodyScroll === 'function') lockBodyScroll();
       requestAnimationFrame(function() {
-        contentEl.innerHTML = content;
-        loadPropertyImages();
-        
-        // CRITICAL: Always scroll property panel to TOP when opening
+        contentEl.innerHTML = prop.panel.html;
+        loadPropertyImages(prop.id);
         requestAnimationFrame(function() {
-          if (panel) {
-            panel.scrollTop = 0;
-          }
-          if (contentEl) {
-            contentEl.scrollTop = 0;
-          }
+          if (panel) panel.scrollTop = 0;
+          if (contentEl) contentEl.scrollTop = 0;
         });
       });
-      
-      console.log('🌈 Opened unified property panel with gallery');
+
+      console.log('🌈 Opened property panel:', prop.name);
     }
     
-    // Load property images from Supabase
-    function loadPropertyImages() {
+        // Load property images from Supabase
+    function loadPropertyImages(propId) {
       console.log('📸 Loading property images from image-urls.js');
       
       // Get reference to main carousel and thumbnails
@@ -3804,7 +3279,7 @@ app.get('/', (req, res) => {
       }
       
       // Use pre-configured property images from IMAGE_URLS
-      fetch('/api/images/property/current')
+      fetch('/api/images/' + propId + '/property/current')
         .then(response => response.json())
         .then(data => {
           if (!data.success || !data.images || data.images.length === 0) {
@@ -4498,7 +3973,8 @@ app.get('/', (req, res) => {
     }
     
     // Load images for a specific zone (preserves gallery state)
-    async function loadZoneImages(zoneId) {
+    async function loadZoneImages(zone) {
+      const zoneId = zone.id;
       console.log('🖼️ loadZoneImages called for zoneId:', zoneId);
       const categories = ['current', 'vision'];
       
@@ -4508,7 +3984,7 @@ app.get('/', (req, res) => {
           if (!container) continue;
           
           // Fetch image URLs from API
-          const apiUrl = '/api/images/' + zoneId + '/' + category;
+          const apiUrl = '/api/images/' + zone.propertyId + '/' + zoneId + '/' + category;
           console.log('📡 Fetching images from:', apiUrl);
           const response = await fetch(apiUrl);
           const data = await response.json();
@@ -5225,6 +4701,7 @@ app.get('/', (req, res) => {
     
     // Generate comprehensive project details HTML
     function generateProjectDetails(zone) {
+      const prop = propertiesById[zone.propertyId] || { cta: {}, footerInfo: [] };
       const zoneColor = zoneColorMap[zone.type] || '#333';
       const lightColor = zoneColor + '15'; // 15% opacity for backgrounds
       const mediumColor = zoneColor + '40'; // 40% opacity for highlights
@@ -5334,7 +4811,7 @@ app.get('/', (req, res) => {
             <h3 style="color: \${zoneColor};">📅 Development Timeline</h3>
             <div style="padding: 20px; background: linear-gradient(135deg, \${lightColor} 0%, \${mediumColor} 100%); border-radius: 12px; border-left: 4px solid \${zoneColor};">
               <span class="timeline-phase">\${zone.timeline}</span>
-              <p style="margin-top: 12px; color: #555; font-size: 14px; line-height: 1.5;">This zone is part of the comprehensive Howard Property development plan, strategically phased for optimal cash flow and sustainable growth across the 44-acre Howard property.</p>
+              <p style="margin-top: 12px; color: #555; font-size: 14px; line-height: 1.5;">This zone is part of the property's phased development plan, strategically sequenced for sustainable growth.</p>
             </div>
           </div>
         \`}
@@ -5952,10 +5429,8 @@ app.get('/', (req, res) => {
         <div class="project-section cta-section">
           <h3 style="color: \${zoneColor};">🤝 Get Involved</h3>
           <div style="background: linear-gradient(135deg, \${zoneColor} 0%, \${zoneColor}CC 100%); padding: 30px; border-radius: 16px; text-align: center; color: white; border: 2px solid \${zoneColor};">
-            <h4 style="color: white; margin: 0 0 15px 0; font-size: 20px;">Let's Talk About This Idea</h4>
-            <p style="margin: 0 0 25px 0; opacity: 0.9; font-size: 15px; line-height: 1.5;">
-              Everything on this map is a flexible proposal — a picture of what's possible on this land. If an idea speaks to you, belongs in a different spot, or sparks something better, let's talk.
-            </p>
+            <h4 style="color: white; margin: 0 0 15px 0; font-size: 20px;">\${(prop.cta && prop.cta.heading) || 'Get In Touch'}</h4>
+            <p style="margin: 0 0 25px 0; opacity: 0.9; font-size: 15px; line-height: 1.5;">\${(prop.cta && prop.cta.paragraph) || ''}</p>
             
             <div class="contact-dropdown">
               <button class="dropdown-button" onclick="toggleDropdown(this)">
@@ -5964,36 +5439,25 @@ app.get('/', (req, res) => {
               </button>
               <div class="dropdown-content">
                 <div class="team-contact-header">Team Contact:</div>
-                <div class="contact-item">
-                  <span class="contact-name">Mark Panics</span>
-                  <a href="mailto:markeduardpancis@gmail.com" class="contact-email">markeduardpancis@gmail.com</a>
-                </div>
-                <div class="contact-item">
-                  <span class="contact-name">Paul Muresan</span>
-                  <a href="mailto:paulmuresan77@gmail.com" class="contact-email">paulmuresan77@gmail.com</a>
-                </div>
+                \${((prop.cta && prop.cta.contacts) || []).map(c => \`<div class="contact-item"><span class="contact-name">\${c.name}</span><a href="mailto:\${c.email}" class="contact-email">\${c.email}</a></div>\`).join('')}
               </div>
             </div>
 
+            \${((prop.cta && prop.cta.buttons) || []).length ? \`<div class="action-buttons">\${prop.cta.buttons.map(b => \`<a href="\${b.url}" target="_blank" class="action-button website-button">\${b.label}</a>\`).join('')}</div>\` : ''}
           </div>
         </div>
-
+        
         <div class="project-footer">
           <div class="footer-content">
-            <div class="footer-title">🌿 Howard Property</div>
-            <div class="footer-info">
-              <span>13 Proposed Projects</span> • 
-              <span>44 Acres</span> • 
-              <span>1320 Baldwin Rd</span> • 
-              <span>Upper Ojai, CA</span>
-            </div>
+            <div class="footer-title">\${prop.footerTitle || prop.name || ''}</div>
+            <div class="footer-info">\${(prop.footerInfo || []).map(t => \`<span>\${t}</span>\`).join(' • ')}</div>
             <div class="footer-tagline">Regenerative Living • Collaborative Design • Community Wellness</div>
           </div>
         </div>
       \`;
     }
     
-    // Admin Popup Menu Functionality
+        // Admin Popup Menu Functionality
     const adminToggle = document.getElementById('admin-menu-toggle');
     const adminPopup = document.getElementById('admin-popup');
     const closePopup = document.getElementById('close-popup');
@@ -6245,18 +5709,26 @@ app.get('/', (req, res) => {
     // Bulletproof Capture Zone Positions functionality
     const captureZonesBtn = document.getElementById('capture-zones-btn');
     captureZonesBtn.addEventListener('click', () => {
-      const capturedPositions = [];
+      const grouped = {};
+      let total = 0;
       map.eachLayer(layer => {
         if (layer.options && layer.options.zoneId) {
           const p = layer.getLatLng();
-          capturedPositions.push({ id: layer.options.zoneId, name: layer.options.zoneName || layer.options.zoneId, position: [ +p.lat.toFixed(6), +p.lng.toFixed(6) ] });
+          const propId = layer.options.propertyId || 'unknown';
+          if (!grouped[propId]) grouped[propId] = [];
+          grouped[propId].push({ id: layer.options.zoneId, position: [ +p.lat.toFixed(6), +p.lng.toFixed(6) ] });
+          total++;
         }
       });
-      capturedPositions.sort(function(a, b) { return a.id.localeCompare(b.id); });
-      const lines = capturedPositions.map(function(z) { return '  "' + z.id + '": [' + z.position[0] + ', ' + z.position[1] + ']'; });
-      const jsonText = '{' + String.fromCharCode(10) + lines.join(',' + String.fromCharCode(10)) + String.fromCharCode(10) + '}';
+      const NL = String.fromCharCode(10);
+      const propBlocks = Object.keys(grouped).sort().map(function(propId) {
+        grouped[propId].sort(function(a, b) { return a.id.localeCompare(b.id); });
+        const lines = grouped[propId].map(function(z) { return '    "' + z.id + '": [' + z.position[0] + ', ' + z.position[1] + ']'; });
+        return '  "' + propId + '": {' + NL + lines.join(',' + NL) + NL + '  }';
+      });
+      const jsonText = '{' + NL + propBlocks.join(',' + NL) + NL + '}';
       
-      statusIndicator.innerHTML = '<div>🎯</div><div class="status-text">Captured ' + capturedPositions.length + ' positions</div>';
+      statusIndicator.innerHTML = '<div>🎯</div><div class="status-text">Captured ' + total + ' positions</div>';
       statusIndicator.style.background = 'linear-gradient(135deg, #E8F5E8 0%, #A5D6A7 100%)';
       statusIndicator.style.borderLeftColor = '#4CAF50';
       
@@ -6268,7 +5740,7 @@ app.get('/', (req, res) => {
       overlay.innerHTML = '<div style="background:#fff;max-width:540px;width:100%;max-height:85vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.35);display:flex;flex-direction:column;overflow:hidden;">' +
         '<div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:14px 18px;font-weight:700;display:flex;justify-content:space-between;align-items:center;">📍 Captured Icon Positions' +
         '<button id="close-positions-overlay" style="background:rgba(255,255,255,0.25);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">&times;</button></div>' +
-        '<div style="padding:14px 18px 6px 18px;font-size:13px;color:#555;line-height:1.5;">These are the current positions of every icon. <strong>Copy this and paste it to Claude</strong> to lock the new positions into the map permanently.</div>' +
+        '<div style="padding:14px 18px 6px 18px;font-size:13px;color:#555;line-height:1.5;">Current positions for every icon, grouped by property. <strong>Copy this and paste it to Claude</strong> to lock the new positions in permanently.</div>' +
         '<textarea id="positions-textarea" readonly style="margin:10px 18px 0 18px;height:240px;font-family:monospace;font-size:12px;border:2px solid #e0e0e0;border-radius:8px;padding:10px;resize:none;white-space:pre;"></textarea>' +
         '<div style="padding:14px 18px;display:flex;gap:10px;">' +
         '<button id="copy-positions-btn" style="flex:1;background:#4CAF50;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">📋 Copy to Clipboard</button>' +
@@ -6288,7 +5760,7 @@ app.get('/', (req, res) => {
       document.getElementById('download-positions-btn').addEventListener('click', function() {
         const blob = new Blob([jsonText], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'howard-zone-positions.json';
+        const a = document.createElement('a'); a.href = url; a.download = 'zone-positions.json';
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
       });
       console.log('Captured positions:', jsonText);
@@ -6303,57 +5775,63 @@ app.get('/', (req, res) => {
       const selectedName = document.getElementById('selected-zone-name');
       const statusDiv = document.getElementById('status-indicator');
       
-      if (!selector || !unlockBtn || !lockBtn) {
-        console.log('Zone movement UI not found');
-        return;
-      }
+      if (!selector || !unlockBtn || !lockBtn) return;
       
       const markerMap = new Map();
       let currentMarker = null;
-      let currentZoneId = null;
+      let currentZone = null;
       
-      // Populate dropdown
-      zones.forEach(function(z) {
-        const opt = document.createElement('option');
-        opt.value = z.id;
-        opt.textContent = z.emoji + ' ' + z.name;
-        selector.appendChild(opt);
+      // Grouped dropdown: one optgroup per property
+      properties.forEach(function(prop) {
+        const group = document.createElement('optgroup');
+        group.label = prop.name;
+        prop.zones.forEach(function(z) {
+          const opt = document.createElement('option');
+          opt.value = prop.id + '/' + z.id;
+          opt.textContent = z.emoji + ' ' + z.name;
+          group.appendChild(opt);
+        });
+        selector.appendChild(group);
       });
       
-      // Map markers
       map.eachLayer(function(layer) {
         if (layer.options && layer.options.zoneId) {
-          markerMap.set(layer.options.zoneId, layer);
+          markerMap.set((layer.options.propertyId || '?') + '/' + layer.options.zoneId, layer);
         }
       });
       
-      // Selection handler
+      const findZone = function(key) {
+        const parts = (key || '').split('/');
+        const p = propertiesById[parts[0]];
+        if (!p) return null;
+        return p.zones.find(function(zone) { return zone.id === parts[1]; }) || null;
+      };
+      
       selector.addEventListener('change', function(e) {
-        const id = e.target.value;
-        if (!id) {
+        const key = e.target.value;
+        if (!key) {
           unlockBtn.disabled = true;
           if (selectedIndicator) selectedIndicator.style.display = 'none';
           return;
         }
         unlockBtn.disabled = false;
-        const z = zones.find(function(zone) { return zone.id === id; });
+        const z = findZone(key);
         if (selectedName && z) {
           selectedName.textContent = 'Selected: ' + z.emoji + ' ' + z.name;
         }
         if (selectedIndicator) selectedIndicator.style.display = 'flex';
       });
       
-      // Unlock handler
       unlockBtn.addEventListener('click', function() {
-        const id = selector.value;
-        if (!id) return;
-        const marker = markerMap.get(id);
-        const z = zones.find(function(zone) { return zone.id === id; });
+        const key = selector.value;
+        if (!key) return;
+        const marker = markerMap.get(key);
+        const z = findZone(key);
         if (!marker || !z) return;
         
         marker.dragging.enable();
         currentMarker = marker;
-        currentZoneId = id;
+        currentZone = z;
         
         const el = marker.getElement();
         if (el) {
@@ -6373,14 +5851,10 @@ app.get('/', (req, res) => {
           const ico = statusDiv.querySelector('div:first-child');
           if (ico) ico.textContent = '🔓';
         }
-        
-        console.log('Unlocked:', z.name);
       });
       
-      // Lock handler
       lockBtn.addEventListener('click', function() {
-        if (!currentMarker || !currentZoneId) return;
-        const z = zones.find(function(zone) { return zone.id === currentZoneId; });
+        if (!currentMarker || !currentZone) return;
         
         currentMarker.dragging.disable();
         
@@ -6391,8 +5865,7 @@ app.get('/', (req, res) => {
         }
         
         const pos = currentMarker.getLatLng();
-        console.log('Locked:', z.name);
-        console.log('New position:', [pos.lat, pos.lng]);
+        console.log('Locked:', currentZone.name, [pos.lat, pos.lng]);
         
         unlockBtn.style.display = 'block';
         lockBtn.style.display = 'none';
@@ -6407,13 +5880,13 @@ app.get('/', (req, res) => {
         }
         
         currentMarker = null;
-        currentZoneId = null;
+        currentZone = null;
       });
       
-      console.log('Zone movement controls initialized');
+      console.log('Zone movement controls initialized (multi-property)');
     })();
     
-    // Image upload handling function
+        // Image upload handling function
     function handleImageUpload(input, zoneId, category) {
       const files = input.files;
       if (files.length === 0) return;
@@ -6511,8 +5984,7 @@ app.get('/', (req, res) => {
 
     // Replace placeholders with actual data
     const finalHtml = htmlContent
-      .replace('ZONES_DATA_PLACEHOLDER', JSON.stringify(PROJECT_ZONES))
-      .replace('PERMANENT_LINES_PLACEHOLDER', JSON.stringify(PERMANENT_PROPERTY_LINES));
+      .replace('PROPERTIES_PLACEHOLDER', JSON.stringify(PROPERTIES));
 
     // Set correct content type header and send as HTML
     res.type('html');
@@ -6560,6 +6032,7 @@ app.get('/api/project-zones', (req, res) => {
     res.json({
       success: true,
       totalZones: PROJECT_ZONES.length,
+      properties: PROPERTIES.map(p => ({ id: p.id, name: p.name, zones: p.zones.length, boundarySegments: p.boundary.length })),
       totalInvestment: `$${totalInvestment.toLocaleString()}`,
       zones: PROJECT_ZONES,
       propertyLines: PERMANENT_PROPERTY_LINES.length,
@@ -6587,13 +6060,13 @@ const PROJECT_FOLDER_MAP = {};
 // API endpoint to get images for a specific zone
 // Uses configuration file (image-urls.js) with direct URLs from Supabase
 // Supports subcategories for zones like infrastructure, main-residence, retreat-village
-app.get('/api/images/:zoneId/:category', async (req, res) => {
+app.get('/api/images/:propertyId/:zoneId/:category', async (req, res) => {
   try {
-    const { zoneId, category } = req.params;
+    const { propertyId, zoneId, category } = req.params;
     const categoryLower = category.toLowerCase();
     
     // Get images from configuration
-    const zoneImages = IMAGE_URLS[zoneId] || {};
+    const zoneImages = (IMAGE_URLS[propertyId] || {})[zoneId] || {};
     let categoryData = zoneImages[categoryLower];
     
     // Check if category data has subcategories (is an object with subcategory keys)
@@ -6654,7 +6127,7 @@ if (process.env.VERCEL !== '1') {
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log('🚀 Howard Property Interactive Map Server');
     console.log(`🌐 Server running on port ${PORT}`);
-    console.log(`📊 Serving ${PROJECT_ZONES.length} project zones`);
+    console.log(`📊 Serving ${PROJECT_ZONES.length} zones across ${PROPERTIES.length} properties`);
     console.log(`🔲 ${PERMANENT_PROPERTY_LINES.length} permanent property boundary lines`);
     console.log('✨ Ready for interactive exploration');
   });

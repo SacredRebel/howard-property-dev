@@ -1,31 +1,29 @@
-# 🏔️ Howard Property Interactive Map — 1320 Baldwin Rd, Ojai
+# 🗺️ Ojai Valley Properties — Interactive Development Map
 
-**Proposal release (V0.2)** — interactive satellite map with the real county-recorded property boundary and **13 proposed projects**, built as a visual proposal for the property owner. Reposition mode is ON: icons can be dragged, locked, and captured.
+**Multi-property release (V0.3)** — one interactive map, multiple properties. Currently: the **Howard Property** (1320 Baldwin Rd) and the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), both in Upper Ojai, ~9 miles apart.
 
-## Overview
+## How it works
 
-Interactive web map for the Howard Property:
+The map opens on an **overview** showing both parcels with their glowing rainbow boundaries and name chips. Click a chip (or zoom in) to fly into a property — its project icons appear below zoom 15. Click any icon for the full project page; click a boundary for that property's details panel.
 
-- **Address:** 1320 Baldwin Rd, Ojai, CA 93023
-- **APN:** 032-0-010-090 (Ventura County, unincorporated)
-- **Size:** ~44.1 acres (per County GIS parcel geometry)
-- **Zoning:** OS-40 ac / SRP / TRU / DKS / HCWC
-- **Boundary:** traced from the official Ventura County GIS parcel service — the animated glowing "rainbow" line
+| Property | Projects | Size | Status |
+|---|---|---|---|
+| 🏔️ Howard Property | 13 proposed | ~44 acres | Proposal draft |
+| 🌿 Sulphur Mountain Eco-Village | 18 zones | ~10 acres | V1 production data |
 
-## The 13 Proposed Projects
+Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://github.com/SacredRebel/EcoVillage-map) via raw.githubusercontent.com — no image copies in this repo.
 
-🏠 Main House · ⛰️ Hugelkultur Project · 🛖 Community Hub · 🛠️ Community Workshop · 🌱 Nursery · 🏋️ Outdoor Nature Gym · 🔥 Ceremony & Sacred Spaces · 🍄 Mushroom Growing Containers · 🐝 Beekeeping & Honey Production · 🐟 Pond & Swimming Hole · 🌴 Growing Dome Greenhouse · 🐐 Livestock & Animals · ♻️ Compost Operation
+## Adding a new property
 
-Click any icon for its full proposal page: description, features, structure options, revenue ideas, and timelines.
+1. Create `properties/<name>.js` exporting a property object: `{ id, name, shortLabel, labelChip, center, zoom, footerTitle, footerInfo, cta, panel: { title, html }, boundary: [segments], zones: [zones] }` (copy `properties/howard.js` as the template).
+2. Register it in `server-complete.js`: add the import and append to `PROPERTIES`.
+3. Add an entry in `image-urls.js` under the property's id for photos.
 
-## Repositioning Icons (currently enabled)
+That's it — boundaries, panels, icons, admin tools, and the overview all pick it up automatically.
 
-Positions are initial estimates. To fix them:
+## Repositioning icons (currently enabled)
 
-1. Click the **⚙️ button** (top right) → "Move & Lock Icons"
-2. Select a zone → **🔓 Unlock** → drag its icon → **🔒 Lock**
-3. Repeat for each icon, then hit **💾 Capture All Positions**
-4. **📋 Copy** the JSON and paste it to Claude — the new positions get committed permanently
+⚙️ button → select a zone (grouped by property) → Unlock → drag → Lock → **💾 Capture All Positions** → copy the JSON (grouped by property) → paste it to Claude to commit permanently.
 
 ## Quick Start
 
@@ -35,20 +33,29 @@ npm run dev
 # → http://localhost:5001
 ```
 
-No environment variables required.
+No env vars, no build step.
+
+## Structure
+
+```
+├── server-complete.js            # App: Express + embedded Leaflet frontend
+├── properties/
+│   ├── howard.js                 # Howard Property (zones, boundary, panel, CTA)
+│   └── sulphur-mountain.js       # Sulphur Mountain Eco-Village
+├── image-urls.js                 # Photo manifests, namespaced by property id
+├── api/index.js                  # Vercel serverless entry
+└── vercel.json
+```
 
 ## Roadmap
 
-1. ✅ Map layout + real property lines + property info panel
-2. ✅ 13 proposal zones + drag-to-reposition mode
-3. ⬜ Final positions locked in (after owner/johny review)
-4. ⬜ Photo galleries per project (`images/` + `image-urls.js`)
-5. ⬜ Custom UI theme · hide admin tools for public link
-
-## Deployment
-
-Push to `main` and import into Vercel — zero build step. Railway/Render also work (`node server-complete.js`).
+1. ✅ Howard layout + real county boundary
+2. ✅ 13 Howard proposal zones + reposition mode
+3. ✅ Multi-property merge (Sulphur Mountain on the same map)
+4. ⬜ Final Howard icon positions locked
+5. ⬜ Howard photo galleries
+6. ⬜ Custom UI theme · hide admin tools for public release
 
 ---
 
-© 2026 Howard Property
+© 2026 Howard Property + Sulphur Mountain Eco-Village

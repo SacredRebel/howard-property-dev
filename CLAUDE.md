@@ -4,43 +4,30 @@ Guidance for AI coding assistants working in this repository.
 
 ## Overview
 
-Interactive **proposal map** for the Howard Property — 1320 Baldwin Rd, Ojai, CA 93023 (APN 032-0-010-090, ~44.1 acres, zoning OS-40 ac/SRP/TRU/DKS/HCWC). Duplicated from the Sulphur Mountain EcoVillage stack (`SacredRebel/EcoVillage-map`). Current state: **V0.2** — real county boundary + 13 proposed project zones + reposition mode ENABLED.
+**Multi-property interactive map** (V0.3): one Leaflet app serving several properties, each with its own boundary, project zones, panels, and photo galleries. Current properties: `howard` (1320 Baldwin Rd, Ojai — 13 proposal zones, reposition mode ON) and `sulphur-mountain` (Sulphur Mountain Eco-Village — 18 zones, V1 production data from `SacredRebel/EcoVillage-map`).
 
-## Architecture — single-file app
+## Architecture
 
-`server-complete.js` (~6,800 lines) is the entire application:
+- **`properties/*.js`** — one module per property: `{ id, name, shortLabel, labelChip, center, zoom, footerTitle, footerInfo[], cta { heading, paragraph, contacts[], buttons[] }, panel { title, html }, boundary[], zones[] }`. Adding a property = new module + import + append to `PROPERTIES` in server-complete.js.
+- **`server-complete.js`** — Express + whole frontend in a template literal. `PROPERTIES` array is injected via the `PROPERTIES_PLACEHOLDER` token (JSON). Aggregates `PROJECT_ZONES` / `PERMANENT_PROPERTY_LINES` feed `/api/health` and `/api/project-zones`.
+- **Frontend flow:** map starts at `fitBounds` of all boundaries (overview). Below zoom 15 the `#map` div gets `.overview-mode`: zone markers hide, per-property **label chips** show (click → flyTo property). Each property renders 3 stacked polylines (glow + animated rainbow + 30px invisible hit line); boundary click → `openPropertyPanel(propId)` which injects `prop.panel.html` and calls `loadPropertyImages(propId)`.
+- **Zone panels:** `generateProjectDetails(zone)` looks up `propertiesById[zone.propertyId]` for the per-property CTA + footer. Zone galleries fetch `/api/images/:propertyId/:zoneId/:category` (manifest: `image-urls.js`, namespaced by property id; `'property'` zoneId = property panel gallery). Sulphur photos are absolute raw.githubusercontent.com URLs into EcoVillage-map.
+- **Zone ids may repeat across properties** (both have `community-hub`) — everything is keyed `propertyId + '/' + zoneId` where uniqueness matters (admin markerMap, selector values); the images API namespaces by property.
 
-- **`PROJECT_ZONES`** — 13 proposal zone objects (main-house, hugelkultur-project, community-hub, community-workshop, property-nursery, nature-gym, sacred-spaces, mushroom-containers, beekeeping, pond-swimming-hole, growing-dome, livestock, compost-operation). Each renders a 3D-style emoji marker + territory circle + full detail side panel. Zone fields: id, name, emoji, position [lat,lng], type, budget, timeline, monthlyRevenue, roi, description, features[], optional revenueStreams[], developmentTimeline[], regenerativeFeatures[], and **optionsTitle + options[{name, details}]** (custom section added in V0.2, used by community-hub for structure options).
-- **`PERMANENT_PROPERTY_LINES`** — 8 segments of the REAL parcel boundary from Ventura County GIS (`maps.ventura.org/.../SDs/Parcels/FeatureServer/0`, `APN10='0320010090'`). Stitched client-side into one closed animated rainbow loop.
-- **`app.get('/')`** — whole frontend as a template literal (inner escapes `\${...}` / `` \` ``); data injected via `ZONES_DATA_PLACEHOLDER` / `PERMANENT_LINES_PLACEHOLDER`.
-- **Map:** center `[34.424346, -119.319557]`, zoom 16.5, Esri World Imagery + Google/OSM failover.
-- **Types → colors** (frontend `zoneColorMap`): agriculture, residential, community, hospitality, infrastructure, creative, ceremonial, wellness, landscape, beekeeping, events, **water** (added V0.2 for the pond).
+## Reposition mode (ON)
 
-## Reposition mode (V0.2 — currently ON)
-
-- The ⚙️ admin toggle is **visible** (`.admin-menu-toggle` has `display: flex`). Flow: select zone → unlock → drag marker → lock → **Capture All Positions** → overlay shows `{ "zone-id": [lat, lng], ... }` JSON with copy/download.
-- The user (johny) pastes that JSON back to Claude; Claude updates each zone's `position` in `PROJECT_ZONES` and commits.
-- **After positions are final:** re-hide the admin tool by restoring `display: none !important;` on `.admin-menu-toggle`.
-- The 🎨 territory-editor toggle stays hidden (canvas drawing, not wired to persistence).
+⚙️ admin: dropdown grouped by property (optgroups) → unlock → drag → lock → Capture overlay outputs `{ "<propertyId>": { "<zoneId>": [lat, lng], ... }, ... }` for pasting back to Claude. To hide for public release: restore `display: none !important;` on `.admin-menu-toggle`.
 
 ## Commands
 
 ```bash
-npm install
-npm run dev      # → http://localhost:5001
+npm install && npm run dev   # → http://localhost:5001
 ```
-
-No env vars, no build, no database.
-
-## Next steps
-
-1. Lock final positions (paste from capture overlay → update `PROJECT_ZONES`).
-2. Photos: `images/<Zone Name>/{current,vision}/` + entries in `image-urls.js` + ids→folders in `PROJECT_FOLDER_MAP`.
-3. Public release: hide admin toggle again.
 
 ## Key gotchas
 
-- Frontend lives inside a template literal — keep `\${...}` / `` \` `` escaping intact; placeholders `ZONES_DATA_PLACEHOLDER` / `PERMANENT_LINES_PLACEHOLDER` must remain.
-- Boundary segments chain end-to-start; client drops each segment's last point and closes the loop.
-- `vercel.json` hardcodes this repo's raw.githubusercontent URL for `/images/*`.
-- Zone panel CTA contacts: Mark Panics + Paul Muresan (proposal audience: John Ellis).
+- Frontend lives in a template literal — keep `\${...}` / `` \` `` escaping intact; the injection token is exactly `PROPERTIES_PLACEHOLDER`.
+- Boundary segments per property must chain (segment N's last coord = segment N+1's first); client stitches and closes each loop.
+- `preferCanvas: true` — boundary/circle vector layers are canvas-rendered (no per-path CSS), zone markers + label chips are DOM divIcons.
+- `properties/*.js` panel `html` strings are injected into the panel verbatim — plain string-concat HTML, no `<script>` tags allowed (would break the JSON-in-`<script>` injection).
+- Vercel: git-connected project `howard-property-dev` auto-deploys `main`; `/images/*` 302s to THIS repo's raw URLs (for future Howard photos).
