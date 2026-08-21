@@ -18,6 +18,11 @@ export const IMAGE_URLS = {
       current: []
     }
   },
+  'chers-property': {
+    'property': {
+      current: []
+    }
+  },
   'sulphur-mountain': {
   "ceremonial-infrastructure": {
     "current": [

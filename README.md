@@ -1,6 +1,6 @@
 # 🗺️ Ojai Valley Properties — Interactive Development Map
 
-**Multi-property platform (V0.5)** — one interactive map, multiple properties in the Upper Ojai Valley: the **Howard Property** (1320 Baldwin Rd), the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), and **Keri's Property** (14209 De La Garrigue Rd).
+**Multi-property platform** — one interactive map, multiple properties in the Ojai Valley: the **Howard Property** (1320 Baldwin Rd), the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), **Keri's Property** (14209 De La Garrigue Rd), and **Cher's Property** (10622 Encino Dr, Oak View).
 
 ## How it works
 
@@ -11,6 +11,7 @@ The map opens on an **overview** showing both parcels with their glowing rainbow
 | 🏔️ Howard Property | 13 proposed | ~44 acres | Proposal draft |
 | 🌿 Sulphur Mountain Eco-Village | 18 zones | ~10 acres | V1 production data |
 | 🌸 Keri's Property | 3 places | ~34 acres | Starting points |
+| 🌹 Cher's Property | 2 places | 2 acres | Starting points |
 
 Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://github.com/SacredRebel/EcoVillage-map) via raw.githubusercontent.com — no image copies in this repo.
 
