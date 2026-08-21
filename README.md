@@ -84,7 +84,7 @@ Drop images into `images/<property>/<project>/current/` (photos of how it looks 
 3. ✅ Multi-property merge (Sulphur Mountain on the same map)
 4. ✅ Keri's + Cher's properties · icon positions locked in git
 5. ✅ Black Mountain Ranch — 62 county parcels drawn as individual lot territories
-6. ⬜ Ranch: remaining APNs (~830 ac) + project zones after owner reassessment
+6. ⬜ Ranch: 63rd parcel candidate found (APN 035-0-020-010, 610 ac — see `bmr/PARCEL-63-CANDIDATE.md`), awaiting ownership confirmation; project zones after owner reassessment
 7. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
 8. ⬜ Custom UI theme · hide admin tools for public release
 
