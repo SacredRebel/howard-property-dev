@@ -2501,6 +2501,55 @@ app.get('/', (req, res) => {
       transition: transform 0.2s ease;
     }
     .property-label-chip:hover { transform: translate(-50%, -50%) scale(1.06); }
+    /* ── Position Editor ── */
+    .admin-popup { z-index: 2600; }
+    .editor-label { display: block; margin: 2px 0 8px 0; font-weight: 600; color: #333; font-size: 13.5px; }
+    .edit-property-buttons { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .edit-prop-btn {
+      flex: 1; min-width: 118px; padding: 10px 8px;
+      border: 2px solid #e0e0e0; border-radius: 8px; background: #fff;
+      font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .edit-prop-btn:hover { border-color: #b3b9f0; }
+    .edit-prop-btn.active { border-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+    #edit-toggle-btn { background: #4CAF50; color: #fff; margin-bottom: 12px; }
+    #edit-toggle-btn:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; }
+    #edit-toggle-btn.editing { background: #FF9800; }
+    #reset-positions-btn { background: #607D8B; color: #fff; margin-bottom: 12px; }
+    .edit-hint {
+      font-size: 12.5px; color: #666; background: #FFF8E1;
+      border-left: 3px solid #FFC107; padding: 10px 12px;
+      border-radius: 6px; margin-bottom: 12px; line-height: 1.5;
+    }
+    .moved-list {
+      max-height: 150px; overflow-y: auto; background: #f8f9fa;
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 12.5px;
+    }
+    .moved-title { font-weight: 700; color: #4CAF50; margin-bottom: 6px; }
+    .moved-item { padding: 3px 0; color: #444; }
+    .moved-coords { color: #999; font-family: monospace; font-size: 11px; }
+
+    /* Editing glow on unlocked icons (box-shadow only — never fights the
+       zoom-scaling inline transform) */
+    @keyframes edit-pulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.9), 0 0 18px 6px rgba(255, 152, 0, 0.45); }
+      50% { box-shadow: 0 0 0 7px rgba(255, 152, 0, 0.35), 0 0 26px 10px rgba(255, 152, 0, 0.25); }
+    }
+    .zone-marker.marker-editing > div {
+      animation: edit-pulse 1.5s ease-in-out infinite;
+      border-color: #FFB300 !important;
+      cursor: grab;
+    }
+    .zone-marker.marker-editing > div:active { cursor: grabbing; }
+    /* Icons being edited stay visible even at overview zoom */
+    .overview-mode .zone-marker.marker-editing { display: block !important; }
+
+    @media (max-width: 768px) {
+      .admin-popup {
+        top: auto; bottom: 12px; left: 10px; right: 10px; width: auto;
+        max-height: 62vh; overflow-y: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -2516,48 +2565,41 @@ app.get('/', (req, res) => {
   
   <div class="admin-popup" id="admin-popup" style="display: none;">
     <div class="popup-header">
-      <h3>🎯 Move & Lock Icons</h3>
+      <h3>✏️ Position Editor</h3>
       <button class="close-popup" id="close-popup">&times;</button>
     </div>
     
     <div class="popup-content">
-      <div class="zone-selector" style="margin-bottom: 15px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Select Zone to Move:</label>
-        <select id="zone-move-selector" style="width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #e0e0e0; font-size: 14px; margin-bottom: 10px;">
-          <option value="">Choose a zone...</option>
-        </select>
+      <label class="editor-label">1 · Pick a property:</label>
+      <div id="edit-property-buttons" class="edit-property-buttons"></div>
+      
+      <label class="editor-label">2 · Move the icons:</label>
+      <button class="control-button" id="edit-toggle-btn" disabled>🔓 Start Editing</button>
+      
+      <div class="edit-hint" id="edit-hint" style="display: none;">
+        Drag any <strong>glowing icon</strong> to its new spot — the map still pans and zooms normally. When everything looks right, press <strong>Done</strong>, then <strong>Capture</strong>.
       </div>
       
-      <button class="control-button edit-button" id="unlock-zone-btn" style="background: #4CAF50; margin-bottom: 10px;" disabled>
-        🔓 Unlock Selected Zone
-      </button>
-      
-      <button class="control-button edit-button" id="lock-zone-btn" style="background: #FF9800; margin-bottom: 10px; display: none;">
-        🔒 Lock Zone Position
-      </button>
-      
-      <button class="control-button capture-button" id="capture-zones-btn" style="background: #9C27B0; margin-bottom: 10px;">
-        💾 Capture All Positions
-      </button>
-      
-      <div class="status-indicator" id="status-indicator">
+      <div class="status-indicator" id="edit-status">
         <div>🔒</div>
-        <div class="status-text">All Zones Locked</div>
+        <div class="status-text">Pick a property to begin</div>
       </div>
       
-      <div class="status-indicator" id="selected-zone-indicator" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-left-color: #FF9800; margin-top: 10px; display: none;">
-        <div>📍</div>
-        <div class="status-text" id="selected-zone-name">None Selected</div>
-      </div>
+      <div class="moved-list" id="moved-list" style="display: none;"></div>
+      
+      <button class="control-button" id="reset-positions-btn" style="display: none;">↩️ Reset This Property</button>
+      
+      <label class="editor-label">3 · Save your layout:</label>
+      <button class="control-button capture-button" id="capture-zones-btn">💾 Capture All Positions</button>
       
       <div class="status-indicator" id="zoom-indicator" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border-left-color: #2196F3; margin-top: 10px;">
         <div>🔍</div>
-        <div class="status-text" id="zoom-level">Zoom: 17</div>
+        <div class="status-text" id="zoom-level">Zoom: —</div>
       </div>
     </div>
   </div>
 
-  <!-- Territory Drawing Editor Panel -->
+    <!-- Territory Drawing Editor Panel -->
   <div class="territory-editor" id="territory-editor" style="display: none;">
     <div class="editor-header">
       <h3>🎨 Territory Drawing Editor</h3>
@@ -2871,6 +2913,7 @@ app.get('/', (req, res) => {
       propertyLines.push(mainLine);
 
       var openHandler = function(e) {
+        if (window.positionEditActive) { L.DomEvent.stopPropagation(e); return; }
         if (window.ignoreMapClicksUntil && Date.now() < window.ignoreMapClicksUntil) { L.DomEvent.stopPropagation(e); return; }
         var side = document.getElementById('side-panel');
         if (side && side.classList.contains('open')) { side.classList.remove('open'); }
@@ -2993,6 +3036,7 @@ app.get('/', (req, res) => {
       
       // Add click handlers for interactive side panel (guard against swipe-ending ghost clicks)
       const clickHandler = (e) => {
+        if (window.positionEditActive) { L.DomEvent.stopPropagation(e); return; }
         if (window.ignoreMapClicksUntil && Date.now() < window.ignoreMapClicksUntil) { L.DomEvent.stopPropagation(e); return; }
         if (window.panelIsClosing) { L.DomEvent.stopPropagation(e); return; }
         // DEBUG: Log which zone is being clicked
@@ -3011,23 +3055,31 @@ app.get('/', (req, res) => {
       marker.on('click', clickHandler);
       polygon.on('click', clickHandler);
       
-      // Add drag functionality with position saving
-      marker.on('dragend', function(e) {
-        const newPos = e.target.getLatLng();
-        zone.position = [newPos.lat, newPos.lng];
-        console.log('📍 ' + zone.name + ' moved to: [' + newPos.lat + ', ' + newPos.lng + ']');
-        
-        // Update polygon position as well
-        map.removeLayer(polygon);
-        const newCircularPolygon = createCircularPolygon([newPos.lat, newPos.lng], 15);
-        const newPolygon = L.polygon(newCircularPolygon, {
+      // Drag support: track the CURRENT territory circle so repeat drags
+      // replace it instead of stacking duplicates (old bug), and feed the
+      // Position Editor via notifyZoneMoved + a redraw registry for Reset.
+      let zonePolygon = polygon;
+      const territoryKey = zone.propertyId + '/' + zone.id;
+      const redrawTerritory = function(pos) {
+        try { map.removeLayer(zonePolygon); } catch (err) {}
+        zonePolygon = L.polygon(createCircularPolygon(pos, 15), {
           color: zoneColorMap[zone.type] || '#333',
           fillColor: zoneColorMap[zone.type] || '#333',
           fillOpacity: 0.3,
           weight: 2,
           opacity: 0.8
         }).addTo(map);
-        newPolygon.on('click', clickHandler);
+        zonePolygon.on('click', clickHandler);
+      };
+      if (!window.zoneTerritories) window.zoneTerritories = {};
+      window.zoneTerritories[territoryKey] = redrawTerritory;
+      
+      marker.on('dragend', function(e) {
+        const newPos = e.target.getLatLng();
+        zone.position = [newPos.lat, newPos.lng];
+        redrawTerritory([newPos.lat, newPos.lng]);
+        if (window.notifyZoneMoved) window.notifyZoneMoved(zone);
+        console.log('📍 ' + zone.name + ' moved to: [' + newPos.lat + ', ' + newPos.lng + ']');
       });
     });
     
@@ -5457,30 +5509,177 @@ app.get('/', (req, res) => {
       \`;
     }
     
-        // Admin Popup Menu Functionality
+        // ── Position Editor: pick property → edit all icons at once → capture ──
     const adminToggle = document.getElementById('admin-menu-toggle');
     const adminPopup = document.getElementById('admin-popup');
     const closePopup = document.getElementById('close-popup');
-    const statusIndicator = document.getElementById('status-indicator');
+    const statusIndicator = document.getElementById('edit-status');
+    window.positionEditActive = false;
     
-    // Toggle admin popup
-    adminToggle.addEventListener('click', () => {
-      adminPopup.style.display = adminPopup.style.display === 'none' ? 'block' : 'none';
-    });
-    
-    // Close admin popup
-    closePopup.addEventListener('click', () => {
-      adminPopup.style.display = 'none';
-    });
-    
-    // Close popup when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!adminPopup.contains(e.target) && !adminToggle.contains(e.target)) {
+    (function initPositionEditor() {
+      const buttonsWrap = document.getElementById('edit-property-buttons');
+      const editBtn = document.getElementById('edit-toggle-btn');
+      const hintEl = document.getElementById('edit-hint');
+      const movedList = document.getElementById('moved-list');
+      const resetBtn = document.getElementById('reset-positions-btn');
+      const zoomLevelEl = document.getElementById('zoom-level');
+      if (!adminToggle || !adminPopup || !buttonsWrap || !editBtn) return;
+      
+      let selectedPropId = null;
+      let editing = false;
+      const markerMap = new Map();
+      const movedZones = new Map();
+      
+      map.eachLayer(function(layer) {
+        if (layer.options && layer.options.zoneId) {
+          markerMap.set((layer.options.propertyId || '?') + '/' + layer.options.zoneId, layer);
+        }
+      });
+      
+      // Open/close: the panel STAYS OPEN while you work on the map.
+      // (The old version closed itself on any outside click — maddening.)
+      adminToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        adminPopup.style.display = adminPopup.style.display === 'none' ? 'block' : 'none';
+      });
+      closePopup.addEventListener('click', function() {
+        if (editing) stopEditing();
         adminPopup.style.display = 'none';
+      });
+      
+      function setStatus(icon, text, color) {
+        if (!statusIndicator) return;
+        statusIndicator.innerHTML = '<div>' + icon + '</div><div class="status-text">' + text + '</div>';
+        statusIndicator.style.borderLeftColor = color || '#F44336';
+        statusIndicator.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)';
       }
-    });
-
-    // Territory Drawing Editor Functionality
+      
+      function eachPropertyMarker(propId, fn) {
+        markerMap.forEach(function(marker, key) {
+          if (key.indexOf(propId + '/') === 0) fn(marker, key);
+        });
+      }
+      
+      function refreshMovedList() {
+        if (movedZones.size === 0) {
+          movedList.style.display = 'none';
+          movedList.innerHTML = '';
+          return;
+        }
+        movedList.style.display = 'block';
+        const items = [];
+        movedZones.forEach(function(z) {
+          items.push('<div class="moved-item">' + z.emoji + ' ' + z.name + ' <span class="moved-coords">' + (+z.position[0]).toFixed(6) + ', ' + (+z.position[1]).toFixed(6) + '</span></div>');
+        });
+        movedList.innerHTML = '<div class="moved-title">📍 Moved this session (' + movedZones.size + '):</div>' + items.join('');
+      }
+      
+      // Property buttons — generated from the registry, so future
+      // properties show up here automatically.
+      properties.forEach(function(prop) {
+        const b = document.createElement('button');
+        b.className = 'edit-prop-btn';
+        b.type = 'button';
+        b.textContent = prop.shortLabel || prop.name;
+        b.addEventListener('click', function() {
+          if (editing) stopEditing();
+          selectedPropId = prop.id;
+          Array.prototype.forEach.call(buttonsWrap.children, function(x) {
+            x.classList.toggle('active', x === b);
+          });
+          editBtn.disabled = false;
+          editBtn.textContent = '🔓 Start Editing ' + (prop.shortLabel || prop.name);
+          resetBtn.style.display = 'none';
+          setStatus('🎯', prop.name + ' selected — flying there now', '#2196F3');
+          map.flyTo(prop.center, prop.zoom, { animate: true, duration: 1.0 });
+        });
+        buttonsWrap.appendChild(b);
+      });
+      
+      function startEditing() {
+        if (!selectedPropId) return;
+        editing = true;
+        window.positionEditActive = true;
+        // Close any open panels so nothing overlaps while editing
+        const sp = document.getElementById('side-panel');
+        if (sp) { sp.classList.remove('open', 'swiping'); sp.style.transform = ''; }
+        const pp = document.getElementById('property-panel');
+        if (pp) { pp.classList.remove('open', 'swiping'); pp.style.transform = ''; }
+        if (typeof unlockBodyScroll === 'function') unlockBodyScroll();
+        
+        eachPropertyMarker(selectedPropId, function(marker) {
+          if (marker.dragging) marker.dragging.enable();
+          marker.setZIndexOffset(1500);
+          const el = marker.getElement();
+          if (el) el.classList.add('marker-editing');
+        });
+        editBtn.textContent = '✅ Done — Lock Positions';
+        editBtn.classList.add('editing');
+        hintEl.style.display = 'block';
+        resetBtn.style.display = 'block';
+        setStatus('🔓', 'Editing — drag the glowing icons', '#FF9800');
+      }
+      
+      function stopEditing() {
+        editing = false;
+        window.positionEditActive = false;
+        markerMap.forEach(function(marker) {
+          if (marker.dragging) marker.dragging.disable();
+          marker.setZIndexOffset(0);
+          const el = marker.getElement();
+          if (el) el.classList.remove('marker-editing');
+        });
+        const prop = propertiesById[selectedPropId];
+        editBtn.textContent = '🔓 Start Editing ' + (prop ? (prop.shortLabel || prop.name) : '');
+        editBtn.classList.remove('editing');
+        hintEl.style.display = 'none';
+        if (movedZones.size > 0) {
+          setStatus('💾', movedZones.size + ' icon(s) moved — hit Capture below', '#4CAF50');
+        } else {
+          setStatus('🔒', 'All icons locked', '#F44336');
+        }
+      }
+      
+      editBtn.addEventListener('click', function() {
+        if (editing) { stopEditing(); } else { startEditing(); }
+      });
+      
+      // Fed by every marker dragend
+      window.notifyZoneMoved = function(zone) {
+        movedZones.set(zone.propertyId + '/' + zone.id, zone);
+        refreshMovedList();
+        setStatus('📍', zone.emoji + ' ' + zone.name + ' moved', '#4CAF50');
+      };
+      
+      // Reset every icon of the selected property to its saved position
+      resetBtn.addEventListener('click', function() {
+        const prop = propertiesById[selectedPropId];
+        if (!prop) return;
+        prop.zones.forEach(function(zone) {
+          if (!zone.originalPosition) return;
+          const marker = markerMap.get(prop.id + '/' + zone.id);
+          if (!marker) return;
+          zone.position = [zone.originalPosition[0], zone.originalPosition[1]];
+          marker.setLatLng(zone.position);
+          const redraw = window.zoneTerritories && window.zoneTerritories[prop.id + '/' + zone.id];
+          if (redraw) redraw(zone.position);
+          movedZones.delete(prop.id + '/' + zone.id);
+        });
+        refreshMovedList();
+        setStatus('↩️', prop.name + ' reset to the saved layout', '#2196F3');
+      });
+      
+      // Live zoom readout
+      const updateZoomLabel = function() {
+        if (zoomLevelEl) zoomLevelEl.textContent = 'Zoom: ' + (Math.round(map.getZoom() * 10) / 10);
+      };
+      map.on('zoomend', updateZoomLabel);
+      updateZoomLabel();
+      
+      console.log('✏️ Position editor ready —', properties.length, 'properties');
+    })();
+    
+        // Territory Drawing Editor Functionality
     const territoryToggle = document.getElementById('territory-editor-toggle');
     const territoryEditor = document.getElementById('territory-editor');
     const closeTerritoryEditor = document.getElementById('close-territory-editor');
@@ -5767,125 +5966,8 @@ app.get('/', (req, res) => {
     });
     
     // Zone movement controls - Carefully implemented
-    (function initZoneMovement() {
-      const selector = document.getElementById('zone-move-selector');
-      const unlockBtn = document.getElementById('unlock-zone-btn');
-      const lockBtn = document.getElementById('lock-zone-btn');
-      const selectedIndicator = document.getElementById('selected-zone-indicator');
-      const selectedName = document.getElementById('selected-zone-name');
-      const statusDiv = document.getElementById('status-indicator');
-      
-      if (!selector || !unlockBtn || !lockBtn) return;
-      
-      const markerMap = new Map();
-      let currentMarker = null;
-      let currentZone = null;
-      
-      // Grouped dropdown: one optgroup per property
-      properties.forEach(function(prop) {
-        const group = document.createElement('optgroup');
-        group.label = prop.name;
-        prop.zones.forEach(function(z) {
-          const opt = document.createElement('option');
-          opt.value = prop.id + '/' + z.id;
-          opt.textContent = z.emoji + ' ' + z.name;
-          group.appendChild(opt);
-        });
-        selector.appendChild(group);
-      });
-      
-      map.eachLayer(function(layer) {
-        if (layer.options && layer.options.zoneId) {
-          markerMap.set((layer.options.propertyId || '?') + '/' + layer.options.zoneId, layer);
-        }
-      });
-      
-      const findZone = function(key) {
-        const parts = (key || '').split('/');
-        const p = propertiesById[parts[0]];
-        if (!p) return null;
-        return p.zones.find(function(zone) { return zone.id === parts[1]; }) || null;
-      };
-      
-      selector.addEventListener('change', function(e) {
-        const key = e.target.value;
-        if (!key) {
-          unlockBtn.disabled = true;
-          if (selectedIndicator) selectedIndicator.style.display = 'none';
-          return;
-        }
-        unlockBtn.disabled = false;
-        const z = findZone(key);
-        if (selectedName && z) {
-          selectedName.textContent = 'Selected: ' + z.emoji + ' ' + z.name;
-        }
-        if (selectedIndicator) selectedIndicator.style.display = 'flex';
-      });
-      
-      unlockBtn.addEventListener('click', function() {
-        const key = selector.value;
-        if (!key) return;
-        const marker = markerMap.get(key);
-        const z = findZone(key);
-        if (!marker || !z) return;
-        
-        marker.dragging.enable();
-        currentMarker = marker;
-        currentZone = z;
-        
-        const el = marker.getElement();
-        if (el) {
-          el.style.filter = 'drop-shadow(0 0 10px #FF9800) brightness(1.3)';
-          el.style.transform = 'scale(1.2)';
-          el.style.transition = 'all 0.3s ease';
-        }
-        
-        unlockBtn.style.display = 'none';
-        lockBtn.style.display = 'block';
-        
-        if (statusDiv) {
-          const txt = statusDiv.querySelector('.status-text');
-          if (txt) txt.textContent = z.emoji + ' ' + z.name + ' - UNLOCKED';
-          statusDiv.style.background = 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)';
-          statusDiv.style.borderLeftColor = '#FF9800';
-          const ico = statusDiv.querySelector('div:first-child');
-          if (ico) ico.textContent = '🔓';
-        }
-      });
-      
-      lockBtn.addEventListener('click', function() {
-        if (!currentMarker || !currentZone) return;
-        
-        currentMarker.dragging.disable();
-        
-        const el = currentMarker.getElement();
-        if (el) {
-          el.style.filter = '';
-          el.style.transform = '';
-        }
-        
-        const pos = currentMarker.getLatLng();
-        console.log('Locked:', currentZone.name, [pos.lat, pos.lng]);
-        
-        unlockBtn.style.display = 'block';
-        lockBtn.style.display = 'none';
-        
-        if (statusDiv) {
-          const txt = statusDiv.querySelector('.status-text');
-          if (txt) txt.textContent = 'All Zones Locked';
-          statusDiv.style.background = 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)';
-          statusDiv.style.borderLeftColor = '#F44336';
-          const ico = statusDiv.querySelector('div:first-child');
-          if (ico) ico.textContent = '🔒';
-        }
-        
-        currentMarker = null;
-        currentZone = null;
-      });
-      
-      console.log('Zone movement controls initialized (multi-property)');
-    })();
-    
+    // (Old one-zone-at-a-time movement UI removed — replaced by the Position
+    // Editor above, which unlocks a whole property's icons at once.)
         // Image upload handling function
     function handleImageUpload(input, zoneId, category) {
       const files = input.files;

@@ -14,9 +14,11 @@ Guidance for AI coding assistants working in this repository.
 - **Zone panels:** `generateProjectDetails(zone)` looks up `propertiesById[zone.propertyId]` for the per-property CTA + footer. Zone galleries fetch `/api/images/:propertyId/:zoneId/:category` (manifest: `image-urls.js`, namespaced by property id; `'property'` zoneId = property panel gallery). Sulphur photos are absolute raw.githubusercontent.com URLs into EcoVillage-map.
 - **Zone ids may repeat across properties** (both have `community-hub`) — everything is keyed `propertyId + '/' + zoneId` where uniqueness matters (admin markerMap, selector values); the images API namespaces by property.
 
-## Reposition mode (ON)
+## Position Editor (V0.4 — ON)
 
-⚙️ admin: dropdown grouped by property (optgroups) → unlock → drag → lock → Capture overlay outputs `{ "<propertyId>": { "<zoneId>": [lat, lng], ... }, ... }` for pasting back to Claude. To hide for public release: restore `display: none !important;` on `.admin-menu-toggle`.
+⚙️ opens the Position Editor (never auto-closes on outside clicks): property buttons (auto-generated from `PROPERTIES`) → Start Editing unlocks ALL of that property's markers (`.marker-editing` glow — box-shadow-only animation so it never fights the zoom-scale inline transform) → drags update `zone.position`, redraw the territory circle via `window.zoneTerritories[propId/zoneId]` (single mutable reference — repeat drags never stack duplicate circles), and feed `window.notifyZoneMoved` (live moved-list UI). While `window.positionEditActive` is true, zone-marker and boundary click handlers are suppressed so panels can't open mid-edit. Reset restores `zone.originalPosition` for the whole property. Capture overlay outputs `{ "<propertyId>": { "<zoneId>": [lat, lng], ... }, ... }` for pasting back to Claude. To hide for public release: restore `display: none !important;` on `.admin-menu-toggle`.
+
+**Testing note:** the frontend lives inside a template literal, so `node --check server-complete.js` does NOT validate the embedded page JS. Always extract the served page's `<script>` block and `node --check` that too.
 
 ## Commands
 

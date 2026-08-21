@@ -21,9 +21,13 @@ Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://git
 
 That's it — boundaries, panels, icons, admin tools, and the overview all pick it up automatically.
 
-## Repositioning icons (currently enabled)
+## Position Editor (currently enabled)
 
-⚙️ button → select a zone (grouped by property) → Unlock → drag → Lock → **💾 Capture All Positions** → copy the JSON (grouped by property) → paste it to Claude to commit permanently.
+Click the **⚙️ button** (top right) to open the Position Editor — it stays open while you work:
+
+1. **Pick a property** — the map flies there (buttons appear automatically for every property)
+2. **Start Editing** — ALL of that property's icons unlock at once with a glowing pulse; drag any of them (the map still pans/zooms; icon taps won't open panels while editing). A live list shows everything you've moved, and **Reset This Property** undoes the session.
+3. **Done — Lock Positions**, then **💾 Capture All Positions** → **📋 Copy** the property-grouped JSON and paste it to Claude to commit permanently.
 
 ## Quick Start
 
