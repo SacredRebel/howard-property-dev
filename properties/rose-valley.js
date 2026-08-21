@@ -63,6 +63,15 @@ const ROSE_PANEL_HTML = '<div class="image-gallery-section" style="margin-bottom
     '<li><strong>Creek frontage</strong> and abundant wildlife under dark, star-filled skies</li>' +
     '<li><strong>Due diligence head start</strong> — archaeology and soils work already done</li>' +
   '</ul>' +
+'</div>' +
+
+'<div class="property-info-section">' +
+  '<h4>📐 Boundary Note</h4>' +
+  '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">' +
+    '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
+      '<p style="margin: 0;">The line shown is the county assessor\'s mapped parcel. Rose Valley sits in <strong>unsurveyed federal township land</strong>, so recorded lines here are protracted (mathematically projected) — the historic fencing on the ground differs from the mapped line by roughly 30–60 m in places, and this is true of every parcel in the valley. A licensed survey is the only way to fix the true corners — recommended as part of purchase due diligence (and a fair negotiation point).</p>' +
+    '</div>' +
+  '</div>' +
 '</div>';
 
 const ROSE_BOUNDARY = [
