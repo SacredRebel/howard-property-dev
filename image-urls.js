@@ -25,7 +25,40 @@ export const IMAGE_URLS = {
   },
   'black-mountain-ranch': {
     'property': {
-      current: []
+      current: [
+        '/images/black-mountain-ranch/property/current/hero-ojai-mountains.jpg'
+      ],
+      vision: [
+        '/images/black-mountain-ranch/property/vision/vision-hero-split.jpg',
+        '/images/black-mountain-ranch/property/vision/hero-communities.jpg'
+      ]
+    },
+    'chumash-village': {
+      vision: [
+        '/images/black-mountain-ranch/chumash-village/vision/hero-indigenous-ceremony.jpg',
+        '/images/black-mountain-ranch/chumash-village/vision/ancient-wisdom.jpg'
+      ]
+    },
+    'white-buffalo-temple': {
+      vision: [
+        '/images/black-mountain-ranch/white-buffalo-temple/vision/synthesis-ceremony.jpg'
+      ]
+    },
+    'lemuria-studios': {
+      vision: [
+        '/images/black-mountain-ranch/lemuria-studios/vision/hero-technology-spatial-web.jpg',
+        '/images/black-mountain-ranch/lemuria-studios/vision/modern-innovation.jpg'
+      ]
+    },
+    'regenerative-agriculture': {
+      vision: [
+        '/images/black-mountain-ranch/regenerative-agriculture/vision/hero-regenerative-farm.jpg'
+      ]
+    },
+    'white-buffalo-dome': {
+      vision: [
+        '/images/black-mountain-ranch/white-buffalo-dome/vision/hero-ar-community.jpg'
+      ]
     }
   },
   'sulphur-mountain': {

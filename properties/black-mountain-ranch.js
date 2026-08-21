@@ -1,6 +1,6 @@
 // Black Mountain Ranch — property module for the multi-property map.
 // 8434 Ojai Santa Paula Rd, Ojai, CA 93023 · ~3,600 acres reported · 63 tax parcels
-// 62 parcels mapped so far (Assessor Bk 035 Pgs 030 + 350) = 2769.8 county acres.
+// 63 parcels (Assessor Bk 035 Pgs 02 + 03 + 35) = 3380.2 county acres — complete.
 // Every lot boundary is the REAL county parcel line (Ventura County GIS parcel
 // service, WGS84, validated parcel-by-parcel against county acreage records).
 // The outer rainbow boundary is the computed union of all lot polygons.
@@ -35,7 +35,7 @@ const BMR_PANEL_HTML = '<div class="image-gallery-section" style="margin-bottom:
   '</div>' +
   '<div class="property-detail-row">' +
     '<span class="property-detail-label">Mapped so far:</span>' +
-    '<span class="property-detail-value">62 parcels · 2770 county-recorded acres (Assessor Bk 035, Pgs 030 + 350)</span>' +
+    '<span class="property-detail-value">63 parcels · 3380 county-recorded acres — complete (Assessor Bk 035, Pgs 02 + 03 + 35)</span>' +
   '</div>' +
 '</div>' +
 
@@ -64,9 +64,9 @@ const BMR_PANEL_HTML = '<div class="image-gallery-section" style="margin-bottom:
 '<div class="property-info-section">' +
   '<h4>💡 About This Map</h4>' +
   '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #FF9800;">' +
-    '<div style="font-weight: 600; color: #FF9800; margin-bottom: 10px; font-size: 14px;">🚧 Acquisition Study</div>' +
+    '<div style="font-weight: 600; color: #4CAF50; margin-bottom: 10px; font-size: 14px;">✅ Parcel Structure Complete</div>' +
     '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
-      '<p style="margin: 0;">This is the parcel-structure map for the ranch. Roughly 830 reported acres sit on additional assessor pages still being identified against the ownership records. Project zones and vision content come next.</p>' +
+      '<p style="margin: 0;">All <strong>63 parcels confirmed</strong> — including the 610-acre North Ridge parcel (deed-verified against the 2001 assembly and confirmed by ownership records). Every boundary here is the recorded county line. Flip to Vision to see what this land becomes.</p>' +
     '</div>' +
   '</div>' +
 '</div>';
@@ -74,118 +74,118 @@ const BMR_PANEL_HTML = '<div class="image-gallery-section" style="margin-bottom:
 const BMR_BOUNDARY = [
   {
     id: 'bmr_boundary_1',
-    coordinates: [[34.406194,-119.243073],[34.406188,-119.241851],[34.406088,-119.240396],[34.405842,-119.2368],[34.40694,-119.236829],[34.409018,-119.236884],[34.408846,-119.233213],[34.408787,-119.231958],[34.408841,-119.229332],[34.40885,-119.228868],[34.408979,-119.222604],[34.409033,-119.219935],[34.409108,-119.216249],[34.409116,-119.215875],[34.409122,-119.215554],[34.408573,-119.209107]],
+    coordinates: [[34.406194,-119.243073],[34.406188,-119.241851],[34.406088,-119.240396],[34.405842,-119.2368],[34.40694,-119.236829],[34.409018,-119.236884],[34.408846,-119.233213],[34.408787,-119.231958],[34.408841,-119.229332],[34.40885,-119.228868],[34.408979,-119.222604],[34.409033,-119.219935],[34.409108,-119.216249],[34.409116,-119.215875],[34.409122,-119.215554],[34.408573,-119.209107],[34.408369,-119.206714]],
     thickness: 10,
     gradientColors: ["#9C27B0","#673AB7","#3F51B5","#2196F3"],
     glowColor: '#9C27B0',
     description: 'North Boundary (county parcel union)',
     name: 'North Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg1'
   },
   {
     id: 'bmr_boundary_2',
-    coordinates: [[34.408573,-119.209107],[34.408369,-119.206714],[34.409625,-119.206683],[34.409936,-119.206675],[34.413742,-119.206579],[34.41465,-119.206557],[34.415247,-119.206541],[34.415662,-119.206531],[34.415516,-119.203714],[34.413984,-119.203374],[34.414031,-119.202901],[34.414379,-119.199396],[34.414545,-119.197726],[34.414832,-119.194835],[34.414956,-119.193591],[34.414986,-119.19329]],
+    coordinates: [[34.408369,-119.206714],[34.409625,-119.206683],[34.409936,-119.206675],[34.413742,-119.206579],[34.41465,-119.206557],[34.415247,-119.206541],[34.415662,-119.206531],[34.415516,-119.203714],[34.413984,-119.203374],[34.414031,-119.202901],[34.414379,-119.199396],[34.414545,-119.197726],[34.414832,-119.194835],[34.414956,-119.193591],[34.414986,-119.19329],[34.415156,-119.191573],[34.415204,-119.191091]],
     thickness: 10,
     gradientColors: ["#2196F3","#03A9F4","#00BCD4","#26C6DA"],
     glowColor: '#00BCD4',
     description: 'Northeast Boundary (county parcel union)',
     name: 'Northeast Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg2'
   },
   {
     id: 'bmr_boundary_3',
-    coordinates: [[34.414986,-119.19329],[34.415156,-119.191573],[34.415204,-119.191091],[34.415424,-119.188872],[34.415451,-119.188605],[34.415691,-119.186183],[34.415863,-119.18445],[34.416145,-119.181605],[34.431487,-119.182826],[34.434971,-119.182773],[34.434967,-119.182911],[34.435667,-119.182905],[34.435704,-119.183017],[34.435734,-119.183115],[34.435757,-119.183216],[34.435774,-119.183317]],
+    coordinates: [[34.415204,-119.191091],[34.415424,-119.188872],[34.415451,-119.188605],[34.415691,-119.186183],[34.415863,-119.18445],[34.416145,-119.181605],[34.431487,-119.182826],[34.434971,-119.182773],[34.434967,-119.182911],[34.435667,-119.182905],[34.435704,-119.183017],[34.435734,-119.183115],[34.435757,-119.183216],[34.435774,-119.183317],[34.435784,-119.18342],[34.435788,-119.183523],[34.435785,-119.183626]],
     thickness: 10,
     gradientColors: ["#00BCD4","#00ACC1","#0097A7","#4CAF50"],
     glowColor: '#00BCD4',
     description: 'East Boundary (county parcel union)',
     name: 'East Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg3'
   },
   {
     id: 'bmr_boundary_4',
-    coordinates: [[34.435774,-119.183317],[34.435784,-119.18342],[34.435788,-119.183523],[34.435785,-119.183626],[34.435776,-119.183729],[34.435761,-119.18383],[34.435739,-119.183931],[34.43571,-119.18403],[34.435676,-119.184127],[34.435635,-119.184222],[34.435588,-119.184314],[34.435536,-119.184403],[34.435041,-119.185152],[34.434981,-119.185251],[34.434926,-119.185353],[34.434879,-119.185459]],
+    coordinates: [[34.435785,-119.183626],[34.435776,-119.183729],[34.435761,-119.18383],[34.435739,-119.183931],[34.43571,-119.18403],[34.435676,-119.184127],[34.435635,-119.184222],[34.435588,-119.184314],[34.435536,-119.184403],[34.435041,-119.185152],[34.434981,-119.185251],[34.434926,-119.185353],[34.434879,-119.185459],[34.434837,-119.185567],[34.434517,-119.186488],[34.434485,-119.186597],[34.434458,-119.186708]],
     thickness: 10,
     gradientColors: ["#4CAF50","#66BB6A","#81C784","#8BC34A"],
     glowColor: '#4CAF50',
     description: 'Southeast Boundary (county parcel union)',
     name: 'Southeast Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg4'
   },
   {
     id: 'bmr_boundary_5',
-    coordinates: [[34.434879,-119.185459],[34.434837,-119.185567],[34.434517,-119.186488],[34.434485,-119.186597],[34.434458,-119.186708],[34.434438,-119.18682],[34.434424,-119.186933],[34.434271,-119.188506],[34.434235,-119.188874],[34.434227,-119.188994],[34.434225,-119.189114],[34.434231,-119.189235],[34.434244,-119.189355],[34.434263,-119.189474],[34.434289,-119.189592],[34.434322,-119.189708]],
+    coordinates: [[34.434458,-119.186708],[34.434438,-119.18682],[34.434424,-119.186933],[34.434271,-119.188506],[34.434235,-119.188874],[34.434227,-119.188994],[34.434225,-119.189114],[34.434231,-119.189235],[34.434244,-119.189355],[34.434263,-119.189474],[34.434289,-119.189592],[34.434322,-119.189708],[34.434362,-119.189821],[34.434559,-119.190331],[34.434614,-119.190473],[34.434645,-119.190563],[34.434669,-119.190654]],
     thickness: 10,
     gradientColors: ["#8BC34A","#CDDC39","#D4E157","#FFEB3B"],
     glowColor: '#CDDC39',
     description: 'South Boundary (East) (county parcel union)',
     name: 'South Boundary (East)',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg5'
   },
   {
     id: 'bmr_boundary_6',
-    coordinates: [[34.434322,-119.189708],[34.434362,-119.189821],[34.434559,-119.190331],[34.434614,-119.190473],[34.434645,-119.190563],[34.434669,-119.190654],[34.434688,-119.190747],[34.434701,-119.190841],[34.434708,-119.190936],[34.434709,-119.191031],[34.434703,-119.191125],[34.434691,-119.19122],[34.434674,-119.191313],[34.434388,-119.192583],[34.432759,-119.198276],[34.432581,-119.198893]],
+    coordinates: [[34.434669,-119.190654],[34.434688,-119.190747],[34.434701,-119.190841],[34.434708,-119.190936],[34.434709,-119.191031],[34.434703,-119.191125],[34.434691,-119.19122],[34.434674,-119.191313],[34.434388,-119.192583],[34.432759,-119.198276],[34.432581,-119.198893],[34.432554,-119.198999],[34.432534,-119.199107],[34.432521,-119.199216],[34.432515,-119.199325],[34.432516,-119.199435],[34.432525,-119.199544]],
     thickness: 10,
     gradientColors: ["#FFEB3B","#FDD835","#FBC02D","#FFC107"],
     glowColor: '#FDD835',
     description: 'South Boundary (West) (county parcel union)',
     name: 'South Boundary (West)',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg6'
   },
   {
     id: 'bmr_boundary_7',
-    coordinates: [[34.432581,-119.198893],[34.432554,-119.198999],[34.432534,-119.199107],[34.432521,-119.199216],[34.432515,-119.199325],[34.432516,-119.199435],[34.432525,-119.199544],[34.43254,-119.199653],[34.432563,-119.19976],[34.432592,-119.199865],[34.432629,-119.199969],[34.432672,-119.20007],[34.432721,-119.200167],[34.432748,-119.200213],[34.432791,-119.200278],[34.432837,-119.20034]],
+    coordinates: [[34.432525,-119.199544],[34.43254,-119.199653],[34.432563,-119.19976],[34.432592,-119.199865],[34.432629,-119.199969],[34.432672,-119.20007],[34.432721,-119.200167],[34.432748,-119.200213],[34.432791,-119.200278],[34.432837,-119.20034],[34.432887,-119.2004],[34.43294,-119.200457],[34.432979,-119.200495],[34.433532,-119.201005],[34.433586,-119.201053],[34.433642,-119.201099],[34.433701,-119.201141]],
     thickness: 10,
     gradientColors: ["#FFC107","#FFB300","#FFA000","#FF8F00"],
     glowColor: '#FFC107',
     description: 'Southwest Boundary (county parcel union)',
     name: 'Southwest Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg7'
   },
   {
     id: 'bmr_boundary_8',
-    coordinates: [[34.432837,-119.20034],[34.432887,-119.2004],[34.43294,-119.200457],[34.432979,-119.200495],[34.433532,-119.201005],[34.433586,-119.201053],[34.433642,-119.201099],[34.433701,-119.201141],[34.434036,-119.201371],[34.434115,-119.201421],[34.434197,-119.201466],[34.434282,-119.201505],[34.43437,-119.201537],[34.43446,-119.201563],[34.434552,-119.201582],[34.434645,-119.201594]],
+    coordinates: [[34.433701,-119.201141],[34.434036,-119.201371],[34.434115,-119.201421],[34.434197,-119.201466],[34.434282,-119.201505],[34.43437,-119.201537],[34.43446,-119.201563],[34.434552,-119.201582],[34.434645,-119.201594],[34.43469,-119.201598],[34.434756,-119.2016],[34.434823,-119.201604],[34.434272,-119.203019],[34.437037,-119.205377],[34.440613,-119.208426],[34.44242,-119.209963],[34.442538,-119.210068]],
     thickness: 10,
     gradientColors: ["#FF8F00","#FF6F00","#E65100","#FF5722"],
     glowColor: '#FF6F00',
     description: 'West Boundary (county parcel union)',
     name: 'West Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg8'
   },
   {
     id: 'bmr_boundary_9',
-    coordinates: [[34.434645,-119.201594],[34.434065,-119.203081],[34.432563,-119.203552],[34.432551,-119.207834],[34.432539,-119.212037],[34.432531,-119.214883],[34.430308,-119.214874],[34.425706,-119.214855],[34.425349,-119.217795],[34.424902,-119.221471],[34.424497,-119.224805],[34.424349,-119.226015],[34.423558,-119.232521],[34.422679,-119.239743],[34.422448,-119.241646],[34.422302,-119.242839]],
+    coordinates: [[34.442538,-119.210068],[34.442367,-119.210831],[34.441906,-119.21288],[34.441661,-119.213972],[34.441037,-119.216753],[34.440856,-119.217558],[34.440416,-119.220079],[34.440075,-119.221997],[34.440362,-119.224842],[34.440363,-119.224857],[34.432041,-119.22483],[34.424497,-119.224805],[34.424349,-119.226015],[34.423558,-119.232521],[34.422679,-119.239743],[34.422448,-119.241646],[34.422302,-119.242839]],
     thickness: 10,
     gradientColors: ["#FF5722","#F4511E","#E64A19","#E91E63"],
     glowColor: '#FF5722',
     description: 'Northwest Boundary (county parcel union)',
     name: 'Northwest Boundary',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg9'
   },
@@ -198,13 +198,20 @@ const BMR_BOUNDARY = [
     description: 'North Boundary (West) (county parcel union)',
     name: 'North Boundary (West)',
     length: 'part of ~11 mi perimeter',
-    features: ['Assembled from 62 county parcels'],
+    features: ['Assembled from 63 county parcels'],
     permanent: true,
     section: 'seg10'
   }
 ];
 
 const BMR_LOTS = [
+  {
+    id: '0350020010',
+    apn: '035-0-020-010',
+    name: "Lot 1 (Bk 35 Pg 02 — North Ridge)",
+    acreage: "610.41",
+    rings: [[[34.44242,-119.209963],[34.442538,-119.210068],[34.442367,-119.210831],[34.441906,-119.21288],[34.441661,-119.213972],[34.441037,-119.216753],[34.440856,-119.217558],[34.440416,-119.220079],[34.440075,-119.221997],[34.440362,-119.224842],[34.440363,-119.224857],[34.432041,-119.22483],[34.424497,-119.224805],[34.424902,-119.221471],[34.425349,-119.217795],[34.425706,-119.214855],[34.430308,-119.214874],[34.432531,-119.214883],[34.432539,-119.212037],[34.432551,-119.207834],[34.432563,-119.203552],[34.434065,-119.203081],[34.434645,-119.201594],[34.43469,-119.201598],[34.434756,-119.2016],[34.434823,-119.201604],[34.434272,-119.203019],[34.437037,-119.205377],[34.440613,-119.208426],[34.44242,-119.209963]]]
+  },
   {
     id: '0350030055',
     apn: '035-0-030-055',
@@ -658,10 +665,10 @@ export const BMR_PROPERTY = {
   name: 'Black Mountain Ranch',
   shortLabel: '⛰️ Black Mtn',
   labelChip: '⛰️ Black Mountain Ranch',
-  center: [34.420978,-119.212339],
+  center: [34.42419,-119.212339],
   zoom: 14,
   footerTitle: '⛰️ Black Mountain Ranch',
-  footerInfo: ['62 Parcels Mapped', '~3,600 Acres', '8434 Ojai Santa Paula Rd', 'Upper Ojai, CA'],
+  footerInfo: ['63 Parcels Mapped', '~3,600 Acres', '8434 Ojai Santa Paula Rd', 'Upper Ojai, CA'],
   cta: {
     heading: "Let's Talk About This Idea",
     paragraph: 'Black Mountain Ranch is the biggest vision on this map — a 3,600-acre legacy landscape. This map lays out its real parcel structure as the foundation for everything that comes next.',
@@ -675,5 +682,146 @@ export const BMR_PROPERTY = {
   lotStyle: { color: '#FFFFFF', weight: 1.4, opacity: 0.85, fillColor: '#FFFFFF', fillOpacity: 0.05 },
   boundary: BMR_BOUNDARY,
   lots: BMR_LOTS,
-  zones: []
+  visionLabelChip: "⛰️ Lemuria Headquarters",
+  visionPanel: { title: "Lemuria Headquarters — Black Mountain Ranch", html: "<div class=\"image-gallery-section\" style=\"margin-bottom: 20px;\"><h4 style=\"margin-bottom: 12px; color: #7C3AED;\">📸 Vision Gallery</h4><div class=\"carousel-container\"><div class=\"carousel-main\" id=\"property-carousel-main\"><div class=\"carousel-loading\">Loading images...</div></div><div class=\"carousel-thumbnails\" id=\"property-carousel-thumbnails\"></div></div></div><div class=\"property-info-section\"><h4>✨ The Headquarters of Lemuria Life</h4><div style=\"background: linear-gradient(135deg, #1a1030 0%, #2a1a40 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #FFD700;\"><div style=\"color: #FFE9A8; line-height: 1.8; font-size: 14px;\"><p style=\"margin: 0 0 10px 0;\"><strong>3,600 acres in Upper Ojai become the flagship of the Regenerative Renaissance</strong> — the headquarters of a network designed to inspire, fund, and develop 1,000+ regenerative communities worldwide.</p><p style=\"margin: 0;\">Pending purchase <strong>$50M</strong> · Development investment <strong>$250M</strong> · Projected value <strong>$1B+</strong></p></div></div></div><div class=\"property-info-section\"><h4>🗺️ Six-Zone Master Plan</h4><ul class=\"property-features-list\"><li><strong>🏘️ Chumash Village</strong> — 50 carbon-negative homes, museum & craft workshops · $75M</li><li><strong>🕊️ Temple of the White Buffalo</strong> — 500-person acoustic spiritual center · $25M</li><li><strong>🦬 Buffalo Ranch & Rewilding</strong> — 200+ buffalo restoration program · $30M</li><li><strong>🎬 Lemuria Studios</strong> — the New Hollywood, 12+ productions/yr · $40M</li><li><strong>🌾 Regenerative Agriculture</strong> — food for 1,000+ people · $35M</li><li><strong>🛖 White Buffalo Dome</strong> — Chumash immersive center & Indigenous University · $20M</li></ul></div><div class=\"property-info-section\"><h4>🏛️ Flagship Programs</h4><div class=\"property-detail-row\"><span class=\"property-detail-label\">Indigenous University:</span><span class=\"property-detail-value\">Connecting the Ancient and the New</span></div><div class=\"property-detail-row\"><span class=\"property-detail-label\">Lemuria Studios:</span><span class=\"property-detail-value\">Distributed studio network — content for the Golden Age</span></div><div class=\"property-detail-row\"><span class=\"property-detail-label\">Oya Spa Hotels:</span><span class=\"property-detail-value\">Wellness hotel network integrating the Oya Spa brand</span></div><div class=\"property-detail-row\"><span class=\"property-detail-label\">Quantum Energy Center:</span><span class=\"property-detail-value\">Patented self-generative pumping technology</span></div></div><div class=\"property-info-section\"><h4>📈 The Path</h4><div style=\"background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;\"><div style=\"color: #555; line-height: 1.8; font-size: 14px;\"><p style=\"margin: 0 0 10px 0;\"><strong>Phase 1 ($50M):</strong> acquisition + 10 fireproof premium homes on 40-acre lots. <strong>Phase 2 ($250M):</strong> the six zones + hospitality network. <strong>Phase 3 ($1B):</strong> global ecosystem.</p><p style=\"margin: 0;\">Flip the toggle to <strong>Today</strong> to see the real county parcel structure underneath this vision — all 63 confirmed parcels, 3,380 county-recorded acres, every line a recorded boundary.</p></div></div></div>" },
+  zones: [
+    {
+      "id": "chumash-village",
+      "name": "Chumash Village",
+      "emoji": "🏘️",
+      "position": [
+        34.4185,
+        -119.227
+      ],
+      "type": "community",
+      "budget": "$75M development",
+      "timeline": "Phase 1–2",
+      "monthlyRevenue": "50 homes + communal buildings",
+      "roi": "Cultural heart of the ranch",
+      "mode": "vision",
+      "description": "A living village honoring the first people of this valley — 50 carbon-negative residences woven around ceremony and gathering spaces, with a visitors center, museum, and traditional craft workshops built in partnership with the Chumash Nation.",
+      "features": [
+        "Carbon-negative residences (fire & seismic engineered)",
+        "Ceremony and gathering spaces",
+        "Visitors center and museum",
+        "Traditional craft workshops",
+        "Built through the Chumash Nation partnership protocols"
+      ]
+    },
+    {
+      "id": "white-buffalo-temple",
+      "name": "Temple of the White Buffalo",
+      "emoji": "🕊️",
+      "position": [
+        34.4262,
+        -119.212
+      ],
+      "type": "ceremonial",
+      "budget": "$25M development",
+      "timeline": "Phase 1–2",
+      "monthlyRevenue": "500-person capacity",
+      "roi": "Spiritual centerpiece",
+      "mode": "vision",
+      "description": "An acoustically designed spiritual center at the heart of the headquarters — healing and activation chambers, sound therapy facilities, and meditation gardens where the ancient and the new meet in ceremony.",
+      "features": [
+        "Acoustically designed spiritual center (500 capacity)",
+        "Healing and activation chambers",
+        "Sound therapy facilities",
+        "Meditation gardens",
+        "Home of the Circle-of-Truth gatherings"
+      ]
+    },
+    {
+      "id": "buffalo-rewilding",
+      "name": "Buffalo Ranch & Rewilding",
+      "emoji": "🦬",
+      "position": [
+        34.4235,
+        -119.1935
+      ],
+      "type": "landscape",
+      "budget": "$30M development",
+      "timeline": "Phase 1–3",
+      "monthlyRevenue": "200+ buffalo target herd",
+      "roi": "Living land restoration",
+      "mode": "vision",
+      "description": "American Buffalo return to these hills — a restoration program with wildlife corridors, habitat regeneration, educational tours, and a research and breeding center, converting the working cattle ranch into a rewilded sanctuary.",
+      "features": [
+        "American Buffalo restoration program (200+ herd target)",
+        "Wildlife corridors and habitat restoration",
+        "Educational tour facilities",
+        "Research and breeding center",
+        "Builds on the ranch’s existing working-ranch infrastructure"
+      ]
+    },
+    {
+      "id": "lemuria-studios",
+      "name": "Lemuria Studios",
+      "emoji": "🎬",
+      "position": [
+        34.4135,
+        -119.2145
+      ],
+      "type": "creative",
+      "budget": "$40M development",
+      "timeline": "Phase 1–2",
+      "monthlyRevenue": "12+ productions / year",
+      "roi": "The New Hollywood construct",
+      "mode": "vision",
+      "description": "Media and production studios cultivating the New Hollywood — film and television stages, podcast and streaming facilities, VR creation labs, and a distribution center producing content that inspires and implements the Golden Age.",
+      "features": [
+        "Film and television production stages",
+        "Podcast and streaming facilities",
+        "Virtual reality creation labs",
+        "Content distribution center — LightBody Love Productions",
+        "Properties as content-creation machines: construction, events, regeneration"
+      ]
+    },
+    {
+      "id": "regenerative-agriculture",
+      "name": "Regenerative Agriculture",
+      "emoji": "🌾",
+      "position": [
+        34.4105,
+        -119.2295
+      ],
+      "type": "agriculture",
+      "budget": "$35M development",
+      "timeline": "Phase 1–3",
+      "monthlyRevenue": "Feeds 1,000+ people",
+      "roi": "Food sovereignty engine",
+      "mode": "vision",
+      "description": "Permaculture farming systems across the ranch flats — medicinal herb cultivation, advanced water management, and soil restoration projects yielding food for more than a thousand people while healing the land.",
+      "features": [
+        "Permaculture farming systems",
+        "Medicinal herb and mushroom cultivation",
+        "Advanced water management + patented self-generative pumping",
+        "Soil restoration projects",
+        "Ceremonial herbal garden supplying the healing programs"
+      ]
+    },
+    {
+      "id": "white-buffalo-dome",
+      "name": "White Buffalo Dome",
+      "emoji": "🛖",
+      "position": [
+        34.4238,
+        -119.2185
+      ],
+      "type": "events",
+      "budget": "$20M development",
+      "timeline": "Phase 2",
+      "monthlyRevenue": "Year-round cultural events",
+      "roi": "Indigenous University anchor",
+      "mode": "vision",
+      "description": "A Chumash immersive experience center — Native American cultural programs, educational workshops, and community gathering under one great dome, anchoring the Indigenous University: connecting the Ancient and the New.",
+      "features": [
+        "Chumash immersive experience center",
+        "Native American cultural programs",
+        "Educational workshops — Indigenous University",
+        "Community gathering space",
+        "Year-round cultural events calendar"
+      ]
+    }
+  ]
 };

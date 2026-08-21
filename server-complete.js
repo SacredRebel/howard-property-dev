@@ -2573,6 +2573,44 @@ app.get('/', (req, res) => {
     /* Icons being edited stay visible at any zoom */
     .zone-marker.marker-editing { display: block !important; }
 
+    /* ---- Current / Vision mode toggle ---- */
+    #mode-toggle {
+      position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 1200; display: flex; gap: 2px;
+      background: rgba(18, 18, 30, 0.82);
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 999px;
+      padding: 4px; cursor: pointer; user-select: none;
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      transition: box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+    #mode-toggle .mt-opt {
+      padding: 7px 18px; border-radius: 999px; font-weight: 700;
+      font-size: 13px; letter-spacing: 0.4px; line-height: 1;
+      color: rgba(255,255,255,0.6); transition: all 0.3s ease;
+    }
+    #mode-toggle .mt-current { background: rgba(255,255,255,0.94); color: #1a1a2e; }
+    #mode-toggle.vision .mt-current { background: transparent; color: rgba(255,255,255,0.6); }
+    #mode-toggle.vision .mt-vision {
+      background: linear-gradient(135deg, #FFD700 0%, #FFB300 55%, #FF8F00 100%);
+      color: #2a1600; box-shadow: 0 0 18px rgba(255, 200, 60, 0.6);
+    }
+    #mode-toggle.vision { border-color: rgba(255, 215, 0, 0.55); box-shadow: 0 6px 24px rgba(255, 180, 40, 0.35); }
+    @media (max-width: 640px) {
+      #mode-toggle { top: 10px; }
+      #mode-toggle .mt-opt { padding: 6px 13px; font-size: 12px; }
+    }
+    /* Vision-mode ambience */
+    body.vision-mode .map-footer {
+      background: linear-gradient(90deg, #1a1030, #2d1b45, #1a1030);
+      color: #FFE9A8; border-top: 1px solid rgba(255, 215, 0, 0.35);
+    }
+    body.vision-mode .property-label-chip {
+      background: linear-gradient(135deg, #3b2160 0%, #6a3d9a 100%);
+      border-color: rgba(255, 215, 0, 0.75);
+      box-shadow: 0 4px 14px rgba(80, 40, 140, 0.55), 0 0 12px rgba(255, 215, 0, 0.25);
+    }
+
     @media (max-width: 768px) {
       .admin-popup {
         top: auto; bottom: 12px; left: 10px; right: 10px; width: auto;
@@ -2702,13 +2740,17 @@ app.get('/', (req, res) => {
     </div>
   </div>
   
+  <!-- Current / Vision mode toggle -->
+  <div id="mode-toggle" title="Switch between today's reality and the Lemuria vision">
+    <span class="mt-opt mt-current">Today</span>
+    <span class="mt-opt mt-vision">✨ Vision</span>
+  </div>
+
   <!-- Map Container -->
   <div id="map"></div>
   
   <!-- Footer -->
-  <div class="map-footer">
-    © 2026 Ojai Valley Properties | ${PROPERTIES.length} Properties • ${PROJECT_ZONES.length} Projects | Interactive Map
-  </div>
+  <div class="map-footer"><span id="map-footer-text">© 2026 Ojai Valley Properties | ${PROPERTIES.length} Properties • ${PROJECT_ZONES.filter(z => (z.mode || 'both') !== 'vision').length} Projects | Interactive Map</span></div>
   
   <script>
     console.log('🗺️ Initializing Howard Property Interactive Map...');
@@ -3004,6 +3046,11 @@ app.get('/', (req, res) => {
           iconAnchor: [0, 0]
         })
       }).addTo(map);
+      if (!window.propertyChipEls) window.propertyChipEls = {};
+      window.propertyChipEls[prop.id] = function() {
+        var el = labelMarker.getElement();
+        return el && el.querySelector('.property-label-chip');
+      };
       labelMarker.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
         map.flyTo(prop.center, prop.zoom, { animate: true, duration: 1.0 });
@@ -3083,6 +3130,7 @@ app.get('/', (req, res) => {
         zoneId: zone.id, // Add zone ID for reset functionality
         propertyId: zone.propertyId,
         zoneName: zone.name, // Add zone name for capture functionality
+        zoneMode: zone.mode || 'both', // 'current' | 'vision' | 'both' — gated by the mode toggle
         icon: L.divIcon({
           className: 'zone-marker',
           html: '<div style="background: linear-gradient(135deg, ' + zoneColor + ' 0%, ' + zoneColor + 'dd 50%, ' + zoneColor + 'aa 100%); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 22px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.4); filter: brightness(1.1) contrast(1.1); transform: perspective(100px) rotateX(15deg); text-shadow: 0 1px 2px rgba(0,0,0,0.3);">' + zone.emoji + '</div>',
@@ -3131,6 +3179,13 @@ app.get('/', (req, res) => {
       };
       if (!window.zoneTerritories) window.zoneTerritories = {};
       window.zoneTerritories[territoryKey] = redrawTerritory;
+      if (!window.zoneTerritoryToggles) window.zoneTerritoryToggles = {};
+      window.zoneTerritoryToggles[territoryKey] = function(show) {
+        try {
+          if (show) { if (!map.hasLayer(zonePolygon)) zonePolygon.addTo(map); }
+          else if (map.hasLayer(zonePolygon)) { map.removeLayer(zonePolygon); }
+        } catch (err) {}
+      };
       
       marker.on('dragend', function(e) {
         const newPos = e.target.getLatLng();
@@ -3159,7 +3214,8 @@ app.get('/', (req, res) => {
         // huge ranch at zoom 14 shows its icons while a neighbor's stay tucked.
         const p = propertiesById[m.options && m.options.propertyId];
         const minZoom = p ? (p.zoom - 2.5) : 13.5;
-        el.style.display = (zoom >= minZoom) ? '' : 'none';
+        const inMode = !window.zoneVisibleInMode || window.zoneVisibleInMode(m.options && m.options.zoneMode);
+        el.style.display = (inMode && zoom >= minZoom) ? '' : 'none';
         const inner = el.querySelector('div');
         if (!inner) return;
         inner.style.transform = 'perspective(100px) rotateX(15deg) scale(' + scale + ')';
@@ -3364,13 +3420,14 @@ app.get('/', (req, res) => {
         sidePanel.classList.remove('open', 'swiping');
         sidePanel.style.transform = '';
       }
-      titleEl.textContent = prop.panel.title;
+      const panelData = (window.visionMode && prop.visionPanel) ? prop.visionPanel : prop.panel;
+      titleEl.textContent = panelData.title;
       window.currentPropertyId = prop.id;
 
       panel.classList.add('open');
       if (typeof lockBodyScroll === 'function') lockBodyScroll();
       requestAnimationFrame(function() {
-        contentEl.innerHTML = prop.panel.html;
+        contentEl.innerHTML = panelData.html;
         loadPropertyImages(prop.id);
         requestAnimationFrame(function() {
           if (panel) panel.scrollTop = 0;
@@ -3394,9 +3451,17 @@ app.get('/', (req, res) => {
         return;
       }
       
-      // Use pre-configured property images from IMAGE_URLS
-      fetch('/api/images/' + propId + '/property/current')
+      // Use pre-configured property images from IMAGE_URLS.
+      // Vision mode prefers the property's vision gallery, falling back to current.
+      const propImgCategory = window.visionMode ? 'vision' : 'current';
+      fetch('/api/images/' + propId + '/property/' + propImgCategory)
         .then(response => response.json())
+        .then(data => {
+          if (propImgCategory === 'vision' && (!data.success || !data.images || data.images.length === 0)) {
+            return fetch('/api/images/' + propId + '/property/current').then(function(r) { return r.json(); });
+          }
+          return data;
+        })
         .then(data => {
           if (!data.success || !data.images || data.images.length === 0) {
             console.log('ℹ️ No property images found');
@@ -6201,6 +6266,51 @@ app.get('/', (req, res) => {
     fixTimelineOnMobile();
     window.addEventListener('resize', fixTimelineOnMobile);
     
+    // ---- Current / Vision mode engine ----
+    window.visionMode = false;
+    window.zoneVisibleInMode = function(mode) {
+      mode = mode || 'both';
+      if (mode === 'both') return true;
+      return window.visionMode ? (mode === 'vision') : (mode === 'current');
+    };
+    function applyMode(vision) {
+      window.visionMode = !!vision;
+      try { localStorage.setItem('ojaiMapMode', vision ? 'vision' : 'current'); } catch (err) {}
+      document.body.classList.toggle('vision-mode', !!vision);
+      var tgl = document.getElementById('mode-toggle');
+      if (tgl) tgl.classList.toggle('vision', !!vision);
+      // property chips swap to their vision identity
+      properties.forEach(function(p) {
+        var getEl = window.propertyChipEls && window.propertyChipEls[p.id];
+        var el = getEl && getEl();
+        if (el) el.textContent = (vision && p.visionLabelChip) ? p.visionLabelChip : p.labelChip;
+      });
+      // territory circles follow their zone's mode
+      zones.forEach(function(z) {
+        var t = window.zoneTerritoryToggles && window.zoneTerritoryToggles[z.propertyId + '/' + z.id];
+        if (t) t(window.zoneVisibleInMode(z.mode));
+      });
+      // markers re-evaluate visibility
+      updateMarkerScale();
+      // footer narrative
+      var f = document.getElementById('map-footer-text');
+      if (f) {
+        var visibleZones = zones.filter(function(z) { return window.zoneVisibleInMode(z.mode); }).length;
+        f.textContent = vision
+          ? ('© 2026 Lemuria Life — Sacred Villages | ' + properties.length + ' Properties • ' + visibleZones + ' Vision Projects | The Golden Age Map')
+          : ('© 2026 Ojai Valley Properties | ' + properties.length + ' Properties • ' + visibleZones + ' Projects | Interactive Map');
+      }
+      console.log(vision ? '✨ Vision mode — Lemuria awakens' : '🏞️ Current mode — the reality of today');
+    }
+    window.applyMode = applyMode;
+    var modeToggleEl = document.getElementById('mode-toggle');
+    if (modeToggleEl) {
+      modeToggleEl.addEventListener('click', function() { applyMode(!window.visionMode); });
+    }
+    var savedMode = null;
+    try { savedMode = localStorage.getItem('ojaiMapMode'); } catch (err) {}
+    applyMode(savedMode === 'vision');
+
     console.log('✅ Howard Property Interactive Map fully initialized');
     console.log('🎯 Ready for investor presentations and zone exploration');
     console.log('📁 Image upload system ready - all directories created');

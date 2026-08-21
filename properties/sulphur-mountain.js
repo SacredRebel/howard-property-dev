@@ -1828,6 +1828,7 @@ export const SULPHUR_PROPERTY = {
   name: 'Sulphur Mountain Eco-Village',
   shortLabel: '🌿 Sulphur',
   labelChip: '🌿 Sulphur Mountain Eco-Village',
+  visionLabelChip: '🌿 Lemuria Pilot Community — Est. 2024',
   center: [34.433086, -119.155336],
   zoom: 17,
   footerTitle: '🌿 Sulphur Mountain Eco-Village',

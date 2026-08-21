@@ -4,7 +4,9 @@
 
 ## How it works
 
-The map opens on an **overview** showing every property with its glowing rainbow boundary and name chip. Click a chip (or zoom in) to fly into a property — each property's project icons fade in as you approach that property's own zoom level. Click any icon for the full project page; click a boundary for that property's details panel.
+The map opens on an **overview** showing every property with its glowing rainbow boundary and name chip. Click a chip (or zoom in) to fly into a property — each property's project icons fade in as you approach that property's own zoom level.
+
+**Current ⇄ Vision:** the pill toggle at the top of the map switches the whole platform between **Today** (what exists — real parcels, real photos, factual panels) and **✨ Vision** (the Lemuria Life overlay — golden branding, vision projects, vision galleries, and each property's future identity). The choice is remembered per visitor. Click any icon for the full project page; click a boundary for that property's details panel.
 
 | Property | Projects | Size | Status |
 |---|---|---|---|
@@ -12,7 +14,7 @@ The map opens on an **overview** showing every property with its glowing rainbow
 | 🌿 Sulphur Mountain Eco-Village | 18 zones | ~10 acres | V1 production data |
 | 🌸 Keri's Property | 3 places | ~34 acres | Starting points |
 | 🌹 Cher's Property | 2 places | 2 acres | Starting points |
-| ⛰️ Black Mountain Ranch | 62 real parcels | ~3,600 acres | Acquisition study — parcel structure mapped |
+| ⛰️ Black Mountain Ranch | 63 real parcels · 6 vision zones | 3,380 county acres | Lemuria Headquarters — vision layer live |
 
 Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://github.com/SacredRebel/EcoVillage-map) via raw.githubusercontent.com — no image copies in this repo.
 
@@ -65,7 +67,7 @@ No env vars, no build step.
 │   ├── keris-property.js         # Keri's Property
 │   ├── chers-property.js         # Cher's Property
 │   └── black-mountain-ranch.js   # Black Mountain Ranch (generated — see bmr/)
-├── bmr/                          # Ranch county-parcel data + module generator
+├── bmr/                          # Ranch county-parcel data + generator (+ vision.mjs: Lemuria zones)
 ├── data/zone-positions.json      # Saved icon layout (git-backed source of truth)
 ├── images/                       # Photo uploads — one folder per property & project
 ├── image-urls.js                 # Photo manifests, namespaced by property id
@@ -83,10 +85,11 @@ Drop images into `images/<property>/<project>/current/` (photos of how it looks 
 2. ✅ 13 Howard proposal zones + reposition mode
 3. ✅ Multi-property merge (Sulphur Mountain on the same map)
 4. ✅ Keri's + Cher's properties · icon positions locked in git
-5. ✅ Black Mountain Ranch — 62 county parcels drawn as individual lot territories
-6. ⬜ Ranch: 63rd parcel candidate found (APN 035-0-020-010, 610 ac — see `bmr/PARCEL-63-CANDIDATE.md`), awaiting ownership confirmation; project zones after owner reassessment
-7. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
-8. ⬜ Custom UI theme · hide admin tools for public release
+5. ✅ Black Mountain Ranch — all 63 county parcels drawn as individual lot territories (63rd confirmed by owner)
+6. ✅ 63rd parcel (APN 035-0-020-010, 610 ac North Ridge) confirmed and on the map
+7. ✅ V0.9 — Current ⇄ Vision toggle · Lemuria HQ vision layer (6 zones) · first vision galleries
+8. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
+9. ⬜ Custom UI theme · hide admin tools for public release
 
 ---
 

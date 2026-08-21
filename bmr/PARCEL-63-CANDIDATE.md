@@ -1,4 +1,6 @@
-# Parcel 63 candidate — NOT yet on the map (pending ownership verification)
+**STATUS: CONFIRMED by the owner's side on 2026-08-21 and added to the map in V0.9** — the ranch now renders all 63 parcels (3,380.2 county acres). The parcel appears as 'Lot 1 (Bk 35 Pg 02 — North Ridge)'.
+
+# Parcel 63 — CONFIRMED and on the map (2026-08-21)
 
 **APN 035-0-020-010** · Book 035 Page 02 (only parcel on that page) · **610.41 county acres** · no situs address
 
@@ -13,7 +15,7 @@
   "assembled from 63 separate parcels" — 62 mapped + this one = exactly 63.
 - With it: 3,380.2 county acres ("~3,600" in the listing = marketing rounding).
 
-## Why it's NOT on the map yet
+## Historical note — why it was briefly held back
 
 Owner (johny) recalled a public park/campground up there. Resolved: that is
 **Dennison Park** — a separate county-owned parcel (035-0-290-055, 33.4 ac,

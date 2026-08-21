@@ -1,6 +1,7 @@
 // Generates properties/black-mountain-ranch.js from validated county parcel data.
 import { readFileSync, writeFileSync } from 'fs';
 import pc from 'polygon-clipping';
+import { BMR_VISION_ZONES, BMR_VISION_PANEL, BMR_VISION_LABEL_CHIP } from './vision.mjs';
 
 const parcels = JSON.parse(readFileSync('./bmr/all-parcels.json', 'utf8'));
 const acreage = JSON.parse(readFileSync('./bmr/acreage.json', 'utf8'));
@@ -15,7 +16,7 @@ for (const [apn, data] of Object.entries(parcels)) {
   lots.push({
     id: apn,
     apn: fmtApn(apn),
-    name: 'Lot ' + parseInt(circle, 10) + (page === '350' ? ' (Bk 35 Pg 35)' : ''),
+    name: 'Lot ' + parseInt(circle, 10) + (page === '350' ? ' (Bk 35 Pg 35)' : page === '020' ? ' (Bk 35 Pg 02 — North Ridge)' : ''),
     acreage: acreage[apn],
     rings
   });
@@ -95,7 +96,7 @@ console.log('center:', center, '| county total:', totalAc.toFixed(1), 'ac | lots
 
 const module_ = `// Black Mountain Ranch — property module for the multi-property map.
 // 8434 Ojai Santa Paula Rd, Ojai, CA 93023 · ~3,600 acres reported · 63 tax parcels
-// ${lots.length} parcels mapped so far (Assessor Bk 035 Pgs 030 + 350) = ${totalAc.toFixed(1)} county acres.
+// ${lots.length} parcels (Assessor Bk 035 Pgs 02 + 03 + 35) = ${totalAc.toFixed(1)} county acres — complete.
 // Every lot boundary is the REAL county parcel line (Ventura County GIS parcel
 // service, WGS84, validated parcel-by-parcel against county acreage records).
 // The outer rainbow boundary is the computed union of all lot polygons.
@@ -130,7 +131,7 @@ const BMR_PANEL_HTML = '<div class="image-gallery-section" style="margin-bottom:
   '</div>' +
   '<div class="property-detail-row">' +
     '<span class="property-detail-label">Mapped so far:</span>' +
-    '<span class="property-detail-value">${lots.length} parcels · ${totalAc.toFixed(0)} county-recorded acres (Assessor Bk 035, Pgs 030 + 350)</span>' +
+    '<span class="property-detail-value">${lots.length} parcels · ${totalAc.toFixed(0)} county-recorded acres — complete (Assessor Bk 035, Pgs 02 + 03 + 35)</span>' +
   '</div>' +
 '</div>' +
 
@@ -159,9 +160,9 @@ const BMR_PANEL_HTML = '<div class="image-gallery-section" style="margin-bottom:
 '<div class="property-info-section">' +
   '<h4>💡 About This Map</h4>' +
   '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #FF9800;">' +
-    '<div style="font-weight: 600; color: #FF9800; margin-bottom: 10px; font-size: 14px;">🚧 Acquisition Study</div>' +
+    '<div style="font-weight: 600; color: #4CAF50; margin-bottom: 10px; font-size: 14px;">✅ Parcel Structure Complete</div>' +
     '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
-      '<p style="margin: 0;">This is the parcel-structure map for the ranch. Roughly 830 reported acres sit on additional assessor pages still being identified against the ownership records. Project zones and vision content come next.</p>' +
+      '<p style="margin: 0;">All <strong>${lots.length} parcels confirmed</strong> — including the 610-acre North Ridge parcel (deed-verified against the 2001 assembly and confirmed by ownership records). Every boundary here is the recorded county line. Flip to Vision to see what this land becomes.</p>' +
     '</div>' +
   '</div>' +
 '</div>';
@@ -196,7 +197,9 @@ export const BMR_PROPERTY = {
   lotStyle: { color: '#FFFFFF', weight: 1.4, opacity: 0.85, fillColor: '#FFFFFF', fillOpacity: 0.05 },
   boundary: BMR_BOUNDARY,
   lots: BMR_LOTS,
-  zones: []
+  visionLabelChip: ${JSON.stringify(BMR_VISION_LABEL_CHIP)},
+  visionPanel: { title: ${JSON.stringify(BMR_VISION_PANEL.title)}, html: ${JSON.stringify(BMR_VISION_PANEL.html)} },
+  zones: ${JSON.stringify(BMR_VISION_ZONES, null, 2).split('\n').map((l, i) => i === 0 ? l : '  ' + l).join('\n')}
 };
 `;
 writeFileSync('./properties/black-mountain-ranch.js', module_);
