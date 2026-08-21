@@ -6,6 +6,7 @@ import compression from 'compression';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { readFileSync } from 'fs';
 import { IMAGE_URLS } from './image-urls.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,6 +40,32 @@ PROPERTIES.forEach(p => p.zones.forEach(z => { z.propertyId = p.id; }));
 // Aggregates used by the API endpoints
 const PROJECT_ZONES = PROPERTIES.flatMap(p => p.zones);
 const PERMANENT_PROPERTY_LINES = PROPERTIES.flatMap(p => p.boundary);
+
+// ── Saved layout (git-tracked) ──────────────────────────────────────────────
+// data/zone-positions.json is the live source of truth for icon positions.
+// The map editor's "Save Layout for Everyone" button commits new versions of
+// this file straight to GitHub (see POST /api/save-positions), so every layout
+// change is a git commit and Vercel redeploys with it baked in.
+try {
+  const savedLayout = JSON.parse(readFileSync(join(__dirname, 'data', 'zone-positions.json'), 'utf8'));
+  let appliedCount = 0;
+  for (const p of PROPERTIES) {
+    const zones = savedLayout[p.id];
+    if (!zones) continue;
+    for (const z of p.zones) {
+      const pos = zones[z.id];
+      if (Array.isArray(pos) && pos.length === 2 && isFinite(pos[0]) && isFinite(pos[1])) {
+        z.position = [pos[0], pos[1]];
+        appliedCount++;
+      }
+    }
+  }
+  if (process.env.VERCEL !== '1') {
+    console.log('📍 Applied saved layout from data/zone-positions.json (' + appliedCount + ' positions)');
+  }
+} catch (e) {
+  // No saved layout file — module defaults apply.
+}
 
 // Updated Zone color mapping with unique representative colors
 const zoneColors = {
@@ -2578,7 +2605,7 @@ app.get('/', (req, res) => {
       <button class="control-button" id="edit-toggle-btn" disabled>🔓 Start Editing</button>
       
       <div class="edit-hint" id="edit-hint" style="display: none;">
-        Drag any <strong>glowing icon</strong> to its new spot — the map still pans and zooms normally. When everything looks right, press <strong>Done</strong>, then <strong>Capture</strong>.
+        Drag any <strong>glowing icon</strong> to its new spot — the map still pans and zooms normally. When everything looks right, press <strong>Done</strong>, then <strong>🔒 Save Layout for Everyone</strong>.
       </div>
       
       <div class="status-indicator" id="edit-status">
@@ -2591,7 +2618,12 @@ app.get('/', (req, res) => {
       <button class="control-button" id="reset-positions-btn" style="display: none;">↩️ Reset This Property</button>
       
       <label class="editor-label">3 · Save your layout:</label>
-      <button class="control-button capture-button" id="capture-zones-btn">💾 Capture All Positions</button>
+      <button class="control-button" id="save-layout-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; margin-bottom: 12px;">🔒 Save Layout for Everyone</button>
+      <div id="pin-row" style="display: none; margin-bottom: 12px;">
+        <input id="edit-pin-input" type="password" placeholder="Edit PIN" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 8px;">
+        <button class="control-button" id="pin-confirm-btn" style="background: #4CAF50; color: #fff;">✅ Confirm PIN &amp; Save</button>
+      </div>
+      <button class="control-button capture-button" id="capture-zones-btn">📋 Capture / Export (backup)</button>
       
       <div class="status-indicator" id="zoom-indicator" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border-left-color: #2196F3; margin-top: 10px;">
         <div>🔍</div>
@@ -5670,6 +5702,86 @@ app.get('/', (req, res) => {
         setStatus('↩️', prop.name + ' reset to the saved layout', '#2196F3');
       });
       
+      // ── Permanent save: commits the layout to git via the server ──
+      const saveBtn = document.getElementById('save-layout-btn');
+      const pinRow = document.getElementById('pin-row');
+      const pinInput = document.getElementById('edit-pin-input');
+      const pinConfirm = document.getElementById('pin-confirm-btn');
+      
+      function collectPositions() {
+        const grouped = {};
+        markerMap.forEach(function(marker, key) {
+          const parts = key.split('/');
+          const propId = parts[0], zoneId = parts.slice(1).join('/');
+          if (!grouped[propId]) grouped[propId] = {};
+          const p = marker.getLatLng();
+          grouped[propId][zoneId] = [ +p.lat.toFixed(6), +p.lng.toFixed(6) ];
+        });
+        return grouped;
+      }
+      
+      function doSave(pin) {
+        if (editing) stopEditing();
+        setStatus('⏳', 'Saving layout to git…', '#2196F3');
+        if (saveBtn) saveBtn.disabled = true;
+        fetch('/api/save-positions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: pin, positions: collectPositions() })
+        }).then(function(r) { return r.json().then(function(data) { return { status: r.status, data: data }; }); }).then(function(resp) {
+          if (saveBtn) saveBtn.disabled = false;
+          if (resp.status === 200 && resp.data && resp.data.ok) {
+            try { localStorage.setItem('ojaiMapEditPin', pin); } catch (e) {}
+            if (pinRow) pinRow.style.display = 'none';
+            movedZones.clear();
+            refreshMovedList();
+            markerMap.forEach(function(marker, key) {
+              const parts = key.split('/');
+              const prop2 = propertiesById[parts[0]];
+              if (!prop2) return;
+              const z2 = prop2.zones.find(function(zz) { return zz.id === parts.slice(1).join('/'); });
+              if (!z2) return;
+              const p2 = marker.getLatLng();
+              z2.position = [p2.lat, p2.lng];
+              z2.originalPosition = [p2.lat, p2.lng];
+            });
+            setStatus('✅', 'Saved to git! Everyone sees this layout — a fresh deploy locks it in (~30s)', '#4CAF50');
+          } else if (resp.status === 401) {
+            try { localStorage.removeItem('ojaiMapEditPin'); } catch (e) {}
+            if (pinRow) pinRow.style.display = 'block';
+            if (pinInput) { pinInput.value = ''; pinInput.focus(); }
+            setStatus('🔑', 'Wrong PIN — enter the Edit PIN and try again', '#F44336');
+          } else if (resp.status === 501) {
+            setStatus('⚙️', 'Saving is not configured yet (needs EDIT_PIN + GITHUB_TOKEN on Vercel). Use Capture and send to Claude.', '#FF9800');
+          } else {
+            setStatus('⚠️', 'Save failed (' + resp.status + ') — try again, or use Capture as backup', '#F44336');
+          }
+        }).catch(function(err) {
+          if (saveBtn) saveBtn.disabled = false;
+          setStatus('⚠️', 'Save failed — no connection. Use Capture as backup.', '#F44336');
+        });
+      }
+      
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+          let pin = null;
+          try { pin = localStorage.getItem('ojaiMapEditPin'); } catch (e) {}
+          if (pin) { doSave(pin); }
+          else {
+            if (pinRow) pinRow.style.display = 'block';
+            if (pinInput) pinInput.focus();
+            setStatus('🔑', 'First time: enter the Edit PIN, then hit Confirm', '#2196F3');
+          }
+        });
+      }
+      if (pinConfirm) {
+        pinConfirm.addEventListener('click', function() {
+          const pin = ((pinInput && pinInput.value) || '').trim();
+          if (!pin) { setStatus('🔑', 'Enter the Edit PIN first', '#F44336'); return; }
+          doSave(pin);
+        });
+      }
+      
       // Live zoom readout
       const updateZoomLabel = function() {
         if (zoomLevelEl) zoomLevelEl.textContent = 'Zoom: ' + (Math.round(map.getZoom() * 10) / 10);
@@ -6134,6 +6246,82 @@ app.get('/api/health', (req, res) => {
     zones: PROJECT_ZONES.length,
     propertyLines: PERMANENT_PROPERTY_LINES.length
   });
+});
+
+// Save the icon layout to git. The editor posts { pin, positions } here;
+// with a valid PIN the layout is committed to data/zone-positions.json on
+// GitHub (which auto-redeploys the site) and applied in-memory immediately.
+// Requires two Vercel env vars: EDIT_PIN and GITHUB_TOKEN (fine-grained PAT
+// with Contents read/write on this repo). GITHUB_REPO overrides the default.
+app.post('/api/save-positions', async (req, res) => {
+  try {
+    const { pin, positions } = req.body || {};
+    const EDIT_PIN = process.env.EDIT_PIN;
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    const GITHUB_REPO = process.env.GITHUB_REPO || 'SacredRebel/howard-property-dev';
+
+    if (!EDIT_PIN || !GITHUB_TOKEN) {
+      return res.status(501).json({ ok: false, error: 'not_configured' });
+    }
+    if (!pin || String(pin) !== String(EDIT_PIN)) {
+      return res.status(401).json({ ok: false, error: 'bad_pin' });
+    }
+    if (!positions || typeof positions !== 'object') {
+      return res.status(400).json({ ok: false, error: 'bad_body' });
+    }
+
+    // Validate against known properties/zones and apply in-memory
+    const clean = {};
+    for (const p of PROPERTIES) {
+      const zones = positions[p.id];
+      if (!zones || typeof zones !== 'object') continue;
+      clean[p.id] = {};
+      for (const z of p.zones) {
+        const pos = zones[z.id];
+        if (Array.isArray(pos) && pos.length === 2 && isFinite(pos[0]) && isFinite(pos[1])) {
+          const lat = Math.round(pos[0] * 1e6) / 1e6;
+          const lng = Math.round(pos[1] * 1e6) / 1e6;
+          clean[p.id][z.id] = [lat, lng];
+          z.position = [lat, lng];
+        }
+      }
+    }
+
+    // Commit to GitHub via the Contents API
+    const filePath = 'data/zone-positions.json';
+    const apiBase = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + filePath;
+    const ghHeaders = {
+      'Authorization': 'Bearer ' + GITHUB_TOKEN,
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': 'ojai-map-server',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    let sha;
+    const getResp = await fetch(apiBase + '?ref=main', { headers: ghHeaders });
+    if (getResp.ok) {
+      const info = await getResp.json();
+      sha = info.sha;
+    }
+    const content = Buffer.from(JSON.stringify(clean, null, 2) + '\n').toString('base64');
+    const putResp = await fetch(apiBase, {
+      method: 'PUT',
+      headers: { ...ghHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: '📍 Save icon layout from the map editor',
+        content: content,
+        sha: sha,
+        branch: 'main'
+      })
+    });
+    if (!putResp.ok) {
+      const detail = await putResp.text();
+      return res.status(502).json({ ok: false, error: 'github_error', status: putResp.status, detail: String(detail).slice(0, 300) });
+    }
+    const result = await putResp.json();
+    res.json({ ok: true, commit: result.commit && result.commit.sha });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'server_error', message: String(e && e.message) });
+  }
 });
 
 // Mapping from project IDs to actual folder names under images/ — empty until

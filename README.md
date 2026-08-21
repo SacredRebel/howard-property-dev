@@ -28,7 +28,20 @@ Click the **⚙️ button** (top right) to open the Position Editor — it stays
 
 1. **Pick a property** — the map flies there (buttons appear automatically for every property)
 2. **Start Editing** — ALL of that property's icons unlock at once with a glowing pulse; drag any of them (the map still pans/zooms; icon taps won't open panels while editing). A live list shows everything you've moved, and **Reset This Property** undoes the session.
-3. **Done — Lock Positions**, then **💾 Capture All Positions** → **📋 Copy** the property-grouped JSON and paste it to Claude to commit permanently.
+3. **🔒 Save Layout for Everyone** — commits the layout straight to git (`data/zone-positions.json`) and Vercel redeploys with it baked in. First save asks for the Edit PIN (then remembers it on that device). **📋 Capture / Export** stays as a backup path.
+
+### How saving works (git-backed)
+
+`data/zone-positions.json` is the live source of truth for icon positions — the server applies it over the built-in defaults at boot. The Save button POSTs to `/api/save-positions`, which verifies the PIN and commits the new file to GitHub via the Contents API, so **every layout change is a git commit** and the site auto-redeploys.
+
+One-time setup (Vercel → project → Settings → Environment Variables):
+
+| Variable | Value |
+|---|---|
+| `EDIT_PIN` | any PIN you choose — the editor asks for it on first save |
+| `GITHUB_TOKEN` | fine-grained PAT, this repo only, **Contents: Read & write** |
+
+Until those are set, the Save button politely says saving isn't configured and the Capture → paste-to-Claude path still works.
 
 ## Quick Start
 

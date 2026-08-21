@@ -18,6 +18,13 @@ Guidance for AI coding assistants working in this repository.
 
 ⚙️ opens the Position Editor (never auto-closes on outside clicks): property buttons (auto-generated from `PROPERTIES`) → Start Editing unlocks ALL of that property's markers (`.marker-editing` glow — box-shadow-only animation so it never fights the zoom-scale inline transform) → drags update `zone.position`, redraw the territory circle via `window.zoneTerritories[propId/zoneId]` (single mutable reference — repeat drags never stack duplicate circles), and feed `window.notifyZoneMoved` (live moved-list UI). While `window.positionEditActive` is true, zone-marker and boundary click handlers are suppressed so panels can't open mid-edit. Reset restores `zone.originalPosition` for the whole property. Capture overlay outputs `{ "<propertyId>": { "<zoneId>": [lat, lng], ... }, ... }` for pasting back to Claude. To hide for public release: restore `display: none !important;` on `.admin-menu-toggle`.
 
+## Git-backed layout saving (V0.6)
+
+- `data/zone-positions.json` = live source of truth for icon positions; applied over module defaults at server boot (module positions are the fallback if the file is missing).
+- `POST /api/save-positions` `{ pin, positions: {propId: {zoneId: [lat,lng]}} }`: checks `EDIT_PIN` env var, validates ids against `PROPERTIES`, applies in-memory, then commits the file to GitHub via the Contents API using `GITHUB_TOKEN` (fine-grained PAT, Contents R/W on this repo; `GITHUB_REPO` env overrides the default repo slug). Missing env vars → 501; the editor then guides users to the Capture/export fallback.
+- The editor's 🔒 Save button drives this; PIN is remembered in `localStorage.ojaiMapEditPin` (cleared on 401).
+- When baking positions manually, update BOTH the property modules and `data/zone-positions.json` so defaults and live file agree.
+
 **Testing note:** the frontend lives inside a template literal, so `node --check server-complete.js` does NOT validate the embedded page JS. Always extract the served page's `<script>` block and `node --check` that too.
 
 ## Commands
