@@ -23,6 +23,11 @@ export const IMAGE_URLS = {
       current: []
     }
   },
+  'black-mountain-ranch': {
+    'property': {
+      current: []
+    }
+  },
   'sulphur-mountain': {
   "ceremonial-infrastructure": {
     "current": [

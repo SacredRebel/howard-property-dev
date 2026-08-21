@@ -34,8 +34,9 @@ import { HOWARD_PROPERTY } from './properties/howard.js';
 import { SULPHUR_PROPERTY } from './properties/sulphur-mountain.js';
 import { KERIS_PROPERTY } from './properties/keris-property.js';
 import { CHERS_PROPERTY } from './properties/chers-property.js';
+import { BMR_PROPERTY } from './properties/black-mountain-ranch.js';
 
-const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY, KERIS_PROPERTY, CHERS_PROPERTY];
+const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY, KERIS_PROPERTY, CHERS_PROPERTY, BMR_PROPERTY];
 PROPERTIES.forEach(p => p.zones.forEach(z => { z.propertyId = p.id; }));
 
 // Aggregates used by the API endpoints
@@ -2511,7 +2512,6 @@ app.get('/', (req, res) => {
       line-height: 1.4;
     }
     /* ── Multi-property overview mode ── */
-    .overview-mode .zone-marker { display: none !important; }
     .property-label-marker { display: none; }
     .overview-mode .property-label-marker { display: block !important; }
     .property-label-chip {
@@ -2570,8 +2570,8 @@ app.get('/', (req, res) => {
       cursor: grab;
     }
     .zone-marker.marker-editing > div:active { cursor: grabbing; }
-    /* Icons being edited stay visible even at overview zoom */
-    .overview-mode .zone-marker.marker-editing { display: block !important; }
+    /* Icons being edited stay visible at any zoom */
+    .zone-marker.marker-editing { display: block !important; }
 
     @media (max-width: 768px) {
       .admin-popup {
@@ -2918,6 +2918,30 @@ app.get('/', (req, res) => {
     var allBounds = null;
 
     properties.forEach(function(prop) {
+      // Lot territories: REAL recorded parcel lines inside the property
+      // (drawn first so the rainbow boundary + icons stay on top)
+      if (prop.lots && prop.lots.length) {
+        var ls = prop.lotStyle || {};
+        prop.lots.forEach(function(lot) {
+          (lot.rings || []).forEach(function(ring) {
+            var lotPoly = L.polygon(ring, {
+              color: ls.color || '#FFFFFF',
+              weight: ls.weight || 1.4,
+              opacity: ls.opacity || 0.85,
+              fillColor: ls.fillColor || '#FFFFFF',
+              fillOpacity: ls.fillOpacity || 0.05,
+              interactive: true
+            }).addTo(map);
+            lotPoly.bindPopup(
+              '<div style="font-weight:700;margin-bottom:4px;">' + (lot.name || 'Lot') + '</div>' +
+              '<div style="font-family:monospace;font-size:12px;margin-bottom:2px;">APN ' + lot.apn + '</div>' +
+              '<div style="font-size:12px;color:#555;">' + lot.acreage + ' acres</div>'
+            );
+          });
+        });
+        console.log('🗺️ ' + prop.name + ': ' + prop.lots.length + ' lot territories rendered');
+      }
+
       // Stitch this property's boundary segments into one closed loop
       var boundaryCoordinates = [];
       prop.boundary.forEach(function(lineData) {
@@ -3123,13 +3147,19 @@ app.get('/', (req, res) => {
     function updateMarkerScale() {
       const zoom = map.getZoom();
       const mapEl = document.getElementById('map');
-      if (mapEl) mapEl.classList.toggle('overview-mode', zoom < 15);
+      // overview-mode drives the property name chips (visible when zoomed out)
+      if (mapEl) mapEl.classList.toggle('overview-mode', zoom < 13.5);
       const scaleBase = 1 + (zoom - 17) * 0.08;
       const scale = Math.max(0.9, Math.min(1.9, scaleBase)) * (window.devicePixelRatio >= 2 ? 1.05 : 1);
       const baseFont = 22;
       zoneMarkers.forEach(m => {
         const el = m.getElement();
         if (!el) return;
+        // Each property's icons appear once you're zoomed near ITS scale, so a
+        // huge ranch at zoom 14 shows its icons while a neighbor's stay tucked.
+        const p = propertiesById[m.options && m.options.propertyId];
+        const minZoom = p ? (p.zoom - 2.5) : 13.5;
+        el.style.display = (zoom >= minZoom) ? '' : 'none';
         const inner = el.querySelector('div');
         if (!inner) return;
         inner.style.transform = 'perspective(100px) rotateX(15deg) scale(' + scale + ')';

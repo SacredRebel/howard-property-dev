@@ -1,10 +1,10 @@
 # 🗺️ Ojai Valley Properties — Interactive Development Map
 
-**Multi-property platform** — one interactive map, multiple properties in the Ojai Valley: the **Howard Property** (1320 Baldwin Rd), the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), **Keri's Property** (14209 De La Garrigue Rd), and **Cher's Property** (10622 Encino Dr, Oak View).
+**Multi-property platform** — one interactive map, multiple properties in the Ojai Valley: the **Howard Property** (1320 Baldwin Rd), the **Sulphur Mountain Eco-Village** (11962 Sulphur Mountain Rd), **Keri's Property** (14209 De La Garrigue Rd), **Cher's Property** (10622 Encino Dr, Oak View), and **Black Mountain Ranch** (8434 Ojai Santa Paula Rd — ~3,600 acres, 63 tax parcels).
 
 ## How it works
 
-The map opens on an **overview** showing both parcels with their glowing rainbow boundaries and name chips. Click a chip (or zoom in) to fly into a property — its project icons appear below zoom 15. Click any icon for the full project page; click a boundary for that property's details panel.
+The map opens on an **overview** showing every property with its glowing rainbow boundary and name chip. Click a chip (or zoom in) to fly into a property — each property's project icons fade in as you approach that property's own zoom level. Click any icon for the full project page; click a boundary for that property's details panel.
 
 | Property | Projects | Size | Status |
 |---|---|---|---|
@@ -12,6 +12,7 @@ The map opens on an **overview** showing both parcels with their glowing rainbow
 | 🌿 Sulphur Mountain Eco-Village | 18 zones | ~10 acres | V1 production data |
 | 🌸 Keri's Property | 3 places | ~34 acres | Starting points |
 | 🌹 Cher's Property | 2 places | 2 acres | Starting points |
+| ⛰️ Black Mountain Ranch | 62 real parcels | ~3,600 acres | Acquisition study — parcel structure mapped |
 
 Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://github.com/SacredRebel/EcoVillage-map) via raw.githubusercontent.com — no image copies in this repo.
 
@@ -60,21 +61,33 @@ No env vars, no build step.
 ├── server-complete.js            # App: Express + embedded Leaflet frontend
 ├── properties/
 │   ├── howard.js                 # Howard Property (zones, boundary, panel, CTA)
-│   └── sulphur-mountain.js       # Sulphur Mountain Eco-Village
+│   ├── sulphur-mountain.js       # Sulphur Mountain Eco-Village
+│   ├── keris-property.js         # Keri's Property
+│   ├── chers-property.js         # Cher's Property
+│   └── black-mountain-ranch.js   # Black Mountain Ranch (generated — see bmr/)
+├── bmr/                          # Ranch county-parcel data + module generator
+├── data/zone-positions.json      # Saved icon layout (git-backed source of truth)
+├── images/                       # Photo uploads — one folder per property & project
 ├── image-urls.js                 # Photo manifests, namespaced by property id
 ├── api/index.js                  # Vercel serverless entry
 └── vercel.json
 ```
+
+## Uploading photos
+
+Drop images into `images/<property>/<project>/current/` (photos of how it looks today) or `.../vision/` (renders & inspiration for what it will become). Property-wide gallery photos go in `images/<property>/property/current/`. Any format is fine (jpg/png/webp). After uploading, the files get listed in `image-urls.js` to appear in the map's galleries. Full folder tree + details: [`images/README.md`](images/README.md). (Sulphur Mountain photos stay in the EcoVillage-map repo.)
 
 ## Roadmap
 
 1. ✅ Howard layout + real county boundary
 2. ✅ 13 Howard proposal zones + reposition mode
 3. ✅ Multi-property merge (Sulphur Mountain on the same map)
-4. ⬜ Final Howard icon positions locked
-5. ⬜ Howard photo galleries
-6. ⬜ Custom UI theme · hide admin tools for public release
+4. ✅ Keri's + Cher's properties · icon positions locked in git
+5. ✅ Black Mountain Ranch — 62 county parcels drawn as individual lot territories
+6. ⬜ Ranch: remaining APNs (~830 ac) + project zones after owner reassessment
+7. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
+8. ⬜ Custom UI theme · hide admin tools for public release
 
 ---
 
-© 2026 Howard Property + Sulphur Mountain Eco-Village
+© 2026 Ojai Valley Properties
