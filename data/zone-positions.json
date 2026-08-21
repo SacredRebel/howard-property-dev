@@ -1,42 +1,154 @@
 {
+  "chers-property": {
+    "main-house": [
+      34.402021,
+      -119.288792
+    ],
+    "quan-yin-rose-garden": [
+      34.401846,
+      -119.2888
+    ]
+  },
   "howard": {
-    "beekeeping": [34.425716, -119.320085],
-    "community-hub": [34.423913, -119.318389],
-    "community-workshop": [34.426016, -119.31941],
-    "compost-operation": [34.425869, -119.31823],
-    "growing-dome": [34.426238, -119.318776],
-    "hugelkultur-project": [34.426104, -119.320536],
-    "livestock": [34.426122, -119.320153],
-    "main-house": [34.426548, -119.320077],
-    "mushroom-containers": [34.426219, -119.318052],
-    "nature-gym": [34.426701, -119.318685],
-    "pond-swimming-hole": [34.426395, -119.319394],
-    "property-nursery": [34.426823, -119.318002],
-    "sacred-spaces": [34.42452, -119.318856]
+    "beekeeping": [
+      34.425716,
+      -119.320085
+    ],
+    "community-hub": [
+      34.423913,
+      -119.318389
+    ],
+    "community-workshop": [
+      34.426016,
+      -119.31941
+    ],
+    "compost-operation": [
+      34.425869,
+      -119.31823
+    ],
+    "growing-dome": [
+      34.426238,
+      -119.318776
+    ],
+    "hugelkultur-project": [
+      34.426104,
+      -119.320536
+    ],
+    "livestock": [
+      34.426122,
+      -119.320153
+    ],
+    "main-house": [
+      34.426548,
+      -119.320077
+    ],
+    "mushroom-containers": [
+      34.426219,
+      -119.318052
+    ],
+    "nature-gym": [
+      34.426701,
+      -119.318685
+    ],
+    "pond-swimming-hole": [
+      34.426395,
+      -119.319394
+    ],
+    "property-nursery": [
+      34.426823,
+      -119.318002
+    ],
+    "sacred-spaces": [
+      34.42452,
+      -119.318856
+    ]
   },
   "keris-property": {
-    "ceremony-space": [34.432483, -119.332106],
-    "guest-house": [34.433521, -119.331145],
-    "main-house": [34.433071, -119.331222]
+    "ceremony-space": [
+      34.432483,
+      -119.332106
+    ],
+    "guest-house": [
+      34.433521,
+      -119.331145
+    ],
+    "main-house": [
+      34.433071,
+      -119.331222
+    ]
   },
   "sulphur-mountain": {
-    "agricultural-hub": [34.433478, -119.155982],
-    "beekeeping-program": [34.433477, -119.15582],
-    "ceremonial-infrastructure": [34.432501, -119.155582],
-    "community-hub": [34.432771, -119.155387],
-    "creative-workshop-center": [34.43347, -119.156486],
-    "events-gatherings-hub": [34.433394, -119.155065],
-    "farmstead-produce-stand": [34.432483, -119.156935],
-    "gatelodge-operations-hub": [34.433082, -119.156728],
-    "glamping-creek-village": [34.432479, -119.15654],
-    "infrastructure": [34.432386, -119.155966],
-    "livestock-dairy": [34.432797, -119.156143],
-    "main-residence": [34.433118, -119.155333],
-    "mcqueens-garage": [34.432549, -119.155279],
-    "mushroom-cultivation": [34.433474, -119.156218],
-    "retreat-village": [34.432173, -119.155628],
-    "sulphur-mountain-sanctuary": [34.433038, -119.155827],
-    "tropical-dome-greenhouse": [34.432888, -119.156763],
-    "wellness-facilities": [34.43293, -119.155062]
+    "agricultural-hub": [
+      34.433478,
+      -119.155982
+    ],
+    "beekeeping-program": [
+      34.433477,
+      -119.15582
+    ],
+    "ceremonial-infrastructure": [
+      34.432501,
+      -119.155582
+    ],
+    "community-hub": [
+      34.432771,
+      -119.155387
+    ],
+    "creative-workshop-center": [
+      34.43347,
+      -119.156486
+    ],
+    "events-gatherings-hub": [
+      34.433394,
+      -119.155065
+    ],
+    "farmstead-produce-stand": [
+      34.432483,
+      -119.156935
+    ],
+    "gatelodge-operations-hub": [
+      34.433082,
+      -119.156728
+    ],
+    "glamping-creek-village": [
+      34.432479,
+      -119.15654
+    ],
+    "infrastructure": [
+      34.432386,
+      -119.155966
+    ],
+    "livestock-dairy": [
+      34.432797,
+      -119.156143
+    ],
+    "main-residence": [
+      34.433118,
+      -119.155333
+    ],
+    "mcqueens-garage": [
+      34.432549,
+      -119.155279
+    ],
+    "mushroom-cultivation": [
+      34.433474,
+      -119.156218
+    ],
+    "retreat-village": [
+      34.432173,
+      -119.155628
+    ],
+    "sulphur-mountain-sanctuary": [
+      34.433038,
+      -119.155827
+    ],
+    "tropical-dome-greenhouse": [
+      34.432888,
+      -119.156763
+    ],
+    "wellness-facilities": [
+      34.43293,
+      -119.155062
+    ]
   }
 }
