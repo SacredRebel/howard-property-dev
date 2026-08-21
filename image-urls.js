@@ -13,6 +13,11 @@ export const IMAGE_URLS = {
       current: []
     }
   },
+  'keris-property': {
+    'property': {
+      current: []
+    }
+  },
   'sulphur-mountain': {
   "ceremonial-infrastructure": {
     "current": [

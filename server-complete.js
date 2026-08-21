@@ -31,8 +31,9 @@ if (process.env.VERCEL !== '1') {
 // panel, cta, footer info, boundary segments, zones) and add it here.
 import { HOWARD_PROPERTY } from './properties/howard.js';
 import { SULPHUR_PROPERTY } from './properties/sulphur-mountain.js';
+import { KERIS_PROPERTY } from './properties/keris-property.js';
 
-const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY];
+const PROPERTIES = [HOWARD_PROPERTY, SULPHUR_PROPERTY, KERIS_PROPERTY];
 PROPERTIES.forEach(p => p.zones.forEach(z => { z.propertyId = p.id; }));
 
 // Aggregates used by the API endpoints
@@ -2673,7 +2674,7 @@ app.get('/', (req, res) => {
   
   <!-- Footer -->
   <div class="map-footer">
-    © 2026 | Howard Property + Sulphur Mountain Eco-Village | 31 Projects Across 2 Properties | Interactive Map
+    © 2026 Ojai Valley Properties | ${PROPERTIES.length} Properties • ${PROJECT_ZONES.length} Projects | Interactive Map
   </div>
   
   <script>
@@ -2861,7 +2862,7 @@ app.get('/', (req, res) => {
       L.DomEvent.disableClickPropagation(div);
       L.DomEvent.on(btn, 'click', function(e) {
         L.DomEvent.stopPropagation(e);
-        if (window.allPropertiesBounds) map.fitBounds(window.allPropertiesBounds, { padding: [40, 40] });
+        if (window.allPropertiesBounds) map.fitBounds(window.allPropertiesBounds, { padding: [130, 60] });
       });
       return div;
     };
@@ -2964,7 +2965,7 @@ app.get('/', (req, res) => {
 
     // Start at the all-properties overview
     window.allPropertiesBounds = allBounds;
-    if (allBounds) map.fitBounds(allBounds, { padding: [40, 40] });
+    if (allBounds) map.fitBounds(allBounds, { padding: [130, 60] });
 
     console.log('🌈 Rainbow boundaries created for', properties.length, 'properties');
     
