@@ -77,16 +77,16 @@ const PROJECT_ZONES = [
     ]
   },
   {
-    id: "pauls-place",
-    name: "Paul's Place",
+    id: "community-hub",
+    name: "Community Hub",
     emoji: "🛖",
     position: [34.42330, -119.31870],
-    type: "residential",
+    type: "community",
     budget: "Self-funded by Paul — needs only a spot + water & electric access",
     timeline: "Can start immediately",
     monthlyRevenue: "Full-time hands on the land",
     roi: "Every structure built stays with the property",
-    description: "A small, hidden live-in homestead spot for Paul — a raw, flat space in nature is enough to start, as long as water and electricity are reachable. From there the space grows into something truly regenerative and beautiful, built with natural materials and tucked into the hillside so it disappears into the land. Whatever gets built stays with the property afterward and keeps adding value.",
+    description: "Paul's live-in base on the land, designed to grow into the property's Community Hub. It starts with just a raw, flat space in nature with water and electricity within reach — and grows into a beautiful, hidden gathering place built from natural materials, tucked into the hillside. Whatever gets built stays with the property afterward and keeps adding value as a shared space for everyone on the land.",
     optionsTitle: "🏗️ Structure Options (flexible — whatever works best)",
     options: [
       {

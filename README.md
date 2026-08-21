@@ -14,7 +14,7 @@ Interactive web map for the Howard Property:
 
 ## The 13 Proposed Projects
 
-🏠 Main House · ⛰️ Hugelkultur Project · 🛖 Paul's Place · 🛠️ Community Workshop · 🌱 Nursery · 🏋️ Outdoor Nature Gym · 🔥 Ceremony & Sacred Spaces · 🍄 Mushroom Growing Containers · 🐝 Beekeeping & Honey Production · 🐟 Pond & Swimming Hole · 🌴 Growing Dome Greenhouse · 🐐 Livestock & Animals · ♻️ Compost Operation
+🏠 Main House · ⛰️ Hugelkultur Project · 🛖 Community Hub · 🛠️ Community Workshop · 🌱 Nursery · 🏋️ Outdoor Nature Gym · 🔥 Ceremony & Sacred Spaces · 🍄 Mushroom Growing Containers · 🐝 Beekeeping & Honey Production · 🐟 Pond & Swimming Hole · 🌴 Growing Dome Greenhouse · 🐐 Livestock & Animals · ♻️ Compost Operation
 
 Click any icon for its full proposal page: description, features, structure options, revenue ideas, and timelines.
 
