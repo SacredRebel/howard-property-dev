@@ -2630,7 +2630,8 @@ app.get('/', (req, res) => {
     }
     #earth3d { position: fixed; inset: 0; z-index: 3000; background: #000; display: none; }
     #earth3d.open { display: block; }
-    #earth3d-map { position: absolute; inset: 0; }
+    #earth3d-stars { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+    #earth3d-map { position: absolute; inset: 0; z-index: 1; }
     #earth3d-exit {
       position: absolute; top: 14px; left: 14px; z-index: 10;
       background: rgba(12, 14, 24, 0.85); color: #fff;
@@ -2675,6 +2676,16 @@ app.get('/', (req, res) => {
       -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     }
     #earth3d-gearth:hover { box-shadow: 0 0 14px rgba(90, 180, 255, 0.5); }
+    .portal-btn {
+      margin: 18px 0 6px; padding: 13px 18px; text-align: center;
+      background: linear-gradient(135deg, #2b1a55 0%, #6a3d9a 50%, #2c6e9e 100%);
+      color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 0.4px;
+      border-radius: 14px; cursor: pointer; user-select: none;
+      border: 1.5px solid rgba(255, 215, 0, 0.55);
+      box-shadow: 0 4px 18px rgba(80, 40, 140, 0.45);
+      transition: box-shadow 0.25s ease, transform 0.15s ease;
+    }
+    .portal-btn:hover { box-shadow: 0 0 24px rgba(255, 215, 0, 0.4); transform: scale(1.02); }
     @media (max-width: 768px) {
       #earth-toggle { top: 56px; }
       #earth3d-hint { font-size: 11px; }
@@ -2819,9 +2830,10 @@ app.get('/', (req, res) => {
   <!-- 🌍 3D terrain mode (Google-Earth-style) -->
   <div id="earth-toggle" title="Tilt into 3D — or just hold your middle mouse button and drag on the map (two-finger drag on mobile)">🌍 3D</div>
   <div id="earth3d">
+    <div id="earth3d-stars"></div>
     <div id="earth3d-map"></div>
     <div id="earth3d-exit">✕ Back to Map</div>
-    <div id="earth3d-hint">drag to move · hold middle mouse (or right-drag / two fingers) to orbit &amp; tilt · scroll to dive · click a chip to fly there</div>
+    <div id="earth3d-hint">drag to move · hold middle mouse (or right-drag / two fingers) to orbit &amp; tilt · scroll out to see the whole planet · click a chip to fly there</div>
     <div id="earth3d-gearth" title="Open this exact view in Google Earth (new tab)">🌐 Google Earth</div>
     <div id="earth3d-attrib">Imagery © Esri &nbsp;·&nbsp; Terrain: Mapzen / AWS Open Data</div>
   </div>
@@ -3512,7 +3524,7 @@ app.get('/', (req, res) => {
       panel.classList.add('open');
       if (typeof lockBodyScroll === 'function') lockBodyScroll();
       requestAnimationFrame(function() {
-        contentEl.innerHTML = panelData.html;
+        contentEl.innerHTML = panelData.html + '<div class="portal-btn" onclick="window.enterPortal(&quot;' + prop.id + '&quot;)">🌀 Enter the Vision</div>';
         loadPropertyImages(prop.id);
         requestAnimationFrame(function() {
           if (panel) panel.scrollTop = 0;
@@ -6367,10 +6379,10 @@ app.get('/', (req, res) => {
       if (window.maplibregl) return cb();
       var css = document.createElement('link');
       css.rel = 'stylesheet';
-      css.href = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+      css.href = 'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css';
       document.head.appendChild(css);
       var sc = document.createElement('script');
-      sc.src = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js';
+      sc.src = 'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js';
       sc.onload = function() { cb(); };
       sc.onerror = function() {
         alert('Could not load the 3D engine - please check your connection and try again.');
@@ -6390,6 +6402,7 @@ app.get('/', (req, res) => {
     var earthOpenedByGesture = false, earthReady = false;
     var earthPendPitch = 0, earthPendBearing = 0;
     var orbitDrag = null, midDrag2D = null;
+    var earthDiveTo = null;
     function earthGestureDelta(ddx, ddy) {
       if (earth3dMap && earthReady) {
         earth3dMap.setPitch(Math.max(0, Math.min(80, earth3dMap.getPitch() - ddy * 0.35)));
@@ -6405,6 +6418,7 @@ app.get('/', (req, res) => {
       earthPendPitch = (opts && typeof opts.pitch === 'number') ? opts.pitch : 0;
       earthPendBearing = 0;
       document.getElementById('earth3d').classList.add('open');
+      buildStars();
       loadMapLibre(function() {
         try { build3D(); }
         catch (err) {
@@ -6445,7 +6459,17 @@ app.get('/', (req, res) => {
               tileSize: 256, encoding: 'terrarium', maxzoom: 14
             }
           },
-          layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+          layers: [{ id: 'sat', type: 'raster', source: 'sat' }],
+          projection: { type: 'globe' },
+          sky: {
+            'sky-color': 'rgba(2, 4, 12, 0)',
+            'horizon-color': 'rgba(110, 175, 255, 0.5)',
+            'fog-color': 'rgba(12, 26, 51, 0.6)',
+            'sky-horizon-blend': 0.7,
+            'horizon-fog-blend': 0.6,
+            'fog-ground-blend': 0.85,
+            'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 8, 1, 11, 0]
+          }
         },
         center: [c2.lng, c2.lat],
         zoom: Math.max(z2 - 1, 10.8),
@@ -6462,7 +6486,8 @@ app.get('/', (req, res) => {
       cvs3d.addEventListener('auxclick', function(e) { e.preventDefault(); });
       earth3dMap.on('load', function() {
         earthReady = true;
-        earth3dMap.setTerrain({ source: 'dem', exaggeration: 1.35 });
+        try { earth3dMap.setTerrain({ source: 'dem', exaggeration: 1.35 }); }
+        catch (e) { console.warn('terrain not available with globe on this device:', e); }
 
         // Rainbow-line stand-ins: gold glow + violet line per property boundary
         properties.forEach(function(p, idx) {
@@ -6521,15 +6546,23 @@ app.get('/', (req, res) => {
             .addTo(earth3dMap);
         });
 
-        // Entry: a live gesture drives the camera; otherwise auto-tilt into the terrain
-        if (earthOpenedByGesture) {
+        // Entry: portal dive > live gesture > auto-tilt into the terrain
+        if (earthDiveTo) {
+          var dvp = earthDiveTo; earthDiveTo = null;
+          earth3dMap.flyTo({
+            center: [dvp.center[1], dvp.center[0]],
+            zoom: Math.max((dvp.zoom || 15.5) - 1, 12.8),
+            pitch: 62, bearing: -24,
+            duration: 4200, curve: 1.7, essential: true
+          });
+        } else if (earthOpenedByGesture) {
           earth3dMap.easeTo({ pitch: earthPendPitch, bearing: earthPendBearing, duration: 450 });
         } else {
           setTimeout(function() {
             if (earth3dMap) earth3dMap.easeTo({ pitch: 58, bearing: -18, duration: 2600 });
           }, 600);
         }
-        console.log('🌍 3D terrain mode ready -', properties.length, 'properties draped on real elevation');
+        console.log('🌍 globe mode ready -', properties.length, 'properties on a real planet (MapLibre 5, globe projection)');
       });
     }
     var earthBtn = document.getElementById('earth-toggle');
@@ -6601,6 +6634,31 @@ app.get('/', (req, res) => {
       var gdist = Math.round(40075017 * Math.abs(Math.cos(glat * Math.PI / 180)) / Math.pow(2, gzm + 1));
       window.open('https://earth.google.com/web/@' + glat.toFixed(6) + ',' + glng.toFixed(6) + ',0a,' + gdist + 'd,35y,' + ghd.toFixed(1) + 'h,' + gtl.toFixed(1) + 't,0r', '_blank');
     });
+
+    // 🌀 Portal: property panel -> Vision mode -> cinematic globe dive
+    window.enterPortal = function(propId) {
+      var pp = document.getElementById('property-panel');
+      if (pp) pp.classList.remove('open');
+      if (typeof unlockBodyScroll === 'function') unlockBodyScroll();
+      if (!window.visionMode) { try { applyMode(true); } catch (e) {} }
+      earthDiveTo = propertiesById[propId] || null;
+      open3D({ dive: true });
+    };
+    function buildStars() {
+      var el = document.getElementById('earth3d-stars');
+      if (!el || el.dataset.built) return;
+      el.dataset.built = '1';
+      var sh = '';
+      for (var i = 0; i < 160; i++) {
+        var sx = (Math.random() * 100).toFixed(2);
+        var sy = (Math.random() * 100).toFixed(2);
+        var so = (Math.random() * 0.7 + 0.25).toFixed(2);
+        sh += (sh ? ', ' : '') + sx + 'vw ' + sy + 'vh 0 ' + (Math.random() > 0.85 ? '1px' : '0') + ' rgba(255,255,255,' + so + ')';
+      }
+      var dot = document.createElement('div');
+      dot.style.cssText = 'position:absolute;top:0;left:0;width:2px;height:2px;border-radius:50%;box-shadow:' + sh;
+      el.appendChild(dot);
+    }
 
     // ---- Current / Vision mode engine ----
     window.visionMode = false;
