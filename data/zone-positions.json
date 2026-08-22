@@ -1,4 +1,62 @@
 {
+  "black-mountain-ranch": {
+    "auto-gallery": [
+      34.428598,
+      -119.185492
+    ],
+    "barn-corrals": [
+      34.429687,
+      -119.193359
+    ],
+    "buffalo-rewilding": [
+      34.425815,
+      -119.20711
+    ],
+    "carriage-house": [
+      34.429771,
+      -119.188399
+    ],
+    "chumash-village": [
+      34.421347,
+      -119.20626
+    ],
+    "guest-cottages": [
+      34.431042,
+      -119.188266
+    ],
+    "lemuria-studios": [
+      34.422283,
+      -119.198104
+    ],
+    "main-lodge": [
+      34.429711,
+      -119.187299
+    ],
+    "ranch-fields": [
+      34.431567,
+      -119.193935
+    ],
+    "ranch-trails": [
+      34.417579,
+      -119.224999
+    ],
+    "regenerative-agriculture": [
+      34.433155,
+      -119.18509
+    ],
+    "shooting-range": [
+      34.422083,
+      -119.197619
+    ],
+    "stocked-lake": [
+      34.421478,
+      -119.199386
+    ],
+    "white-buffalo-temple": [
+      34.428682,
+      -119.188206
+    ]
+  },
   "chers-property": {
     "main-house": [
       34.402021,

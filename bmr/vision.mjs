@@ -14,7 +14,7 @@ export const BMR_TODAY_ZONES = [
     id: 'main-lodge',
     name: 'Main Lodge',
     emoji: '🏛️',
-    position: [34.4286389, -119.1863412],
+    position: [34.429711, -119.187299],
     type: 'residential',
     budget: 'Existing — built 2004',
     timeline: 'Standing today',
@@ -33,7 +33,7 @@ export const BMR_TODAY_ZONES = [
     id: 'guest-cottages',
     name: 'Guest House & Cottages',
     emoji: '🏡',
-    position: [34.431493, -119.189146],
+    position: [34.431042, -119.188266],
     type: 'hospitality',
     budget: 'Existing structures',
     timeline: 'Standing today',
@@ -52,7 +52,7 @@ export const BMR_TODAY_ZONES = [
     id: 'carriage-house',
     name: 'Carriage House',
     emoji: '🍷',
-    position: [34.4293, -119.1875],
+    position: [34.429771, -119.188399],
     type: 'community',
     budget: 'Existing — 6,200 sq ft',
     timeline: 'Standing today',
@@ -71,7 +71,7 @@ export const BMR_TODAY_ZONES = [
     id: 'auto-gallery',
     name: 'Auto Gallery',
     emoji: '🏎️',
-    position: [34.428, -119.1852],
+    position: [34.428598, -119.185492],
     type: 'creative',
     budget: 'Existing — 7,200 sq ft',
     timeline: 'Standing today',
@@ -90,7 +90,7 @@ export const BMR_TODAY_ZONES = [
     id: 'barn-corrals',
     name: 'Horse Barn & Working Corrals',
     emoji: '🐎',
-    position: [34.429652, -119.193832],
+    position: [34.429687, -119.193359],
     type: 'agriculture',
     budget: 'Existing facilities',
     timeline: 'Working today',
@@ -109,7 +109,7 @@ export const BMR_TODAY_ZONES = [
     id: 'ranch-fields',
     name: 'Ranch Fields & Orchards',
     emoji: '🚜',
-    position: [34.431861, -119.19651],
+    position: [34.431567, -119.193935],
     type: 'agriculture',
     budget: 'Existing — in cultivation',
     timeline: 'Farmed today',
@@ -128,7 +128,7 @@ export const BMR_TODAY_ZONES = [
     id: 'stocked-lake',
     name: 'Stocked Fishing Lake',
     emoji: '🎣',
-    position: [34.421369, -119.199635],
+    position: [34.421478, -119.199386],
     type: 'water',
     budget: 'Existing water feature',
     timeline: 'Full today',
@@ -147,7 +147,7 @@ export const BMR_TODAY_ZONES = [
     id: 'shooting-range',
     name: 'Shooting Range',
     emoji: '🎯',
-    position: [34.423394, -119.201866],
+    position: [34.422083, -119.197619],
     type: 'events',
     budget: 'Existing facility',
     timeline: 'In use today',
@@ -164,8 +164,8 @@ export const BMR_TODAY_ZONES = [
   {
     id: 'ranch-trails',
     name: '35+ Miles of Trails',
-    emoji: '🥾',
-    position: [34.421921, -119.218826],
+    emoji: '🌲',
+    position: [34.417579, -119.224999],
     type: 'landscape',
     budget: 'Existing network',
     timeline: 'Ride them today',
@@ -187,7 +187,7 @@ export const BMR_VISION_ZONES = [
     id: 'chumash-village',
     name: 'Chumash Village',
     emoji: '🏘️',
-    position: [34.4185, -119.227],
+    position: [34.421347, -119.20626],
     type: 'community',
     budget: '$75M development',
     timeline: 'Phase 1–2',
@@ -207,27 +207,31 @@ export const BMR_VISION_ZONES = [
     id: 'white-buffalo-temple',
     name: 'Temple of the White Buffalo',
     emoji: '🕊️',
-    position: [34.4262, -119.212],
+    position: [34.428682, -119.188206],
     type: 'ceremonial',
-    budget: '$25M development',
+    budget: '$45M development — Temple + Dome program',
     timeline: 'Phase 1–2',
     monthlyRevenue: '500-person capacity',
     roi: 'Spiritual centerpiece',
     mode: 'vision',
-    description: 'An acoustically designed spiritual center at the heart of the headquarters — healing and activation chambers, sound therapy facilities, and meditation gardens where the ancient and the new meet in ceremony.',
+    description: 'An acoustically designed spiritual center at the heart of the headquarters — healing and activation chambers, sound therapy facilities, and meditation gardens where the ancient and the new meet in ceremony. The White Buffalo Dome lives here too — the Chumash immersive experience center anchoring the Indigenous University, folded into the temple complex.',
     features: [
       'Acoustically designed spiritual center (500 capacity)',
       'Healing and activation chambers',
       'Sound therapy facilities',
       'Meditation gardens',
-      'Home of the Circle-of-Truth gatherings'
+      'Home of the Circle-of-Truth gatherings',
+      'White Buffalo Dome — Chumash immersive experience center',
+      'Native American cultural programs & educational workshops',
+      'Anchors the Indigenous University: connecting the Ancient and the New',
+      'Year-round cultural events calendar'
     ]
   },
   {
     id: 'buffalo-rewilding',
     name: 'Buffalo Ranch & Rewilding',
-    emoji: '🦬',
-    position: [34.4235, -119.1935],
+    emoji: '🐃',
+    position: [34.425815, -119.20711],
     type: 'landscape',
     budget: '$30M development',
     timeline: 'Phase 1–3',
@@ -247,7 +251,7 @@ export const BMR_VISION_ZONES = [
     id: 'lemuria-studios',
     name: 'Lemuria Studios',
     emoji: '🎬',
-    position: [34.4135, -119.2145],
+    position: [34.422283, -119.198104],
     type: 'creative',
     budget: '$40M development',
     timeline: 'Phase 1–2',
@@ -267,7 +271,7 @@ export const BMR_VISION_ZONES = [
     id: 'regenerative-agriculture',
     name: 'Regenerative Agriculture',
     emoji: '🌾',
-    position: [34.4105, -119.2295],
+    position: [34.433155, -119.18509],
     type: 'agriculture',
     budget: '$35M development',
     timeline: 'Phase 1–3',
@@ -281,26 +285,6 @@ export const BMR_VISION_ZONES = [
       'Advanced water management + patented self-generative pumping',
       'Soil restoration projects',
       'Ceremonial herbal garden supplying the healing programs'
-    ]
-  },
-  {
-    id: 'white-buffalo-dome',
-    name: 'White Buffalo Dome',
-    emoji: '🛖',
-    position: [34.4238, -119.2185],
-    type: 'events',
-    budget: '$20M development',
-    timeline: 'Phase 2',
-    monthlyRevenue: 'Year-round cultural events',
-    roi: 'Indigenous University anchor',
-    mode: 'vision',
-    description: 'A Chumash immersive experience center — Native American cultural programs, educational workshops, and community gathering under one great dome, anchoring the Indigenous University: connecting the Ancient and the New.',
-    features: [
-      'Chumash immersive experience center',
-      'Native American cultural programs',
-      'Educational workshops — Indigenous University',
-      'Community gathering space',
-      'Year-round cultural events calendar'
     ]
   }
 ];
@@ -329,14 +313,13 @@ export const BMR_VISION_PANEL = {
 '</div>' +
 
 '<div class="property-info-section">' +
-  '<h4>🗺️ Six-Zone Master Plan</h4>' +
+  '<h4>🗺️ Master Plan</h4>' +
   '<ul class="property-features-list">' +
     '<li><strong>🏘️ Chumash Village</strong> — 50 carbon-negative homes, museum & craft workshops · $75M</li>' +
-    '<li><strong>🕊️ Temple of the White Buffalo</strong> — 500-person acoustic spiritual center · $25M</li>' +
-    '<li><strong>🦬 Buffalo Ranch & Rewilding</strong> — 200+ buffalo restoration program · $30M</li>' +
+    '<li><strong>🕊️ Temple of the White Buffalo</strong> — 500-person acoustic spiritual center + the White Buffalo Dome: Chumash immersive center & Indigenous University · $45M</li>' +
+    '<li><strong>🐃 Buffalo Ranch & Rewilding</strong> — 200+ buffalo restoration program · $30M</li>' +
     '<li><strong>🎬 Lemuria Studios</strong> — the New Hollywood, 12+ productions/yr · $40M</li>' +
     '<li><strong>🌾 Regenerative Agriculture</strong> — food for 1,000+ people · $35M</li>' +
-    '<li><strong>🛖 White Buffalo Dome</strong> — Chumash immersive center & Indigenous University · $20M</li>' +
   '</ul>' +
 '</div>' +
 

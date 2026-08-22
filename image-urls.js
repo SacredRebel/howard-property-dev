@@ -46,7 +46,8 @@ export const IMAGE_URLS = {
     },
     'white-buffalo-temple': {
       vision: [
-        '/images/black-mountain-ranch/white-buffalo-temple/vision/synthesis-ceremony.jpg'
+        '/images/black-mountain-ranch/white-buffalo-temple/vision/synthesis-ceremony.jpg',
+        '/images/black-mountain-ranch/white-buffalo-dome/vision/hero-ar-community.jpg'
       ]
     },
     'lemuria-studios': {
@@ -58,11 +59,6 @@ export const IMAGE_URLS = {
     'regenerative-agriculture': {
       vision: [
         '/images/black-mountain-ranch/regenerative-agriculture/vision/hero-regenerative-farm.jpg'
-      ]
-    },
-    'white-buffalo-dome': {
-      vision: [
-        '/images/black-mountain-ranch/white-buffalo-dome/vision/hero-ar-community.jpg'
       ]
     }
   },
