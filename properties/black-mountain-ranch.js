@@ -844,8 +844,8 @@ export const BMR_PROPERTY = {
       "name": "Shooting Range",
       "emoji": "🎯",
       "position": [
-        34.422083,
-        -119.197619
+        34.424443,
+        -119.193666
       ],
       "type": "events",
       "budget": "Existing facility",

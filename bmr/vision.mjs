@@ -147,7 +147,7 @@ export const BMR_TODAY_ZONES = [
     id: 'shooting-range',
     name: 'Shooting Range',
     emoji: '🎯',
-    position: [34.422083, -119.197619],
+    position: [34.424443, -119.193666],
     type: 'events',
     budget: 'Existing facility',
     timeline: 'In use today',

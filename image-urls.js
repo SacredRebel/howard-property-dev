@@ -142,7 +142,7 @@ export const IMAGE_URLS = {
     ],
     "vision": [
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Community%20Hub/vision/community%20fireplace%20kitchen%20hub.png",
-      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Community%20Hub/vision/communty%20center%20outdoor%20kitchen%20.png",
+      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Community%20Hub/vision/community%20kitchen.jpg",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Community%20Hub/vision/9bf07f4597490223c68888ab091ebe21.jpg",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Community%20Hub/vision/a436746300eee02213d26f31bc7056ec.jpg",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Community%20Hub/vision/c92cb4960a1dc0cdfb946c29a867c782.jpg",
@@ -416,7 +416,8 @@ export const IMAGE_URLS = {
     ],
     "vision": [
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/McQueen's%20Garage%20&%20Creative/vision/mcqeen%20ceremonial%20space%20and%20event%20venue%20%20(2).jpg",
-      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/McQueen's%20Garage%20&%20Creative/vision/mcqeen%20ceremonial%20space%20and%20event%20venue%20%20(3).jpg",
+      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/McQueen's%20Garage%20&%20Creative/vision/mcqeen%20ceremonial%20space%20and%20event%20venue%20%20(2).jpg",
+      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/McQueen's%20Garage%20&%20Creative/vision/McQueen%E2%80%99s%20Garage%20A%20Dynamic%20Space%20for%20Connection.jpg",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/McQueen's%20Garage%20&%20Creative/vision/Mcqueen%20music%20studio%20vision.png",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/McQueen's%20Garage%20&%20Creative/vision/sacred%20ceremonial%20space.png"
     ]
@@ -601,7 +602,8 @@ export const IMAGE_URLS = {
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/current/IMG_9242.JPG",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/current/IMG_9246.JPG",
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/current/IMG_9296.JPG",
-      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/current/sulphur%20mountain%20sanctuary%20place%20.JPG"
+      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/current/IMG_9196.JPG",
+      "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/current/IMG_9245.JPG"
     ],
     "vision": [
       "https://raw.githubusercontent.com/SacredRebel/EcoVillage-map/main/images/Sulphur%20Mountain%20Sanctuary%20The%20Living%20Landscape/vision/sacred%20geometry%20garden.png",
