@@ -307,7 +307,7 @@ export const BMR_VISION_PANEL = {
   '<div style="background: linear-gradient(135deg, #1a1030 0%, #2a1a40 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #FFD700;">' +
     '<div style="color: #FFE9A8; line-height: 1.8; font-size: 14px;">' +
       '<p style="margin: 0 0 10px 0;"><strong>3,600 acres in Upper Ojai become the flagship of the Regenerative Renaissance</strong> — the headquarters of a network designed to inspire, fund, and develop 1,000+ regenerative communities worldwide.</p>' +
-      '<p style="margin: 0;">Pending purchase <strong>$50M</strong> · Development investment <strong>$250M</strong> · Projected value <strong>$1B+</strong></p>' +
+      '<p style="margin: 0;">Acquisition <strong>$50M</strong> · Initial development <strong>$50M+</strong> · Full master plan <strong>$250M</strong> · Projected value <strong>$1B+</strong></p>' +
     '</div>' +
   '</div>' +
 '</div>' +
@@ -335,9 +335,29 @@ export const BMR_VISION_PANEL = {
   '<h4>📈 The Path</h4>' +
   '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">' +
     '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
-      '<p style="margin: 0 0 10px 0;"><strong>Phase 1 ($50M):</strong> acquisition + 10 fireproof premium homes on 40-acre lots. <strong>Phase 2 ($250M):</strong> the six zones + hospitality network. <strong>Phase 3 ($1B):</strong> global ecosystem.</p>' +
+      '<p style="margin: 0 0 10px 0;"><strong>Phase 1 — $50M acquisition + $50M+ first development wave:</strong> purchase, 10 fireproof premium homes on 40-acre lots, core infrastructure. <strong>Phase 2 — to $250M:</strong> the Lemuria zones + hospitality network. <strong>Phase 3 — $1B:</strong> global ecosystem.</p>' +
       '<p style="margin: 0;">Flip the toggle to <strong>Today</strong> to see the real county parcel structure underneath this vision — all 63 confirmed parcels, 3,380 county-recorded acres, every line a recorded boundary.</p>' +
     '</div>' +
   '</div>' +
 '</div>'
 };
+
+// V0.17 — deal status + documents (johny 2026-08-22)
+export const BMR_STATUS = {
+  today: {
+    badge: '🏔️ Trophy Ranch — On the Market',
+    rows: [['Asking', '$50,000,000'], ['Scale', '63 county parcels · 3,380 recorded ac (~3,600 gross)'],
+           ['Standing today', 'Main lodge compound, guest homes, barns, stocked lake'],
+           ['Operations', 'Working cattle ranch with fields, orchards & trails']],
+    note: 'Today mode shows the ranch exactly as it stands and operates — every parcel line is a county-recorded boundary.'
+  },
+  vision: {
+    badge: '⛰️ Lemuria HQ — $100M Program',
+    rows: [['Acquisition', '$50,000,000'], ['Initial development', '$50,000,000+'],
+           ['Full master plan', '$250M build-out'], ['Projected value', '$1B+ ecosystem']],
+    note: 'The Vision layers the Lemuria headquarters over the working ranch — everything that stands today remains. One-pager under Documents.'
+  }
+};
+export const BMR_DOCS = [
+  { label: 'Black Mountain Ranch — Acquisition One-Pager (PDF)', file: 'docs/black-mountain-ranch/Black-Mountain-Ranch-OnePager.pdf' }
+];

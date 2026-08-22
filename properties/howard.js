@@ -56,17 +56,7 @@ const HOWARD_PANEL_HTML = '<div class="image-gallery-section" style="margin-bott
           '<li><strong>Ojai Valley Dark Sky (DKS):</strong> Night-sky lighting protection overlay</li>' +
           '<li><strong>Temporary Rental Units (TRU):</strong> TRU overlay area</li>' +
         '</ul>' +
-      '</div>' +
-
-      '<div class="property-info-section">' +
-        '<h4>💡 About This Proposal</h4>' +
-        '<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">' +
-          '<div style="font-weight: 600; color: #667eea; margin-bottom: 10px; font-size: 14px;">🌱 Proposed Projects</div>' +
-          '<div style="color: #555; line-height: 1.8; font-size: 14px;">' +
-            '<p style="margin: 0;">This map shows <strong>13 proposed projects</strong> for the property — tap any icon to explore what it could become. Every position and every idea is flexible: this is a conversation starter, not a final plan. Photo galleries for each project are coming next.</p>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
+      '</div>' ;
 
 const HOWARD_BOUNDARY = [
   {
@@ -543,6 +533,37 @@ const HOWARD_ZONES = [
   }
 ];
 
+const VISION_PANEL_HTML = 
+      '<div class="image-gallery-section" style="margin-bottom: 20px;">' +
+        '<h4 style="margin-bottom: 12px; color: #7C3AED;">📸 Property Gallery</h4>' +
+        '<div class="carousel-container">' +
+          '<div class="carousel-main" id="property-carousel-main">' +
+            '<div class="carousel-loading">Loading images...</div>' +
+          '</div>' +
+          '<div class="carousel-thumbnails" id="property-carousel-thumbnails"></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="property-info-section">' +
+        '<h4>🌱 The Proposal in One Breath</h4>' +
+        '<div style="background: linear-gradient(135deg, #f3eefc 0%, #fff8e6 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #6a3d9a;">' +
+          '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;">Howard, this map is my proposal to you. You have 44 raw acres and a wish to see agriculture happen here. I am a property developer, software developer, entrepreneur and builder — and I am looking for my next home base. I would like it to be your land.</p>' +
+          '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>What I bring:</strong> hands-on regenerative development — hugelkultur beds, a nursery, mushroom cultivation, beekeeping, livestock rotation and compost systems — plus the workshop, tools and energy to build it, and the digital craft to document and manage everything (this living map is the first artifact).</p>' +
+          '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>What I ask:</strong> a place to live on the land while I develop it — starting simply (studio / cabin), growing only with your blessing. Every project on this map is placed as a suggestion; tap any icon to explore it. We build only what we agree on, phase by phase.</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="property-info-section">' +
+        '<h4>🔨 How It Would Flow</h4>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>Phase 1 — Arrive & prove (months 0–6):</strong> I settle into the studio, build the first hugelkultur beds, get compost running, and start the nursery. Small, visible, real.</p>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>Phase 2 — Grow (months 6–18):</strong> mushrooms, bees, livestock rotation, the pond and swimming hole restored, the community workshop humming.</p>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>Phase 3 — Flourish (18+ months):</strong> the full 13-project vision on this map — a regenerative homestead that feeds people, teaches people, and makes the land more alive every season.</p>' +
+      '</div>' +
+      '<div class="property-info-section">' +
+        '<h4>💡 About This Vision</h4>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;">Every position and idea on this map is flexible — a conversation starter, not a final plan. The Today toggle shows the property exactly as it is; this Vision shows what we could grow together. The full written proposal is available under Documents below.</p>' +
+      '</div>' +
+ '';
+
 export const HOWARD_PROPERTY = {
   id: 'howard',
   name: 'Howard Property',
@@ -562,6 +583,9 @@ export const HOWARD_PROPERTY = {
     buttons: []
   },
   panel: { title: 'Howard Property — 1320 Baldwin Rd', html: HOWARD_PANEL_HTML },
+  status: {"today": {"badge": "\ud83e\udd1d Private Land \u2014 Proposal Invited", "rows": [["Owner", "Howard (private)"], ["Status", "Not for sale \u2014 raw land + residence"], ["Openness", "Owner invites agriculture project ideas"], ["Acreage", "~44.1 ac \u00b7 OS-40 zoning"]], "note": "Howard has welcomed ideas for agricultural projects on this land. What you see in Today mode is the property exactly as it stands."}, "vision": {"badge": "\ud83c\udf31 Live Proposal \u2014 for Howard", "rows": [["Proposal", "Regenerative agriculture homestead & community workshop"], ["Model", "Resident steward-partner \u2014 sweat equity + phased projects"], ["Partner", "Paul (johny) \u2014 developer, builder, software & creative"], ["Ask", "A home base on the land in exchange for full development"]], "note": "Everything in Vision mode is a proposal for Howard to consider \u2014 13 projects, each flexible, each a conversation. Full proposal document below."}},
+  docs: [{"label": "Howard Property \u2014 Full Proposal (PDF)", "file": "docs/howard/Howard-Property-Proposal.pdf"}],
+  visionPanel: { title: "Howard Property \u2014 The Proposal", html: VISION_PANEL_HTML },
   boundary: HOWARD_BOUNDARY,
   zones: HOWARD_ZONES
 };

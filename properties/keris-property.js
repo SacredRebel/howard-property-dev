@@ -215,6 +215,23 @@ const KERIS_ZONES = [
   }
 ];
 
+const VISION_PANEL_HTML = 
+      '<div class="image-gallery-section" style="margin-bottom: 20px;">' +
+        '<h4 style="margin-bottom: 12px; color: #7C3AED;">📸 Property Gallery</h4>' +
+        '<div class="carousel-container">' +
+          '<div class="carousel-main" id="property-carousel-main">' +
+            '<div class="carousel-loading">Loading images...</div>' +
+          '</div>' +
+          '<div class="carousel-thumbnails" id="property-carousel-thumbnails"></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="property-info-section">' +
+        '<h4>🌸 A Vision of Continuity</h4>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;">Some land is not for developing — it is for keeping. Keri&#39;s property remains exactly what it is today: the main house, the guest house, and the ceremony space, held in family stewardship as the quiet anchor of everything else on this map.</p>' +
+      '</div>' +
+ '';
+
 export const KERIS_PROPERTY = {
   id: 'keris-property',
   name: "Keri's Property",
@@ -234,6 +251,9 @@ export const KERIS_PROPERTY = {
     buttons: []
   },
   panel: { title: "Keri's Property — 14209 De La Garrigue Rd", html: KERIS_PANEL_HTML },
+  status: {"today": {"badge": "\ud83d\udd12 Not For Sale \u2014 Family Stewardship", "rows": [["Status", "Held and stewarded within the family circle"], ["Role", "Anchor property of the community"], ["Acreage", "~34 ac \u00b7 De La Garrigue Rd"]], "note": "Keri's land is not on the market and not for acquisition \u2014 it simply is, and it holds the circle."}, "vision": {"badge": "\ud83c\udf38 Steady \u2014 No Development Planned", "rows": [["Plan", "Remains as it is"], ["Continues", "Ceremony space, guest house, family gatherings"]], "note": "The vision for this land is continuity \u2014 the same three places, kept alive and loved."}},
+  docs: [],
+  visionPanel: { title: "Keri's Property \u2014 Vision of Continuity", html: VISION_PANEL_HTML },
   boundary: KERIS_BOUNDARY,
   zones: KERIS_ZONES
 };

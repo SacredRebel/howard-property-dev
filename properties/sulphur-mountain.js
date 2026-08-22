@@ -1859,6 +1859,26 @@ const SULPHUR_ZONES = [
   }
 ];
 
+const VISION_PANEL_HTML = 
+      '<div class="image-gallery-section" style="margin-bottom: 20px;">' +
+        '<h4 style="margin-bottom: 12px; color: #7C3AED;">📸 Property Gallery</h4>' +
+        '<div class="carousel-container">' +
+          '<div class="carousel-main" id="property-carousel-main">' +
+            '<div class="carousel-loading">Loading images...</div>' +
+          '</div>' +
+          '<div class="carousel-thumbnails" id="property-carousel-thumbnails"></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="property-info-section">' +
+        '<h4>🌿 The $3M Eco-Village Vision</h4>' +
+        '<div style="background: linear-gradient(135deg, #f3eefc 0%, #fff8e6 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #6a3d9a;">' +
+          '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;">A working eco-village on Sulphur Mountain: 18 interconnected projects — a retreat village and glamping creek, regenerative agriculture and food forests, wellness and spa facilities, ceremony and creative spaces, mushroom cultivation, beekeeping, livestock and dairy — anchored by the residences that already stand.</p>' +
+          '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>The raise:</strong> $3,000,000 secures the property and funds the first development wave. Explore every vision project by tapping the icons in Vision mode — each carries its budget, timeline and revenue picture.</p>' +
+        '</div>' +
+      '</div>' +
+ '';
+
 export const SULPHUR_PROPERTY = {
   id: 'sulphur-mountain',
   name: 'Sulphur Mountain Eco-Village',
@@ -1882,6 +1902,9 @@ export const SULPHUR_PROPERTY = {
     ]
   },
   panel: { title: 'Sulphur Mountain Property', html: SULPHUR_PANEL_HTML },
+  status: {"today": {"badge": "\ud83c\udfe1 Operating Property \u2014 Stewarded", "rows": [["Status", "Active property with residence, barn, garage & storage"], ["Community", "Current home of the eco-village founding team"], ["Acreage", "~93 ac on Sulphur Mountain Rd"]], "note": "Today mode shows the property as it operates right now \u2014 the four standing places you can visit on the map."}, "vision": {"badge": "\ud83d\udcb0 Raise Open \u2014 $3,000,000", "rows": [["Goal", "$3M to acquire + develop"], ["Use of funds", "Property purchase + eco-village build-out"], ["Program", "18 projects \u2014 retreat village, farm, wellness, ceremony"], ["Stage", "Proposal \u2014 investment conversations open"]], "note": "The Vision shows the full Sulphur Mountain Eco-Village. The one-page raise summary is under Documents below."}},
+  docs: [{"label": "Sulphur Mountain \u2014 $3M Raise One-Pager (PDF)", "file": "docs/sulphur-mountain/Sulphur-Mountain-3M-OnePager.pdf"}],
+  visionPanel: { title: "Sulphur Mountain \u2014 The $3M Eco-Village Vision", html: VISION_PANEL_HTML },
   boundary: SULPHUR_BOUNDARY,
   zones: SULPHUR_ZONES
 };

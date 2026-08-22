@@ -129,6 +129,24 @@ const ROSE_BOUNDARY = [
   }
 ];
 
+const VISION_PANEL_HTML = 
+      '<div class="image-gallery-section" style="margin-bottom: 20px;">' +
+        '<h4 style="margin-bottom: 12px; color: #7C3AED;">📸 Property Gallery</h4>' +
+        '<div class="carousel-container">' +
+          '<div class="carousel-main" id="property-carousel-main">' +
+            '<div class="carousel-loading">Loading images...</div>' +
+          '</div>' +
+          '<div class="carousel-thumbnails" id="property-carousel-thumbnails"></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="property-info-section">' +
+        '<h4>🌲 The Basecamp Vision</h4>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;">Forty acres alone inside the national forest: Rose Valley becomes the network&#39;s wilderness basecamp — a retreat outpost for trail journeys, star-filled ceremony nights and deep-quiet residencies, kept nearly as wild as we found it.</p>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>Path:</strong> licensed boundary survey (the county fabric here is unsurveyed township land), then the offer. Asking price today: $810,000.</p>' +
+      '</div>' +
+ '';
+
 export const ROSE_VALLEY_PROPERTY = {
   id: 'rose-valley',
   name: 'Rose Valley Property',
@@ -148,6 +166,9 @@ export const ROSE_VALLEY_PROPERTY = {
     buttons: []
   },
   panel: { title: 'Rose Valley Property — 7343 Rose Valley Rd', html: ROSE_PANEL_HTML },
+  status: {"today": {"badge": "\ud83c\udff7\ufe0f For Sale \u2014 $810,000", "rows": [["Listing", "MLS V1-35138"], ["Acreage", "40.016 ac \u00b7 OS-160 zoning"], ["Setting", "Private inholding surrounded by Los Padres National Forest"], ["Includes", "3bd/2ba home, owned solar, well, septic, creek, corrals"]], "note": "Today mode shows the listed property exactly as offered."}, "vision": {"badge": "\ud83c\udf32 Acquisition Target \u2014 Wilderness Basecamp", "rows": [["Role", "Retreat & wilderness basecamp node of the network"], ["Next steps", "Licensed survey + offer"], ["Why", "Four-corner forest inholding \u2014 irreplaceable setting"]], "note": "A quiet outpost in the network of communities: base for retreats, trail journeys and dark-sky nights."}},
+  docs: [],
+  visionPanel: { title: "Rose Valley \u2014 Wilderness Basecamp Vision", html: VISION_PANEL_HTML },
   boundary: ROSE_BOUNDARY,
   zones: []
 };

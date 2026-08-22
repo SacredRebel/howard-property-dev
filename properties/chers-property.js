@@ -158,6 +158,24 @@ const CHERS_ZONES = [
   }
 ];
 
+const VISION_PANEL_HTML = 
+      '<div class="image-gallery-section" style="margin-bottom: 20px;">' +
+        '<h4 style="margin-bottom: 12px; color: #7C3AED;">📸 Property Gallery</h4>' +
+        '<div class="carousel-container">' +
+          '<div class="carousel-main" id="property-carousel-main">' +
+            '<div class="carousel-loading">Loading images...</div>' +
+          '</div>' +
+          '<div class="carousel-thumbnails" id="property-carousel-thumbnails"></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="property-info-section">' +
+        '<h4>🌹 The Vision — Keep It in the Family</h4>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;">Cher&#39;s place is already what it wants to be: a finished, loved home with the Quan Yin rose garden at its heart. The vision is to acquire it (≈ $2.2M) so it stays in the family — and to keep caring for it exactly as it is.</p>' +
+        '<p style="margin: 0 0 10px 0; line-height: 1.7; color: #444;"><strong>One exploratory idea:</strong> a second ADU could one day join the property. It is an early thought, not a plan — shown here only so the possibility has a place on the map.</p>' +
+      '</div>' +
+ '';
+
 export const CHERS_PROPERTY = {
   id: 'chers-property',
   name: "Cher's Property",
@@ -177,6 +195,9 @@ export const CHERS_PROPERTY = {
     buttons: []
   },
   panel: { title: "Cher's Property — 10622 Encino Dr", html: CHERS_PANEL_HTML },
+  status: {"today": {"badge": "\ud83c\udff7\ufe0f For Sale Now \u2014 $2.2M (est.)", "rows": [["Status", "On the market"], ["Goal", "Acquire to keep in the family"], ["Needed", "\u2248 $2,200,000"], ["Condition", "Turn-key \u2014 finalized as it is"], ["Acreage", "2.0 ac \u00b7 Encino Dr, Oak View"]], "note": "The mission here is simple: the house is for sale, and we want to bring it into the family circle before it goes to the open market."}, "vision": {"badge": "\ud83c\udf39 Keep & Care \u2014 Family Home", "rows": [["Plan", "Preserve as-is under family stewardship"], ["Exploratory", "Possible second ADU \u2014 early idea only"], ["Depends on", "Outcome of the acquisition"]], "note": "The vision is intentionally light: first the home is secured, then \u2014 perhaps \u2014 a second ADU. Nothing here is committed; it lives on this map as a possibility."}},
+  docs: [{"label": "Cher's Property \u2014 Family Acquisition One-Pager (PDF)", "file": "docs/chers-property/Chers-Property-OnePager.pdf"}],
+  visionPanel: { title: "Cher's Property \u2014 Family Stewardship", html: VISION_PANEL_HTML },
   boundary: CHERS_BOUNDARY,
   zones: CHERS_ZONES
 };
