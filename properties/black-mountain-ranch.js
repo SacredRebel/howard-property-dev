@@ -686,6 +686,203 @@ export const BMR_PROPERTY = {
   visionPanel: { title: "Lemuria Headquarters — Black Mountain Ranch", html: "<div class=\"image-gallery-section\" style=\"margin-bottom: 20px;\"><h4 style=\"margin-bottom: 12px; color: #7C3AED;\">📸 Vision Gallery</h4><div class=\"carousel-container\"><div class=\"carousel-main\" id=\"property-carousel-main\"><div class=\"carousel-loading\">Loading images...</div></div><div class=\"carousel-thumbnails\" id=\"property-carousel-thumbnails\"></div></div></div><div class=\"property-info-section\"><h4>✨ The Headquarters of Lemuria Life</h4><div style=\"background: linear-gradient(135deg, #1a1030 0%, #2a1a40 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #FFD700;\"><div style=\"color: #FFE9A8; line-height: 1.8; font-size: 14px;\"><p style=\"margin: 0 0 10px 0;\"><strong>3,600 acres in Upper Ojai become the flagship of the Regenerative Renaissance</strong> — the headquarters of a network designed to inspire, fund, and develop 1,000+ regenerative communities worldwide.</p><p style=\"margin: 0;\">Pending purchase <strong>$50M</strong> · Development investment <strong>$250M</strong> · Projected value <strong>$1B+</strong></p></div></div></div><div class=\"property-info-section\"><h4>🗺️ Six-Zone Master Plan</h4><ul class=\"property-features-list\"><li><strong>🏘️ Chumash Village</strong> — 50 carbon-negative homes, museum & craft workshops · $75M</li><li><strong>🕊️ Temple of the White Buffalo</strong> — 500-person acoustic spiritual center · $25M</li><li><strong>🦬 Buffalo Ranch & Rewilding</strong> — 200+ buffalo restoration program · $30M</li><li><strong>🎬 Lemuria Studios</strong> — the New Hollywood, 12+ productions/yr · $40M</li><li><strong>🌾 Regenerative Agriculture</strong> — food for 1,000+ people · $35M</li><li><strong>🛖 White Buffalo Dome</strong> — Chumash immersive center & Indigenous University · $20M</li></ul></div><div class=\"property-info-section\"><h4>🏛️ Flagship Programs</h4><div class=\"property-detail-row\"><span class=\"property-detail-label\">Indigenous University:</span><span class=\"property-detail-value\">Connecting the Ancient and the New</span></div><div class=\"property-detail-row\"><span class=\"property-detail-label\">Lemuria Studios:</span><span class=\"property-detail-value\">Distributed studio network — content for the Golden Age</span></div><div class=\"property-detail-row\"><span class=\"property-detail-label\">Oya Spa Hotels:</span><span class=\"property-detail-value\">Wellness hotel network integrating the Oya Spa brand</span></div><div class=\"property-detail-row\"><span class=\"property-detail-label\">Quantum Energy Center:</span><span class=\"property-detail-value\">Patented self-generative pumping technology</span></div></div><div class=\"property-info-section\"><h4>📈 The Path</h4><div style=\"background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;\"><div style=\"color: #555; line-height: 1.8; font-size: 14px;\"><p style=\"margin: 0 0 10px 0;\"><strong>Phase 1 ($50M):</strong> acquisition + 10 fireproof premium homes on 40-acre lots. <strong>Phase 2 ($250M):</strong> the six zones + hospitality network. <strong>Phase 3 ($1B):</strong> global ecosystem.</p><p style=\"margin: 0;\">Flip the toggle to <strong>Today</strong> to see the real county parcel structure underneath this vision — all 63 confirmed parcels, 3,380 county-recorded acres, every line a recorded boundary.</p></div></div></div>" },
   zones: [
     {
+      "id": "main-lodge",
+      "name": "Main Lodge",
+      "emoji": "🏛️",
+      "position": [
+        34.4286389,
+        -119.1863412
+      ],
+      "type": "residential",
+      "budget": "Existing — built 2004",
+      "timeline": "Standing today",
+      "monthlyRevenue": "13,250 sq ft",
+      "roi": "Heart of the ranch",
+      "mode": "both",
+      "description": "The 13,250 sq ft resort-style main residence at the heart of the ranch — the lodge that anchors the whole property today, with the tennis court and pool terrace nearby. In the Lemuria era it remains the headquarters residence.",
+      "features": [
+        "13,250 sq ft resort-style lodge (built 2004)",
+        "Tennis court and outdoor living terraces",
+        "Anchors the 8434 Ojai Santa Paula Rd compound",
+        "Remains the headquarters residence in the vision"
+      ]
+    },
+    {
+      "id": "guest-cottages",
+      "name": "Guest House & Cottages",
+      "emoji": "🏡",
+      "position": [
+        34.431493,
+        -119.189146
+      ],
+      "type": "hospitality",
+      "budget": "Existing structures",
+      "timeline": "Standing today",
+      "monthlyRevenue": "1,800 + 2,000 sq ft",
+      "roi": "Ready guest capacity",
+      "mode": "both",
+      "description": "The existing guest house (1,800 sq ft), caretaker cottage (2,000 sq ft), and staff housing — about a dozen structures in total support life on the ranch today, and seed the hospitality program of the vision.",
+      "features": [
+        "Guest house — 1,800 sq ft",
+        "Caretaker cottage — 2,000 sq ft",
+        "Staff housing and support structures",
+        "First rooms of the future hospitality network"
+      ]
+    },
+    {
+      "id": "carriage-house",
+      "name": "Carriage House",
+      "emoji": "🍷",
+      "position": [
+        34.4293,
+        -119.1875
+      ],
+      "type": "community",
+      "budget": "Existing — 6,200 sq ft",
+      "timeline": "Standing today",
+      "monthlyRevenue": "Gym · office · wine cellar",
+      "roi": "Turn-key amenity building",
+      "mode": "both",
+      "description": "The 6,200 sq ft carriage house — gym, office, and wine cellar under one roof today. A turn-key gathering and wellness building that slots straight into the Lemuria program.",
+      "features": [
+        "6,200 sq ft multi-use building",
+        "Fitness gym",
+        "Office suite",
+        "Wine cellar"
+      ]
+    },
+    {
+      "id": "auto-gallery",
+      "name": "Auto Gallery",
+      "emoji": "🏎️",
+      "position": [
+        34.428,
+        -119.1852
+      ],
+      "type": "creative",
+      "budget": "Existing — 7,200 sq ft",
+      "timeline": "Standing today",
+      "monthlyRevenue": "Private museum",
+      "roi": "Future studio-scale space",
+      "mode": "both",
+      "description": "A 7,200 sq ft private automobile museum — climate-controlled, gallery-grade space housing the vintage car collection today, and one of the ready-made large interiors for future productions and exhibitions.",
+      "features": [
+        "7,200 sq ft gallery building",
+        "Climate-controlled museum space",
+        "Houses the vintage automobile collection",
+        "Studio-scale interior for the vision era"
+      ]
+    },
+    {
+      "id": "barn-corrals",
+      "name": "Horse Barn & Working Corrals",
+      "emoji": "🐎",
+      "position": [
+        34.429652,
+        -119.193832
+      ],
+      "type": "agriculture",
+      "budget": "Existing facilities",
+      "timeline": "Working today",
+      "monthlyRevenue": "Cattle + equestrian",
+      "roi": "Living ranch operations",
+      "mode": "both",
+      "description": "The working heart of the cattle and horse operation — barn, corrals, cross-fencing, and equipment storage. The ranch runs livestock today, and these facilities carry straight into the rewilding and regenerative programs.",
+      "features": [
+        "Horse barn and equipment storage",
+        "Working cattle pens and corrals",
+        "Cross-fenced pastures",
+        "Foundation for the buffalo & regenerative programs"
+      ]
+    },
+    {
+      "id": "ranch-fields",
+      "name": "Ranch Fields & Orchards",
+      "emoji": "🚜",
+      "position": [
+        34.431861,
+        -119.19651
+      ],
+      "type": "agriculture",
+      "budget": "Existing — in cultivation",
+      "timeline": "Farmed today",
+      "monthlyRevenue": "Row crops + orchard blocks",
+      "roi": "Proven productive soil",
+      "mode": "both",
+      "description": "The big cultivated flats along the northern arm — plowed fields and orchard blocks in active use today. Proven water and soil that become the backbone of the regenerative agriculture vision.",
+      "features": [
+        "Large cultivated field visible from Hwy 150",
+        "Orchard plantings",
+        "Existing irrigation infrastructure",
+        "Backbone of the future regenerative agriculture zone"
+      ]
+    },
+    {
+      "id": "stocked-lake",
+      "name": "Stocked Fishing Lake",
+      "emoji": "🎣",
+      "position": [
+        34.421369,
+        -119.199635
+      ],
+      "type": "water",
+      "budget": "Existing water feature",
+      "timeline": "Full today",
+      "monthlyRevenue": "Private lake",
+      "roi": "Water heart of the ranch",
+      "mode": "both",
+      "description": "The private stocked fishing lake in the green heart of the ranch — surrounded by meadows and cottonwoods today, and the centerpiece water feature of every future gathering.",
+      "features": [
+        "Private stocked fishing lake",
+        "Meadow shoreline",
+        "Wildlife magnet — herons, deer, waterfowl",
+        "Centerpiece water feature in the vision"
+      ]
+    },
+    {
+      "id": "shooting-range",
+      "name": "Shooting Range",
+      "emoji": "🎯",
+      "position": [
+        34.423394,
+        -119.201866
+      ],
+      "type": "events",
+      "budget": "Existing facility",
+      "timeline": "In use today",
+      "monthlyRevenue": "Professional grade",
+      "roi": "Established amenity",
+      "mode": "both",
+      "description": "The ranch’s professional shooting range — one of the signature amenities of the estate as it stands today.",
+      "features": [
+        "Professional shooting range",
+        "Established safety berms and layout",
+        "Signature amenity of the current estate"
+      ]
+    },
+    {
+      "id": "ranch-trails",
+      "name": "35+ Miles of Trails",
+      "emoji": "🥾",
+      "position": [
+        34.421921,
+        -119.218826
+      ],
+      "type": "landscape",
+      "budget": "Existing network",
+      "timeline": "Ride them today",
+      "monthlyRevenue": "Hiking · riding · off-road",
+      "roi": "The wild backbone",
+      "mode": "both",
+      "description": "More than 35 miles of private trails web the ranch’s mountains and canyons — hiking, horseback, and off-road routes through the wild western backcountry, today and always.",
+      "features": [
+        "35+ miles of private trails",
+        "Hiking, equestrian, and off-road use",
+        "Reaches the remote western canyons",
+        "Becomes the wildlife-corridor and eco-tour network"
+      ]
+    },
+    {
       "id": "chumash-village",
       "name": "Chumash Village",
       "emoji": "🏘️",

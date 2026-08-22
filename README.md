@@ -10,11 +10,11 @@ The map opens on an **overview** showing every property with its glowing rainbow
 
 | Property | Projects | Size | Status |
 |---|---|---|---|
-| 🏔️ Howard Property | 13 proposed | ~44 acres | Proposal draft |
-| 🌿 Sulphur Mountain Eco-Village | 18 zones | ~10 acres | V1 production data |
+| 🏔️ Howard Property | 4 today · 13 in vision | ~44 acres | Proposal draft |
+| 🌿 Sulphur Mountain Eco-Village | 4 today · 18 in vision | ~10 acres | Lemuria Pilot |
 | 🌸 Keri's Property | 3 places | ~34 acres | Starting points |
 | 🌹 Cher's Property | 2 places | 2 acres | Starting points |
-| ⛰️ Black Mountain Ranch | 63 real parcels · 6 vision zones | 3,380 county acres | Lemuria Headquarters — vision layer live |
+| ⛰️ Black Mountain Ranch | 9 today · 15 in vision · 63 parcels | 3,380 county acres | Lemuria Headquarters |
 | 🌄 Rose Valley | Boundary + panel | 40 acres | For sale — $810K acquisition target |
 
 Sulphur Mountain photos load directly from the [EcoVillage-map repo](https://github.com/SacredRebel/EcoVillage-map) via raw.githubusercontent.com — no image copies in this repo.
@@ -90,8 +90,9 @@ Drop images into `images/<property>/<project>/current/` (photos of how it looks 
 6. ✅ 63rd parcel (APN 035-0-020-010, 610 ac North Ridge) confirmed and on the map
 7. ✅ V0.9 — Current ⇄ Vision toggle · Lemuria HQ vision layer (6 zones) · first vision galleries
 8. ✅ V0.10 — Rose Valley Property added (for-sale acquisition target, real county boundary)
-9. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
-10. ⬜ Custom UI theme · hide admin tools for public release
+9. ✅ V0.11 — Today ⇄ Vision curated per property: what exists now vs what Lemuria builds (zones can carry a different name & story per mode)
+10. ⬜ Photo galleries (upload to `images/`, wire into `image-urls.js`)
+11. ⬜ Custom UI theme · hide admin tools for public release
 
 ---
 

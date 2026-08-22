@@ -223,8 +223,9 @@ const HOWARD_ZONES = [
   },
   {
     id: "community-hub",
+    mode: "vision",
     name: "Community Hub",
-    emoji: "🛖",
+    emoji: "🏡",
     position: [34.423913, -119.318389],
     type: "community",
     budget: "Self-funded by Paul — needs only a spot + water & electric access",
@@ -265,7 +266,8 @@ const HOWARD_ZONES = [
   },
   {
     id: "community-workshop",
-    name: "Community Workshop",
+    name: "Studio",
+    visionName: "Community Workshop",
     emoji: "🛠️",
     position: [34.426016, -119.31941],
     type: "creative",
@@ -273,8 +275,14 @@ const HOWARD_ZONES = [
     timeline: "Phase 1 — early priority",
     monthlyRevenue: "Products, collaborations & property value",
     roi: "The engine room for every other project",
-    description: "The property's main workshop — it can begin as nothing more than a beautifully built shade structure in nature, housing an organized tool and materials setup. From there it becomes the engine room of the whole property: processing lumber and building supplies, organizing materials, and producing everything the other projects need.",
+    description: "The existing structure here is in use today as a studio — a working creative space as it stands. In the vision it grows into the property's shared Community Workshop, built out with Andrew and Logan.",
+    visionDescription: "The property's main workshop — it can begin as nothing more than a beautifully built shade structure in nature, housing an organized tool and materials setup. From there it becomes the engine room of the whole property: processing lumber and building supplies, organizing materials, and producing everything the other projects need.",
     features: [
+      "Existing structure in active use as a studio",
+      "Working creative space today",
+      "Grows into the shared Community Workshop in the vision"
+    ],
+    visionFeatures: [
       "Main tool workshop for the entire property",
       "Can start as a nice open-air shade structure — walls come later",
       "Organized storage for tools, materials, and building supplies",
@@ -291,6 +299,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "property-nursery",
+    mode: "vision",
     name: "Nursery",
     emoji: "🌱",
     position: [34.426823, -119.318002],
@@ -330,6 +339,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "nature-gym",
+    mode: "vision",
     name: "Outdoor Nature Gym",
     emoji: "🏋️",
     position: [34.426701, -119.318685],
@@ -356,6 +366,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "sacred-spaces",
+    mode: "vision",
     name: "Ceremony & Sacred Spaces",
     emoji: "🔥",
     position: [34.42452, -119.318856],
@@ -376,6 +387,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "mushroom-containers",
+    mode: "vision",
     name: "Mushroom Growing Containers",
     emoji: "🍄",
     position: [34.426219, -119.318052],
@@ -413,6 +425,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "beekeeping",
+    mode: "vision",
     name: "Beekeeping & Honey Production",
     emoji: "🐝",
     position: [34.425716, -119.320085],
@@ -440,6 +453,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "pond-swimming-hole",
+    mode: "vision",
     name: "Pond & Swimming Hole",
     emoji: "🐟",
     position: [34.426395, -119.319394],
@@ -461,6 +475,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "growing-dome",
+    mode: "vision",
     name: "Growing Dome Greenhouse",
     emoji: "🌴",
     position: [34.426238, -119.318776],
@@ -502,6 +517,7 @@ const HOWARD_ZONES = [
   },
   {
     id: "compost-operation",
+    mode: "vision",
     name: "Compost Operation",
     emoji: "♻️",
     position: [34.425869, -119.31823],

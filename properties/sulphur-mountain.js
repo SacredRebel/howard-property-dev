@@ -265,6 +265,7 @@ const SULPHUR_BOUNDARY = [
 const SULPHUR_ZONES = [
   {
     id: "agricultural-hub",
+    mode: "vision",
     name: "Agricultural Hub", 
     emoji: "🌾",
     position: [34.433478, -119.155982],
@@ -407,6 +408,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "community-hub",
+    mode: "vision",
     name: "Community Hub",
     emoji: "🏛️",
     position: [34.432771, -119.155387],
@@ -467,7 +469,8 @@ const SULPHUR_ZONES = [
     ]
   },
   {
-    id: "retreat-village", 
+    id: "retreat-village",
+    mode: "vision", 
     name: "Retreat Village",
     emoji: "🏡",
     position: [34.432173, -119.155628],
@@ -542,6 +545,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "infrastructure",
+    mode: "vision",
     name: "Infrastructure & Utilities",
     emoji: "⚡",
     position: [34.432386, -119.155966],
@@ -641,7 +645,8 @@ const SULPHUR_ZONES = [
   },
   {
     id: "mcqueens-garage",
-    name: "McQueen's Garage & Creative",
+    name: "McQueen's Garage",
+    visionName: "McQueen's Garage & Creative",
     emoji: "🎭",
     position: [34.432549, -119.155279],
     polygon: [[34.4340, -119.1555], [34.4345, -119.1555], [34.4345, -119.1545], [34.4340, -119.1545]],
@@ -650,8 +655,15 @@ const SULPHUR_ZONES = [
     timeline: "Phase 1-3 (18 months)",
     monthlyRevenue: "$15K-$25K+",
     roi: "87-97% annual ROI",
-    description: "Premium music recording studio and live event venue featuring a professional stage, outdoor ceremony space, and state-of-the-art recording facilities. The warehouse transformation includes performance areas for live music festivals, kirtans, and high-end retreats, with VIP back-end rooms, recording booths, and overnight accommodations for visiting artists and retreat guests. Positioned as Ojai's destination for intimate concerts, ceremony gatherings, and live music recordings.",
+    description: "The legendary 3,200 sq ft warehouse from the Steve McQueen era — today it is simply the garage: solid, storied, and waiting. The vision transforms it into the creative ceremony and gathering space described on the Vision card.",
+    visionDescription: "Premium music recording studio and live event venue featuring a professional stage, outdoor ceremony space, and state-of-the-art recording facilities. The warehouse transformation includes performance areas for live music festivals, kirtans, and high-end retreats, with VIP back-end rooms, recording booths, and overnight accommodations for visiting artists and retreat guests. Positioned as Ojai's destination for intimate concerts, ceremony gatherings, and live music recordings.",
     features: [
+      "3,200 sq ft historic warehouse / garage",
+      "Steve McQueen provenance",
+      "Sound structure, ready for conversion",
+      "Becomes the creative & ceremony gathering space in the vision"
+    ],
+    visionFeatures: [
       "Professional music recording studio with isolation booths",
       "Live performance stage with professional sound and lighting",
       "Outdoor ceremony space for festivals and gatherings",
@@ -720,6 +732,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "ceremonial-infrastructure",
+    mode: "vision",
     name: "Ceremonial Infrastructure", 
     emoji: "🔮",
     position: [34.432501, -119.155582],
@@ -793,7 +806,8 @@ const SULPHUR_ZONES = [
   },
   {
     id: "wellness-facilities",
-    name: "Wellness & Spa Facilities",
+    name: "Storage Structures",
+    visionName: "Wellness & Spa Facilities",
     emoji: "🧘",
     position: [34.432930, -119.155062],
     polygon: [[34.4330, -119.1565], [34.4335, -119.1565], [34.4335, -119.1555], [34.4330, -119.1555]],
@@ -802,8 +816,14 @@ const SULPHUR_ZONES = [
     timeline: "Phase 1-3 (12+ months)",
     monthlyRevenue: "$10K-$15K (post-launch)",
     roi: "87-131% annual ROI",
-    description: "800 sq ft integrated wellness center and spa facility connecting three existing structures across multiple levels into one unified ADU. Features dedicated yoga studio, fitness center, healing modalities rooms, and oak tree deck for outdoor wellness practices. Serves retreat guests, community members, and monthly wellness memberships through workshops, healing sessions, and regenerative wellness programming.",
+    description: "Today these are storage structures — practical buildings holding equipment and materials for the property. In the vision this spot becomes the Wellness & Spa Facilities.",
+    visionDescription: "800 sq ft integrated wellness center and spa facility connecting three existing structures across multiple levels into one unified ADU. Features dedicated yoga studio, fitness center, healing modalities rooms, and oak tree deck for outdoor wellness practices. Serves retreat guests, community members, and monthly wellness memberships through workshops, healing sessions, and regenerative wellness programming.",
     features: [
+      "Existing structures used for storage",
+      "Equipment and materials for property operations",
+      "Site of the future Wellness & Spa Facilities"
+    ],
+    visionFeatures: [
       "800 sq ft connected ADU spanning 3 levels",
       "Dedicated yoga and movement studio",
       "Fitness center with workout equipment area",
@@ -894,6 +914,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "mushroom-cultivation",
+    mode: "vision",
     name: "Mushroom Cultivation",
     emoji: "🍄",
     position: [34.433474, -119.156218],
@@ -952,6 +973,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "beekeeping-program",
+    mode: "vision",
     name: "Beekeeping & Honey Production",
     emoji: "🐝",
     position: [34.433477, -119.155820],
@@ -980,6 +1002,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "events-gatherings-hub",
+    mode: "vision",
     name: "Events & Gatherings Hub",
     emoji: "🎪",
     position: [34.433394, -119.155065],
@@ -1140,6 +1163,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "livestock-dairy",
+    mode: "vision",
     name: "Livestock & Dairy Program",
     emoji: "🐄",
     position: [34.432797, -119.156143],
@@ -1204,6 +1228,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "creative-workshop-center",
+    mode: "vision",
     name: "Creative Workshop & Art Creation Center",
     emoji: "🎨",
     position: [34.433470, -119.156486],
@@ -1273,6 +1298,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "glamping-creek-village",
+    mode: "vision",
     name: "Creek-Side Glamping & Lodging Village",
     emoji: "🏕️",
     position: [34.432479, -119.156540],
@@ -1341,7 +1367,8 @@ const SULPHUR_ZONES = [
   },
   {
     id: "gatelodge-operations-hub",
-    name: "Sulphur Mountain Gatelodge (Operations ADU)",
+    name: "The Barn",
+    visionName: "Sulphur Mountain Gatelodge (Operations ADU)",
     emoji: "🏘️",
     position: [34.433082, -119.156728],
     type: "infrastructure",
@@ -1349,8 +1376,14 @@ const SULPHUR_ZONES = [
     timeline: "Phase 1 (0-12 months)",
     monthlyRevenue: "Operational support (not revenue-generating)",
     roi: "Enables all property businesses to operate",
-    description: "Central operational hub and team housing ADU expanding from 360 sq ft to 800 sq ft two-story loft barn. Serves as the nerve center for property management, business operations, and coordination of all revenue-generating projects.\n\nThe facility features a full-service living and working space: downstairs living room and kitchen, upstairs loft bedroom and office system, integrated bathroom facilities, and dedicated workshop area with operational tools. A deck provides indoor/outdoor access for team coordination and oversight.\n\nAdjacent to the main structure is a closed-in garden system featuring vertical growing towers and a propagation facility. This integrated garden produces vegetables, fruits, herbs, and propagates seeds and fruit trees for both property use and the agriculture hub's product lines.\n\nThis operational hub is strategically positioned as the coordination center for all property businesses, enabling efficient logistics, team management, and agricultural operations oversight.",
+    description: "Today the structure at the property entrance is a working barn — storage and ranch utility right by the gate. The vision converts it into the Sulphur Mountain Gatelodge, the operations ADU that welcomes every arrival.",
+    visionDescription: "Central operational hub and team housing ADU expanding from 360 sq ft to 800 sq ft two-story loft barn. Serves as the nerve center for property management, business operations, and coordination of all revenue-generating projects.\n\nThe facility features a full-service living and working space: downstairs living room and kitchen, upstairs loft bedroom and office system, integrated bathroom facilities, and dedicated workshop area with operational tools. A deck provides indoor/outdoor access for team coordination and oversight.\n\nAdjacent to the main structure is a closed-in garden system featuring vertical growing towers and a propagation facility. This integrated garden produces vegetables, fruits, herbs, and propagates seeds and fruit trees for both property use and the agriculture hub's product lines.\n\nThis operational hub is strategically positioned as the coordination center for all property businesses, enabling efficient logistics, team management, and agricultural operations oversight.",
     features: [
+      "Existing barn structure at the property entrance",
+      "Storage and ranch utility use today",
+      "Becomes the Gatelodge / Operations ADU in the vision"
+    ],
+    visionFeatures: [
       "Expansion from 360 to 800 sq ft (2-story loft barn)",
       "Full integrated kitchen and bathroom systems",
       "Loft bedroom upstairs with office system",
@@ -1407,6 +1440,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "tropical-dome-greenhouse",
+    mode: "vision",
     name: "Tropical Dome Greenhouse",
     emoji: "🌴",
     position: [34.432888, -119.156763],
@@ -1503,6 +1537,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "sulphur-mountain-sanctuary",
+    mode: "vision",
     name: "Sulphur Mountain Sanctuary: The Living Landscape",
     emoji: "🌺",
     position: [34.433038, -119.155827],
@@ -1544,6 +1579,7 @@ const SULPHUR_ZONES = [
   },
   {
     id: "farmstead-produce-stand",
+    mode: "vision",
     name: "Farmstead Produce Stand & Online Hub",
     emoji: "🛒",
     position: [34.432483, -119.156935],

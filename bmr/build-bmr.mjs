@@ -1,7 +1,7 @@
 // Generates properties/black-mountain-ranch.js from validated county parcel data.
 import { readFileSync, writeFileSync } from 'fs';
 import pc from 'polygon-clipping';
-import { BMR_VISION_ZONES, BMR_VISION_PANEL, BMR_VISION_LABEL_CHIP } from './vision.mjs';
+import { BMR_VISION_ZONES, BMR_VISION_PANEL, BMR_VISION_LABEL_CHIP, BMR_TODAY_ZONES } from './vision.mjs';
 
 const parcels = JSON.parse(readFileSync('./bmr/all-parcels.json', 'utf8'));
 const acreage = JSON.parse(readFileSync('./bmr/acreage.json', 'utf8'));
@@ -199,7 +199,7 @@ export const BMR_PROPERTY = {
   lots: BMR_LOTS,
   visionLabelChip: ${JSON.stringify(BMR_VISION_LABEL_CHIP)},
   visionPanel: { title: ${JSON.stringify(BMR_VISION_PANEL.title)}, html: ${JSON.stringify(BMR_VISION_PANEL.html)} },
-  zones: ${JSON.stringify(BMR_VISION_ZONES, null, 2).split('\n').map((l, i) => i === 0 ? l : '  ' + l).join('\n')}
+  zones: ${JSON.stringify(BMR_TODAY_ZONES.concat(BMR_VISION_ZONES), null, 2).split('\n').map((l, i) => i === 0 ? l : '  ' + l).join('\n')}
 };
 `;
 writeFileSync('./properties/black-mountain-ranch.js', module_);

@@ -3279,7 +3279,7 @@ app.get('/', (req, res) => {
       // Update header: ALWAYS set title with guaranteed visibility
       if (hero) {
         // Calculate title length for responsive sizing
-        const titleText = zone.emoji + ' ' + zone.name;
+        const titleText = zone.emoji + ' ' + (window.zoneView ? window.zoneView(zone).name : zone.name);
         const titleLength = titleText.length;
         let fontSizeClass = '';
         
@@ -4882,7 +4882,17 @@ app.get('/', (req, res) => {
     // Zone positions are now permanently locked - no reset functionality needed
     
     // Generate comprehensive project details HTML
+    function zoneView(zone) {
+      var v = window.visionMode;
+      return {
+        name: (v && zone.visionName) || zone.name,
+        description: (v && zone.visionDescription) || zone.description,
+        features: (v && zone.visionFeatures) || zone.features
+      };
+    }
+    window.zoneView = zoneView;
     function generateProjectDetails(zone) {
+      const zv = zoneView(zone);
       const prop = propertiesById[zone.propertyId] || { cta: {}, footerInfo: [] };
       const zoneColor = zoneColorMap[zone.type] || '#333';
       const lightColor = zoneColor + '15'; // 15% opacity for backgrounds
@@ -4907,13 +4917,13 @@ app.get('/', (req, res) => {
         <div class="project-section">
           <h3 style="color: \${zoneColor};">📋 Project Overview</h3>
           <div style="color: #555; line-height: 1.8; font-size: 15px; white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0;">
-\${zone.description}</div>
+\${zv.description}</div>
         </div>
         
         <div class="project-section">
           <h3 style="color: \${zoneColor};">🏗️ Key Features & Infrastructure</h3>
           <ul class="feature-list">
-            \${zone.features.map(feature => \`<li>\${feature}</li>\`).join('')}
+            \${zv.features.map(feature => \`<li>\${feature}</li>\`).join('')}
           </ul>
         </div>
         
