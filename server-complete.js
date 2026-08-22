@@ -91,6 +91,11 @@ app.get('/', (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Ojai Valley Properties — Interactive Development Map</title>
+  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+  <link rel="preconnect" href="https://s3.amazonaws.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://wsrv.nl" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -2632,6 +2637,21 @@ app.get('/', (req, res) => {
     #earth3d.open { display: block; }
     #earth3d-stars { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
     #earth3d-map { position: absolute; inset: 0; z-index: 1; }
+    #earth3d-loading {
+      position: absolute; inset: 0; z-index: 5; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; color: rgba(255, 255, 255, 0.85); font-size: 13px;
+      letter-spacing: 0.4px; pointer-events: none;
+    }
+    .earth-orb {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: radial-gradient(circle at 32% 30%, #7ec4ff 0%, #2c6e9e 45%, #10304f 100%);
+      animation: orbPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 22px rgba(90, 180, 255, 0.45); }
+      50% { transform: scale(1.12); box-shadow: 0 0 34px rgba(120, 200, 255, 0.75); }
+    }
     #earth3d-exit {
       position: absolute; top: 14px; left: 14px; z-index: 10;
       background: rgba(12, 14, 24, 0.85); color: #fff;
@@ -2831,6 +2851,7 @@ app.get('/', (req, res) => {
   <div id="earth-toggle" title="Tilt into 3D — or just hold your middle mouse button and drag on the map (two-finger drag on mobile)">🌍 3D</div>
   <div id="earth3d">
     <div id="earth3d-stars"></div>
+    <div id="earth3d-loading"><div class="earth-orb"></div><span>waking the planet…</span></div>
     <div id="earth3d-map"></div>
     <div id="earth3d-exit">✕ Back to Map</div>
     <div id="earth3d-hint">drag to move · hold middle mouse (or right-drag / two fingers) to orbit &amp; tilt · scroll out to see the whole planet · click a chip to fly there</div>
@@ -2851,10 +2872,11 @@ app.get('/', (req, res) => {
     const map = L.map('map', {
       center: [34.4287, -119.2375],
       zoom: 13,
-      zoomSnap: 0.25,
-      zoomDelta: 0.6,
-      wheelPxPerZoomLevel: 90,
-      inertiaDeceleration: 2600,
+      zoomSnap: 0,
+      zoomDelta: 0.5,
+      wheelDebounceTime: 20,
+      wheelPxPerZoomLevel: 110,
+      inertiaDeceleration: 2400,
       easeLinearity: 0.16,
       zoomControl: true,
       scrollWheelZoom: true,
@@ -3034,7 +3056,7 @@ app.get('/', (req, res) => {
       L.DomEvent.disableClickPropagation(div);
       L.DomEvent.on(btn, 'click', function(e) {
         L.DomEvent.stopPropagation(e);
-        if (window.allPropertiesBounds) map.flyToBounds(window.allPropertiesBounds, { padding: [130, 60], duration: 2.2, easeLinearity: 0.12 });
+        if (window.allPropertiesBounds) map.flyToBounds(window.allPropertiesBounds, { padding: [130, 60], easeLinearity: 0.12 });
       });
       return div;
     };
@@ -3150,7 +3172,7 @@ app.get('/', (req, res) => {
       };
       labelMarker.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
-        map.flyTo(prop.center, prop.zoom, { animate: true, duration: 2.4, easeLinearity: 0.12 });
+        map.flyTo(prop.center, prop.zoom, { animate: true, easeLinearity: 0.12 });
       });
     });
 
@@ -3320,6 +3342,7 @@ app.get('/', (req, res) => {
       });
     }
     map.on('zoomend', updateMarkerScale);
+    map.on('zoom', updateMarkerScale);
     updateMarkerScale();
     
     // Side panel functionality
@@ -3595,7 +3618,9 @@ app.get('/', (req, res) => {
       
       // Create main image display with loading optimization
       const mainImg = document.createElement('img');
-      mainImg.src = imageUrls[0];
+      mainImg.src = cdnImg(imageUrls[0], 1400);
+      mainImg.dataset.raw = imageUrls[0];
+      mainImg.onerror = function() { if (this.dataset.raw && this.src !== this.dataset.raw) this.src = this.dataset.raw; };
       mainImg.alt = 'Property Image';
       mainImg.className = 'carousel-image';
       mainImg.id = 'property-main-image';
@@ -3631,7 +3656,8 @@ app.get('/', (req, res) => {
         if (mainImage) {
           // Fade transition
           mainImage.style.opacity = '0.5';
-          mainImage.src = imageUrls[currentIndex];
+          mainImage.dataset.raw = imageUrls[currentIndex];
+          mainImage.src = cdnImg(imageUrls[currentIndex], 1400);
           mainImage.onload = () => {
             mainImage.style.opacity = '1';
           };
@@ -4387,8 +4413,8 @@ app.get('/', (req, res) => {
         // Preload every image in this subcategory using new Image() so the browser
         // caches them regardless of display:none on the parent. When the tab becomes
         // active and the actual <img> tag is shown, it pulls from cache instantly.
-        const imgEls = content.querySelectorAll('.carousel-image, .carousel-thumbnail');
-        imgEls.forEach(img => {
+        const imgEls = content.querySelectorAll('.carousel-image');
+        Array.prototype.slice.call(imgEls, 0, 2).forEach(img => {
           const src = img.getAttribute('src');
           if (!src) return;
           const preloader = new Image();
@@ -4444,12 +4470,18 @@ app.get('/', (req, res) => {
     };
     
     // Create image carousel HTML with optimized loading
+    function cdnImg(src, w) {
+      if (!src || src.indexOf('http') !== 0) return src;
+      return 'https://wsrv.nl/?url=' + encodeURIComponent(src) + '&w=' + w + '&q=82&output=webp';
+    }
     function createImageCarousel(images, zoneId, category) {
       const mainImages = images.map((src, index) => \`
-        <img src="\${src}" 
-             class="carousel-image \${index === 0 ? 'active' : ''}" 
+        <img src="\${cdnImg(src, 1400)}"
+             data-raw="\${src}"
+             onerror="if(this.dataset.raw&&this.src!==this.dataset.raw){this.src=this.dataset.raw}"
+             class="carousel-image \${index === 0 ? 'active' : ''}"
              alt="Image \${index + 1}"
-             loading="eager"
+             loading="\${index === 0 ? 'eager' : 'lazy'}"
              fetchpriority="\${index === 0 ? 'high' : 'low'}"
              sizes="(max-width: 768px) 100vw, 580px"
              decoding="async"
@@ -4459,11 +4491,13 @@ app.get('/', (req, res) => {
       \`).join('');
       
       const thumbnails = images.map((src, index) => \`
-        <img src="\${src}" 
-             class="carousel-thumbnail \${index === 0 ? 'active' : ''}" 
+        <img src="\${cdnImg(src, 240)}"
+             data-raw="\${src}"
+             onerror="if(this.dataset.raw&&this.src!==this.dataset.raw){this.src=this.dataset.raw}"
+             class="carousel-thumbnail \${index === 0 ? 'active' : ''}"
              alt="Thumbnail \${index + 1}"
              data-index="\${index}"
-             loading="eager"
+             loading="lazy"
              decoding="async"
              onclick="goToSlide('\${category}', \${index})">
       \`).join('');
@@ -5827,7 +5861,7 @@ app.get('/', (req, res) => {
           editBtn.textContent = '🔓 Start Editing ' + (prop.shortLabel || prop.name);
           resetBtn.style.display = 'none';
           setStatus('🎯', prop.name + ' selected — flying there now', '#2196F3');
-          map.flyTo(prop.center, prop.zoom, { animate: true, duration: 2.4, easeLinearity: 0.12 });
+          map.flyTo(prop.center, prop.zoom, { animate: true, easeLinearity: 0.12 });
         });
         buttonsWrap.appendChild(b);
       });
@@ -6375,18 +6409,29 @@ app.get('/', (req, res) => {
     
     // ---- 🌍 3D terrain mode (Google-Earth-style, MapLibre GL) ----
     var earth3dMap = null;
+    var mlQueue = [], mlLoading = false;
     function loadMapLibre(cb) {
       if (window.maplibregl) return cb();
+      mlQueue.push(cb);
+      if (mlLoading) return;
+      mlLoading = true;
       var css = document.createElement('link');
       css.rel = 'stylesheet';
       css.href = 'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css';
       document.head.appendChild(css);
       var sc = document.createElement('script');
       sc.src = 'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js';
-      sc.onload = function() { cb(); };
+      sc.onload = function() {
+        mlLoading = false;
+        var q = mlQueue.splice(0);
+        q.forEach(function(f) { try { f(); } catch (e) { console.error(e); } });
+      };
       sc.onerror = function() {
-        alert('Could not load the 3D engine - please check your connection and try again.');
-        close3D();
+        mlLoading = false; mlQueue.length = 0;
+        if (document.getElementById('earth3d').classList.contains('open')) {
+          alert('Could not load the 3D engine - please check your connection and try again.');
+          close3D();
+        }
       };
       document.head.appendChild(sc);
     }
@@ -6419,6 +6464,8 @@ app.get('/', (req, res) => {
       earthPendBearing = 0;
       document.getElementById('earth3d').classList.add('open');
       buildStars();
+      var lel = document.getElementById('earth3d-loading');
+      if (lel) lel.style.display = (earth3dMap && earthReady) ? 'none' : 'flex';
       loadMapLibre(function() {
         try { build3D(); }
         catch (err) {
@@ -6434,14 +6481,78 @@ app.get('/', (req, res) => {
           var cc = earth3dMap.getCenter();
           map.setView([cc.lat, cc.lng], Math.max(Math.min(earth3dMap.getZoom() + 1, 19), 9), { animate: false });
         } catch (e) {}
-        try { earth3dMap.remove(); } catch (e) {}
-        earth3dMap = null;
       }
-      earthReady = false;
-      window.earth3dRef = null;
       document.getElementById('earth3d').classList.remove('open');
     }
+    var earthBuiltMode = null;
+    var earth3dMarkers = [];
+    function earthEntry() {
+      if (earthDiveTo) {
+        var dvp = earthDiveTo; earthDiveTo = null;
+        earth3dMap.flyTo({
+          center: [dvp.center[1], dvp.center[0]],
+          zoom: Math.max((dvp.zoom || 15.5) - 1, 12.8),
+          pitch: 62, bearing: -24,
+          duration: 4200, curve: 1.7, essential: true
+        });
+      } else if (earthOpenedByGesture) {
+        earth3dMap.easeTo({ pitch: earthPendPitch, bearing: earthPendBearing, duration: 450 });
+      } else {
+        setTimeout(function() {
+          if (earth3dMap) earth3dMap.easeTo({ pitch: 58, bearing: -18, duration: 2600 });
+        }, 500);
+      }
+    }
+    function buildMarkers3D() {
+      earth3dMarkers.forEach(function(m) { try { m.remove(); } catch (e) {} });
+      earth3dMarkers = [];
+      // Zone markers - respects the Today / Vision toggle
+      zones.forEach(function(z) {
+        if (window.zoneVisibleInMode && !window.zoneVisibleInMode(z.mode)) return;
+        var el = document.createElement('div');
+        el.className = 'zone3d';
+        var col = zoneColorMap[z.type] || '#455a64';
+        el.style.background = 'linear-gradient(135deg, ' + col + ' 0%, ' + col + 'cc 100%)';
+        el.textContent = z.emoji;
+        var nm = (window.zoneView ? window.zoneView(z).name : z.name);
+        el.title = nm;
+        earth3dMarkers.push(new maplibregl.Marker({ element: el })
+          .setLngLat([z.position[1], z.position[0]])
+          .setPopup(new maplibregl.Popup({ offset: 20, closeButton: false }).setText(nm))
+          .addTo(earth3dMap));
+      });
+      // Property chips - click = cinematic dive
+      properties.forEach(function(p) {
+        var el = document.createElement('div');
+        el.className = 'prop-chip3d';
+        el.textContent = (window.visionMode && p.visionLabelChip) ? p.visionLabelChip : p.labelChip;
+        el.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          earth3dMap.flyTo({
+            center: [p.center[1], p.center[0]],
+            zoom: Math.max((p.zoom || 15.5) - 1, 12.8),
+            pitch: 62, bearing: -24,
+            duration: 3400, curve: 1.55, essential: true
+          });
+        });
+        earth3dMarkers.push(new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, -16] })
+          .setLngLat([p.center[1], p.center[0]])
+          .addTo(earth3dMap));
+      });
+      earthBuiltMode = !!window.visionMode;
+    }
     function build3D() {
+      if (earth3dMap) {
+        // The globe never died - just resync it to where the 2D map is and re-enter
+        earth3dMap.resize();
+        var rc = map.getCenter(), rz = map.getZoom();
+        earth3dMap.jumpTo({ center: [rc.lng, rc.lat], zoom: Math.max(rz - 1, 10.8), pitch: 0, bearing: 0 });
+        if (earthBuiltMode !== !!window.visionMode) buildMarkers3D();
+        var lel2 = document.getElementById('earth3d-loading');
+        if (lel2) lel2.style.display = 'none';
+        earthEntry();
+        return;
+      }
       var c2 = map.getCenter(), z2 = map.getZoom();
       earth3dMap = new maplibregl.Map({
         container: 'earth3d-map',
@@ -6474,6 +6585,7 @@ app.get('/', (req, res) => {
         center: [c2.lng, c2.lat],
         zoom: Math.max(z2 - 1, 10.8),
         pitch: 0, bearing: 0, maxPitch: 80,
+        fadeDuration: 150,
         attributionControl: false
       });
       earth3dMap.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
@@ -6484,8 +6596,15 @@ app.get('/', (req, res) => {
         if (e.button === 1) { e.preventDefault(); orbitDrag = { x: e.clientX, y: e.clientY }; }
       });
       cvs3d.addEventListener('auxclick', function(e) { e.preventDefault(); });
+      earth3dMap.once('webglcontextlost', function() {
+        try { earth3dMap.remove(); } catch (e) {}
+        earth3dMap = null; window.earth3dRef = null;
+        earthBuiltMode = null; earthReady = false;
+      });
       earth3dMap.on('load', function() {
         earthReady = true;
+        var lel = document.getElementById('earth3d-loading');
+        if (lel) lel.style.display = 'none';
         try { earth3dMap.setTerrain({ source: 'dem', exaggeration: 1.35 }); }
         catch (e) { console.warn('terrain not available with globe on this device:', e); }
 
@@ -6511,60 +6630,12 @@ app.get('/', (req, res) => {
           earth3dMap.addLayer({ id: 'lots' + idx, type: 'line', source: 'lots' + idx, paint: { 'line-color': '#FFFFFF', 'line-width': 0.9, 'line-opacity': 0.6 } });
         });
 
-        // Zone markers - respects the Today / Vision toggle at open time
-        zones.forEach(function(z) {
-          if (window.zoneVisibleInMode && !window.zoneVisibleInMode(z.mode)) return;
-          var el = document.createElement('div');
-          el.className = 'zone3d';
-          var col = zoneColorMap[z.type] || '#455a64';
-          el.style.background = 'linear-gradient(135deg, ' + col + ' 0%, ' + col + 'cc 100%)';
-          el.textContent = z.emoji;
-          var nm = (window.zoneView ? window.zoneView(z).name : z.name);
-          el.title = nm;
-          new maplibregl.Marker({ element: el })
-            .setLngLat([z.position[1], z.position[0]])
-            .setPopup(new maplibregl.Popup({ offset: 20, closeButton: false }).setText(nm))
-            .addTo(earth3dMap);
-        });
-
-        // Property chips - click = cinematic dive to that property
-        properties.forEach(function(p) {
-          var el = document.createElement('div');
-          el.className = 'prop-chip3d';
-          el.textContent = (window.visionMode && p.visionLabelChip) ? p.visionLabelChip : p.labelChip;
-          el.addEventListener('click', function(ev) {
-            ev.stopPropagation();
-            earth3dMap.flyTo({
-              center: [p.center[1], p.center[0]],
-              zoom: Math.max((p.zoom || 15.5) - 1, 12.8),
-              pitch: 62, bearing: -24,
-              duration: 3400, curve: 1.55, essential: true
-            });
-          });
-          new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, -16] })
-            .setLngLat([p.center[1], p.center[0]])
-            .addTo(earth3dMap);
-        });
-
-        // Entry: portal dive > live gesture > auto-tilt into the terrain
-        if (earthDiveTo) {
-          var dvp = earthDiveTo; earthDiveTo = null;
-          earth3dMap.flyTo({
-            center: [dvp.center[1], dvp.center[0]],
-            zoom: Math.max((dvp.zoom || 15.5) - 1, 12.8),
-            pitch: 62, bearing: -24,
-            duration: 4200, curve: 1.7, essential: true
-          });
-        } else if (earthOpenedByGesture) {
-          earth3dMap.easeTo({ pitch: earthPendPitch, bearing: earthPendBearing, duration: 450 });
-        } else {
-          setTimeout(function() {
-            if (earth3dMap) earth3dMap.easeTo({ pitch: 58, bearing: -18, duration: 2600 });
-          }, 600);
-        }
-        console.log('🌍 globe mode ready -', properties.length, 'properties on a real planet (MapLibre 5, globe projection)');
+        buildMarkers3D();
+        earthEntry();
+        console.log('🌍 globe mode ready -', properties.length, 'properties on a real planet (kept alive between opens)');
       });
     }
+
     var earthBtn = document.getElementById('earth-toggle');
     if (earthBtn) earthBtn.addEventListener('click', function() { open3D(); });
     var earthExit = document.getElementById('earth3d-exit');
@@ -6605,6 +6676,7 @@ app.get('/', (req, res) => {
       }, { passive: true });
       mapEl2D.addEventListener('touchend', function() { twoFinger = null; }, { passive: true });
     }
+    var orbitVel = null;
     window.addEventListener('mousemove', function(e) {
       if (midDrag2D) {
         var gdx = e.clientX - midDrag2D.x, gdy = e.clientY - midDrag2D.y;
@@ -6612,17 +6684,32 @@ app.get('/', (req, res) => {
           if (Math.abs(gdx) + Math.abs(gdy) > 5) { midDrag2D.live = true; open3D({ gesture: true, pitch: 0 }); }
         } else {
           earthGestureDelta(gdx, gdy);
+          orbitVel = { x: gdx, y: gdy };
         }
         midDrag2D.x = e.clientX; midDrag2D.y = e.clientY;
         return;
       }
       if (orbitDrag && earth3dMap) {
-        earthGestureDelta(e.clientX - orbitDrag.x, e.clientY - orbitDrag.y);
+        var odx = e.clientX - orbitDrag.x, ody = e.clientY - orbitDrag.y;
+        earthGestureDelta(odx, ody);
+        orbitVel = { x: odx, y: ody };
         orbitDrag.x = e.clientX; orbitDrag.y = e.clientY;
       }
     });
     window.addEventListener('mouseup', function(e) {
-      if (e.button === 1) { midDrag2D = null; orbitDrag = null; }
+      if (e.button !== 1) return;
+      var hadDrag = !!(midDrag2D && midDrag2D.live) || !!orbitDrag;
+      midDrag2D = null; orbitDrag = null;
+      if (hadDrag && orbitVel && earth3dMap && earthReady && (Math.abs(orbitVel.x) > 2 || Math.abs(orbitVel.y) > 2)) {
+        var vx = orbitVel.x, vy = orbitVel.y;
+        (function glide() {
+          vx *= 0.9; vy *= 0.9;
+          if ((Math.abs(vx) < 0.4 && Math.abs(vy) < 0.4) || !earth3dMap) return;
+          earthGestureDelta(vx, vy);
+          requestAnimationFrame(glide);
+        })();
+      }
+      orbitVel = null;
     });
     var gearthBtn = document.getElementById('earth3d-gearth');
     if (gearthBtn) gearthBtn.addEventListener('click', function() {
@@ -6659,6 +6746,9 @@ app.get('/', (req, res) => {
       dot.style.cssText = 'position:absolute;top:0;left:0;width:2px;height:2px;border-radius:50%;box-shadow:' + sh;
       el.appendChild(dot);
     }
+
+    // Pre-warm the 3D engine in the background so the first open is instant
+    setTimeout(function() { loadMapLibre(function() {}); }, 2500);
 
     // ---- Current / Vision mode engine ----
     window.visionMode = false;
