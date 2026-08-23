@@ -6604,14 +6604,9 @@ app.get('/', (req, res) => {
         var s = gaps.slice(20).sort(function(a, b) { return a - b; });   // drop warmup/entry frames
         var med = s.length ? s[Math.floor(s.length / 2)] : 16;
         var fps = 1000 / med;
-        try {
-          if (fps < 30 && earth3dMap.getTerrain && earth3dMap.getTerrain()) {
-            earth3dMap.setTerrain(null);
-            console.warn('🌍 weak GPU (~' + fps.toFixed(0) + 'fps) — terrain dropped for smooth navigation');
-          } else {
-            console.log('🌍 3D running at ~' + fps.toFixed(0) + 'fps');
-          }
-        } catch (e) {}
+        // Report only — NEVER drop terrain. The hillsides ARE the 3D; keeping them is the whole point.
+        // (The opening fly-in briefly dips below 30fps on any machine, so auto-dropping was a false positive.)
+        console.log('🌍 3D running at ~' + fps.toFixed(0) + 'fps');
       }
       requestAnimationFrame(tick);
     }
@@ -6680,6 +6675,8 @@ app.get('/', (req, res) => {
         earth3dMap.resize();
         var rc = map.getCenter(), rz = map.getZoom();
         earth3dMap.jumpTo({ center: [rc.lng, rc.lat], zoom: Math.max(rz - 1, 10.8), pitch: 0, bearing: 0 });
+        // Re-assert terrain every open — the hillsides must always be there when you enter 3D.
+        try { if (!earth3dMap.getTerrain()) earth3dMap.setTerrain({ source: 'dem', exaggeration: 1.5 }); } catch (e) {}
         if (earthBuiltMode !== !!window.visionMode) buildMarkers3D();
         var lel2 = document.getElementById('earth3d-loading');
         if (lel2) lel2.style.display = 'none';
@@ -6751,7 +6748,7 @@ app.get('/', (req, res) => {
         earthReady = true;
         var lel = document.getElementById('earth3d-loading');
         if (lel) lel.style.display = 'none';
-        try { earth3dMap.setTerrain({ source: 'dem', exaggeration: 1.35 }); }
+        try { earth3dMap.setTerrain({ source: 'dem', exaggeration: 1.5 }); }
         catch (e) { console.warn('terrain not available with globe on this device:', e); }
 
         // Rainbow-line stand-ins: gold glow + violet line per property boundary
