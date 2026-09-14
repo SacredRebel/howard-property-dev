@@ -2636,6 +2636,73 @@ app.get('/', (req, res) => {
       box-shadow: 0 4px 14px rgba(80, 40, 140, 0.55), 0 0 12px rgba(255, 215, 0, 0.25);
     }
 
+    /* ---- 🗺️ V0.21 County GIS layers panel ---- */
+    #layers-toggle {
+      position: fixed; top: 96px; left: 50%; transform: translateX(-50%);
+      z-index: 1200;
+      background: linear-gradient(135deg, #2d4a23 0%, #5c8a4a 100%);
+      color: #fff; font-weight: 800; font-size: 12px; letter-spacing: 0.6px;
+      padding: 6px 16px; border-radius: 999px;
+      border: 1px solid rgba(190, 230, 160, 0.45);
+      cursor: pointer; user-select: none;
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.35);
+      transition: box-shadow 0.25s ease, transform 0.15s ease;
+    }
+    #layers-toggle:hover { box-shadow: 0 0 20px rgba(140, 220, 110, 0.55); transform: translateX(-50%) scale(1.05); }
+    #layers-toggle.active { background: linear-gradient(135deg, #3c6a2d 0%, #7cb35f 100%); }
+    #layers-panel {
+      position: fixed; top: 132px; left: 50%; transform: translateX(-50%);
+      z-index: 1250; display: none;
+      width: min(94vw, 340px); max-height: min(70vh, 560px); overflow-y: auto;
+      background: rgba(18, 22, 20, 0.97); color: #eef2ec;
+      border: 1px solid rgba(150, 200, 130, 0.35); border-radius: 18px;
+      padding: 16px 16px 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      -webkit-overflow-scrolling: touch;
+    }
+    #layers-panel.open { display: block; }
+    #layers-panel .lp-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 0 0 4px; font-size: 15px; font-weight: 800; letter-spacing: 0.3px;
+    }
+    #layers-panel .lp-close { cursor: pointer; opacity: 0.65; padding: 2px 6px; font-size: 15px; }
+    #layers-panel .lp-close:hover { opacity: 1; }
+    #layers-panel .lp-sub { margin: 0 0 14px; font-size: 11.5px; line-height: 1.5; color: rgba(238, 242, 236, 0.6); }
+    #layers-panel .lp-group {
+      margin: 0 0 8px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.11);
+      font-size: 10.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+      color: rgba(190, 220, 175, 0.9);
+    }
+    #layers-panel .lp-group:first-of-type { border-top: none; padding-top: 0; }
+    #layers-panel .lp-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 9px; margin-bottom: 3px; border-radius: 9px;
+      font-size: 13px; cursor: pointer; user-select: none;
+      transition: background 0.12s ease;
+    }
+    #layers-panel .lp-row:hover { background: rgba(255, 255, 255, 0.07); }
+    #layers-panel .lp-row.on { background: rgba(124, 179, 95, 0.18); }
+    #layers-panel .lp-dot {
+      width: 15px; height: 15px; flex: 0 0 15px; border-radius: 5px;
+      border: 1.5px solid rgba(255, 255, 255, 0.35); position: relative;
+    }
+    #layers-panel .lp-row.radio .lp-dot { border-radius: 50%; }
+    #layers-panel .lp-row.on .lp-dot { background: #7cb35f; border-color: #7cb35f; }
+    #layers-panel .lp-row.on .lp-dot:after {
+      content: ''; position: absolute; left: 4px; top: 1px;
+      width: 4px; height: 8px; border: solid #14200e;
+      border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+    #layers-panel .lp-txt { flex: 1; min-width: 0; line-height: 1.35; }
+    #layers-panel .lp-note { display: block; font-size: 10.5px; color: rgba(238, 242, 236, 0.5); margin-top: 1px; }
+    #layers-panel .lp-op { display: flex; align-items: center; gap: 9px; padding: 9px 9px 2px; font-size: 11px; color: rgba(238, 242, 236, 0.65); }
+    #layers-panel .lp-op input { flex: 1; accent-color: #7cb35f; }
+    #layers-panel .lp-credit { margin: 12px 0 0; padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, 0.11); font-size: 10.5px; line-height: 1.5; color: rgba(238, 242, 236, 0.45); }
+    .vc-elev-popup .leaflet-popup-content { margin: 10px 14px; font-size: 13px; font-weight: 700; }
+    @media (max-width: 768px) {
+      #layers-toggle { top: 92px; }
+      #layers-panel { top: 126px; max-height: 60vh; }
+    }
+
     /* ---- 🌍 3D terrain mode ---- */
     #earth-toggle {
       position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
@@ -2952,6 +3019,13 @@ app.get('/', (req, res) => {
 
   <!-- 🌍 3D terrain mode (Google-Earth-style) -->
   <div id="earth-toggle" title="Tilt into 3D — or just hold your middle mouse button and drag on the map (two-finger drag on mobile)">🌍 3D</div>
+  <div id="layers-toggle" title="County GIS layers — topo contours, aerial imagery by year, parcels, zoning and hazards">🗺️ Layers</div>
+  <div id="layers-panel">
+    <div class="lp-head"><span>🗺️ Map Layers</span><span class="lp-close" id="lp-close">✕</span></div>
+    <p class="lp-sub">Live data from the Ventura County GIS — the same source the county uses for topographic review.</p>
+    <div id="lp-body"></div>
+    <p class="lp-credit">Imagery &amp; topography: Ventura County GIS · Elevation readout: USGS 3DEP (1&nbsp;m)</p>
+  </div>
   <div id="earth3d">
     <div id="earth3d-stars"></div>
     <div id="earth3d-loading"><div class="earth-orb"></div><span>waking the planet…</span></div>
@@ -3057,7 +3131,274 @@ app.get('/', (req, res) => {
     
     // Add default layer and layer control
     satelliteLayer.addTo(map);
-    const layerControl = L.control.layers(baseLayers).addTo(map);
+    // (the rich county-layer panel below replaces Leaflet's default layer control)
+
+    // ===================================================================
+    // V0.21 — VENTURA COUNTY GIS LAYER ENGINE
+    // Every source here is public, keyless and CORS-open on the county's
+    // own ArcGIS server (maps.ventura.org) — the same server the assessor
+    // parcel geometry already comes from.
+    // ===================================================================
+    var VC_ROOT = 'https://maps.ventura.org/arcgis/rest/services/';
+    var VC_BLANK = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    var VC_ATTR = '🗺️ Ventura County GIS';
+
+    // Services whose tile cache uses the standard web-mercator scheme can be
+    // consumed directly as XYZ tiles (fast, CDN-cached at the county).
+    function vcXYZ(svc, opts) {
+      return L.tileLayer(VC_ROOT + svc + '/MapServer/tile/{z}/{y}/{x}', Object.assign({
+        attribution: VC_ATTR, minZoom: 1, maxZoom: 22, maxNativeZoom: 21,
+        errorTileUrl: VC_BLANK, updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 2
+      }, opts || {}));
+    }
+
+    // Everything else — the historic aerials (custom cache scheme) and every
+    // dynamic overlay — is tiled by us against the service's /export endpoint.
+    var VCExportLayer = L.TileLayer.extend({
+      options: {
+        minZoom: 1, maxZoom: 22, tileSize: 256, px: 512, fmt: 'png32',
+        transparent: true, showLayers: null, errorTileUrl: VC_BLANK,
+        updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 1
+      },
+      getTileUrl: function (c) {
+        var W = 40075016.685578488, half = W / 2;
+        var span = W / Math.pow(2, c.z);            // tileSize is 256 => one tile per grid cell
+        var xmin = -half + c.x * span, ymax = half - c.y * span;
+        var px = this.options.px;
+        return VC_ROOT + this.options.service + '/MapServer/export'
+          + '?bbox=' + xmin + ',' + (ymax - span) + ',' + (xmin + span) + ',' + ymax
+          + '&bboxSR=3857&imageSR=3857&size=' + px + ',' + px
+          + '&format=' + this.options.fmt
+          + '&transparent=' + (this.options.transparent ? 'true' : 'false')
+          + (this.options.showLayers ? '&layers=show:' + this.options.showLayers : '')
+          + '&dpi=96&f=image';
+      }
+    });
+    function vcExport(svc, opts) {
+      return new VCExportLayer(null, Object.assign({ service: svc, attribution: VC_ATTR }, opts || {}));
+    }
+
+    // ---- the catalog ----------------------------------------------------
+    var VC_BASES = [
+      { id: 'esri',  label: '🛰️ Satellite (Esri)',   note: 'global, always current', ready: satelliteLayer },
+      { id: '2025',  label: 'County 2025',            note: '3 in · flown for developed areas', kind: 'xyz',    svc: 'SDs/2025UrbanAerial' },
+      { id: '2024',  label: 'County 2024',            note: 'countywide',            kind: 'xyz',    svc: 'SDs/2024CountyWideAerial' },
+      { id: '2023',  label: 'County 2023',            note: 'countywide',            kind: 'xyz',    svc: 'SDs/2023CountyWideAerial' },
+      { id: '2022',  label: 'County 2022',            note: 'full county',           kind: 'export', svc: 'SDs/2022FullCountyAerial' },
+      { id: '2021',  label: 'County 2021',            note: '3 in Vexcel — sharpest', kind: 'export', svc: 'SDs/2021Vexcel3Inch' },
+      { id: '2019',  label: 'County 2019',            note: '',                      kind: 'export', svc: 'SDs/2019DecAerial' },
+      { id: '2018f', label: 'County 2018',            note: 'flown right after the Thomas Fire', kind: 'export', svc: 'SDs/2018NovDecPostFireAerial' },
+      { id: '2017',  label: 'County 2017',            note: 'before the Thomas Fire', kind: 'export', svc: 'SDs/2017OctAerial' },
+      { id: '2015',  label: 'County 2015',            note: '',                      kind: 'export', svc: 'SDs/2015DecAerial' },
+      { id: '2010',  label: 'County 2010',            note: '',                      kind: 'export', svc: 'SDs/2010DecAerial' },
+      { id: '2005',  label: 'County 2005',            note: '',                      kind: 'export', svc: 'SDs/2005SepAerial' },
+      { id: '1945',  label: 'County 1945',            note: 'the oldest flight on file', kind: 'export', svc: 'SDs/1945Aerial' },
+      { id: 'gsat',  label: '🛰️ Satellite (Google)',  note: '',                      ready: googleSatLayer },
+      { id: 'osm',   label: '🗺️ Street map',          note: '',                      ready: osmLayer }
+    ];
+
+    var VC_OVERLAYS = [
+      { id: 'topo',    label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92 },
+      { id: 'parcels', label: '▦ Parcel lines',       note: 'official assessor boundaries', svc: 'SDs/Parcels', op: 0.95 },
+      { id: 'apn',     label: '# APN + acreage labels', note: '', svc: 'SDs/ParcelLabels', showLayers: '0,2', op: 0.95 },
+      { id: 'zoning',  label: '⬛ Zoning',            note: 'base zone designations', svc: 'SDs/MyZoning', showLayers: '0', op: 0.5 },
+      { id: 'ovz',     label: '🦌 Overlay zones',     note: 'habitat corridors, wildlife passage, Ojai dark sky', svc: 'SDs/OverlayZones', op: 0.45 },
+      { id: 'flood',   label: '💧 Floodplain',        note: '100-year and 500-year', svc: 'SDs/PWA_Floodplain', op: 0.45 },
+      { id: 'fire',    label: '🔥 CalFire SRA',       note: 'state fire responsibility area', svc: 'SDs/PWACalFireSRA', op: 0.35 }
+    ];
+
+    var vcBaseCache = {}, vcOverlayCache = {};
+    var vcActiveBase = 'esri';
+    var vcActiveOverlays = {};
+    var vcTopoOpacity = 0.92;
+
+    function vcBaseLayer(def) {
+      if (def.ready) return def.ready;
+      if (!vcBaseCache[def.id]) {
+        vcBaseCache[def.id] = def.kind === 'xyz'
+          ? vcXYZ(def.svc)
+          : vcExport(def.svc, { fmt: 'jpg', transparent: false, px: 512 });
+      }
+      return vcBaseCache[def.id];
+    }
+    function vcOverlayLayer(def) {
+      if (!vcOverlayCache[def.id]) {
+        vcOverlayCache[def.id] = vcExport(def.svc, {
+          fmt: 'png32', transparent: true, px: 512,
+          showLayers: def.showLayers || null,
+          opacity: def.id === 'topo' ? vcTopoOpacity : (def.op || 0.9),
+          pane: 'vcOverlayPane', zIndex: def.id === 'topo' ? 60 : 40
+        });
+      }
+      return vcOverlayCache[def.id];
+    }
+    function vcDefById(list, id) {
+      for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+      return null;
+    }
+
+    function vcSetBase(id) {
+      var def = vcDefById(VC_BASES, id);
+      if (!def) return;
+      for (var i = 0; i < VC_BASES.length; i++) {
+        var other = VC_BASES[i];
+        if (other.id === id) continue;
+        var lyr = other.ready || vcBaseCache[other.id];
+        if (lyr && map.hasLayer(lyr)) map.removeLayer(lyr);
+      }
+      var want = vcBaseLayer(def);
+      if (!map.hasLayer(want)) want.addTo(map);
+      if (want.setZIndex) want.setZIndex(0);
+      vcActiveBase = id;
+      try { localStorage.setItem('ojaiMapBase', id); } catch (e) {}
+      vcSyncPanel();
+      if (window.vcSync3DLayers) window.vcSync3DLayers();
+    }
+
+    function vcToggleOverlay(id) {
+      var def = vcDefById(VC_OVERLAYS, id);
+      if (!def) return;
+      var lyr = vcOverlayLayer(def);
+      if (vcActiveOverlays[id]) {
+        delete vcActiveOverlays[id];
+        if (map.hasLayer(lyr)) map.removeLayer(lyr);
+      } else {
+        vcActiveOverlays[id] = true;
+        lyr.addTo(map);
+        if (lyr.setZIndex) lyr.setZIndex(id === 'topo' ? 350 : 300);
+      }
+      try { localStorage.setItem('ojaiMapOverlays', JSON.stringify(Object.keys(vcActiveOverlays))); } catch (e) {}
+      vcSyncPanel();
+      if (window.vcSync3DLayers) window.vcSync3DLayers();
+    }
+
+    // ---- panel UI -------------------------------------------------------
+    function vcRow(kind, id, label, note, on) {
+      return '<div class="lp-row ' + kind + (on ? ' on' : '') + '" data-kind="' + kind + '" data-id="' + id + '">'
+        + '<span class="lp-dot"></span>'
+        + '<span class="lp-txt">' + label + (note ? '<span class="lp-note">' + note + '</span>' : '') + '</span>'
+        + '</div>';
+    }
+    function vcBuildPanel() {
+      var body = document.getElementById('lp-body');
+      if (!body) return;
+      var h = '<div class="lp-group">Overlays</div>';
+      for (var i = 0; i < VC_OVERLAYS.length; i++) {
+        var o = VC_OVERLAYS[i];
+        h += vcRow('check', o.id, o.label, o.note, !!vcActiveOverlays[o.id]);
+      }
+      h += '<div class="lp-op">Topo opacity <input type="range" id="lp-topo-op" min="20" max="100" value="'
+        + Math.round(vcTopoOpacity * 100) + '"></div>';
+      h += '<div class="lp-group">Base imagery</div>';
+      for (var j = 0; j < VC_BASES.length; j++) {
+        var b = VC_BASES[j];
+        h += vcRow('radio', b.id, b.label, b.note, vcActiveBase === b.id);
+      }
+      body.innerHTML = h;
+      var rows = body.querySelectorAll('.lp-row');
+      for (var k = 0; k < rows.length; k++) {
+        rows[k].addEventListener('click', function () {
+          var id = this.getAttribute('data-id');
+          if (this.getAttribute('data-kind') === 'radio') vcSetBase(id); else vcToggleOverlay(id);
+        });
+      }
+      var op = document.getElementById('lp-topo-op');
+      if (op) op.addEventListener('input', function () {
+        vcTopoOpacity = parseInt(this.value, 10) / 100;
+        var t = vcOverlayCache['topo'];
+        if (t && t.setOpacity) t.setOpacity(vcTopoOpacity);
+        if (window.earth3dRef && window.earth3dRef.getLayer && window.earth3dRef.getLayer('vc-topo')) {
+          try { window.earth3dRef.setPaintProperty('vc-topo', 'raster-opacity', vcTopoOpacity); } catch (e) {}
+        }
+      });
+    }
+    function vcSyncPanel() {
+      var body = document.getElementById('lp-body');
+      if (!body) return;
+      var rows = body.querySelectorAll('.lp-row');
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i], id = r.getAttribute('data-id');
+        var on = r.getAttribute('data-kind') === 'radio' ? (vcActiveBase === id) : !!vcActiveOverlays[id];
+        r.classList.toggle('on', on);
+      }
+      var btn = document.getElementById('layers-toggle');
+      if (btn) btn.classList.toggle('active', Object.keys(vcActiveOverlays).length > 0 || vcActiveBase !== 'esri');
+    }
+
+    var vcPanelOpen = false;
+    function vcTogglePanel(force) {
+      var p = document.getElementById('layers-panel');
+      if (!p) return;
+      vcPanelOpen = (typeof force === 'boolean') ? force : !vcPanelOpen;
+      p.classList.toggle('open', vcPanelOpen);
+    }
+
+    // ---- click anywhere for a real ground elevation (USGS 3DEP, 1 m) -----
+    var vcElevBusy = false;
+    function vcElevationAt(latlng) {
+      if (vcElevBusy) return;
+      vcElevBusy = true;
+      var pt = encodeURIComponent(JSON.stringify({ x: latlng.lng, y: latlng.lat, spatialReference: { wkid: 4326 } }));
+      fetch('https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/identify'
+            + '?geometry=' + pt + '&geometryType=esriGeometryPoint&returnGeometry=false&f=json')
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          vcElevBusy = false;
+          var m = parseFloat(j && j.value);
+          if (!isFinite(m)) return;
+          var ft = Math.round(m * 3.28084);
+          L.popup({ className: 'vc-elev-popup', closeButton: false })
+            .setLatLng(latlng)
+            .setContent('⛰️ ' + ft.toLocaleString() + ' ft <span style="font-weight:500;opacity:0.65">(' + m.toFixed(1) + ' m)</span>')
+            .openOn(map);
+        })
+        .catch(function () { vcElevBusy = false; });
+    }
+
+    (function initCountyLayers() {
+      // county rasters sit above the base imagery but below the property
+      // boundaries, lot lines, zone markers and popups
+      try {
+        map.createPane('vcOverlayPane');
+        var vp = map.getPane('vcOverlayPane');
+        vp.style.zIndex = 250;
+        vp.style.pointerEvents = 'none';
+      } catch (e) {}
+      try {
+        var savedBase = localStorage.getItem('ojaiMapBase');
+        if (savedBase && vcDefById(VC_BASES, savedBase)) vcActiveBase = savedBase;
+        var savedOv = JSON.parse(localStorage.getItem('ojaiMapOverlays') || '[]');
+        for (var i = 0; i < savedOv.length; i++) if (vcDefById(VC_OVERLAYS, savedOv[i])) vcActiveOverlays[savedOv[i]] = true;
+      } catch (e) {}
+
+      vcBuildPanel();
+      if (vcActiveBase !== 'esri') vcSetBase(vcActiveBase);
+      var restore = Object.keys(vcActiveOverlays);
+      for (var k = 0; k < restore.length; k++) {
+        var d = vcDefById(VC_OVERLAYS, restore[k]);
+        if (d) { var l = vcOverlayLayer(d); l.addTo(map); if (l.setZIndex) l.setZIndex(d.id === 'topo' ? 350 : 300); }
+      }
+      vcSyncPanel();
+
+      var btn = document.getElementById('layers-toggle');
+      if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); vcTogglePanel(); });
+      var close = document.getElementById('lp-close');
+      if (close) close.addEventListener('click', function (e) { e.stopPropagation(); vcTogglePanel(false); });
+      var panel = document.getElementById('layers-panel');
+      if (panel) panel.addEventListener('click', function (e) { e.stopPropagation(); });
+      document.addEventListener('click', function () { if (vcPanelOpen) vcTogglePanel(false); });
+
+      map.on('click', function (e) {
+        if (!vcActiveOverlays['topo']) return;
+        if (window.positionEditActive) return;
+        if (Date.now() < (window.ignoreMapClicksUntil || 0)) return;
+        vcElevationAt(e.latlng);
+      });
+    })();
+    window.leafletMap = map;
+    window.vcSetBase = vcSetBase;
+    window.vcToggleOverlay = vcToggleOverlay;
+    window.vcState = function () { return { base: vcActiveBase, overlays: Object.keys(vcActiveOverlays) }; };
     
     // Prevent accidental map clicks during panel swipes and track panel state
     window.ignoreMapClicksUntil = 0;
@@ -6521,6 +6862,53 @@ app.get('/', (req, res) => {
     
     // ---- 🌍 3D terrain mode (Google-Earth-style, MapLibre GL) ----
     var earth3dMap = null;
+
+    // ---- V0.21: the same county layers, draped over the 3D terrain --------
+    // MapLibre expands {bbox-epsg-3857} per tile, so the county's /export
+    // endpoint works as a raster source with no proxy in between.
+    var VC_3D_DIRECT = {
+      gsat: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+      osm: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    };
+    function vc3dSource(def, transparent) {
+      if (def.kind === 'xyz') {
+        return { type: 'raster', tiles: [VC_ROOT + def.svc + '/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 21 };
+      }
+      return {
+        type: 'raster', tileSize: 512, maxzoom: 21,
+        tiles: [VC_ROOT + def.svc + '/MapServer/export?bbox={bbox-epsg-3857}'
+          + '&bboxSR=3857&imageSR=3857&size=512,512'
+          + '&format=' + (transparent ? 'png32' : 'jpg')
+          + '&transparent=' + (transparent ? 'true' : 'false')
+          + (def.showLayers ? '&layers=show:' + def.showLayers : '')
+          + '&dpi=96&f=image']
+      };
+    }
+    window.vcSync3DLayers = function () {
+      var m = earth3dMap;
+      if (!m || !earthReady || !m.getStyle) return;
+      try {
+        ['vc-topo', 'vc-base'].forEach(function (id) {
+          if (m.getLayer(id)) m.removeLayer(id);
+          if (m.getSource(id)) m.removeSource(id);
+        });
+        // sit above the built-in satellite but under boundaries, lots and markers
+        var before = null, ls = (m.getStyle().layers || []);
+        for (var i = 0; i < ls.length; i++) { if (ls[i].id !== 'sat') { before = ls[i].id; break; } }
+
+        var bd = vcDefById(VC_BASES, vcActiveBase);
+        if (bd && (bd.svc || VC_3D_DIRECT[bd.id])) {
+          m.addSource('vc-base', bd.svc
+            ? vc3dSource(bd, false)
+            : { type: 'raster', tiles: [VC_3D_DIRECT[bd.id]], tileSize: 256, maxzoom: 20 });
+          m.addLayer({ id: 'vc-base', type: 'raster', source: 'vc-base', paint: { 'raster-opacity': 1 } }, before);
+        }
+        if (vcActiveOverlays['topo']) {
+          m.addSource('vc-topo', vc3dSource({ svc: 'SDs/Topography' }, true));
+          m.addLayer({ id: 'vc-topo', type: 'raster', source: 'vc-topo', paint: { 'raster-opacity': vcTopoOpacity } }, before);
+        }
+      } catch (e) { console.warn('3D county layers:', e); }
+    };
     var mlQueue = [], mlLoading = false;
     function loadMapLibre(cb) {
       if (window.maplibregl) return cb();
@@ -6829,6 +7217,7 @@ app.get('/', (req, res) => {
         earth3dMap.on('mouseleave', 'zones3d', function() { earth3dMap.getCanvas().style.cursor = ''; });
 
         buildMarkers3D();
+        if (window.vcSync3DLayers) window.vcSync3DLayers();
         if (earthPrebuilding) {
           // Warmed up invisibly. Let tiles settle, then drop back to display:none — the map stays
           // alive & fully built, so the first real open is just resize + jumpTo + fly-in.
