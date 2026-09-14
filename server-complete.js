@@ -2703,6 +2703,20 @@ app.get('/', (req, res) => {
     #layers-panel .lp-note { display: block; font-size: 10.5px; color: rgba(238, 242, 236, 0.5); margin-top: 1px; }
     #layers-panel .lp-op { display: flex; align-items: center; gap: 9px; padding: 9px 9px 2px; font-size: 11px; color: rgba(238, 242, 236, 0.65); }
     #layers-panel .lp-op input { flex: 1; accent-color: #7cb35f; }
+    #layers-panel .lp-legend { padding: 2px 2px 6px; }
+    #layers-panel .lp-lg {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: 11.5px; line-height: 1.45; color: rgba(238, 242, 236, 0.72);
+      padding: 4px 7px;
+    }
+    #layers-panel .lp-lg i {
+      width: 11px; height: 11px; flex: 0 0 11px; margin-top: 3px;
+      border-radius: 3px; display: block;
+    }
+    #layers-panel .lp-lg-tip {
+      margin-top: 4px; padding: 7px 9px; border-radius: 8px;
+      background: rgba(124, 179, 95, 0.14); color: rgba(238, 242, 236, 0.85);
+    }
     #layers-panel .lp-credit { margin: 12px 0 0; padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, 0.11); font-size: 10.5px; line-height: 1.5; color: rgba(238, 242, 236, 0.45); }
     .vc-elev-popup .leaflet-popup-content { margin: 10px 14px; font-size: 13px; font-weight: 700; }
     @media (max-width: 768px) {
@@ -3206,10 +3220,13 @@ app.get('/', (req, res) => {
 
     var VC_OVERLAYS = [
       { id: 'topo',    label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92 },
+      { id: 'bldg',    label: '🏚️ Building footprints', note: 'every structure standing today, mapped by the county', svc: 'DataDownloads/CommonData', showLayers: '0', op: 0.95 },
       { id: 'parcels', label: '▦ Parcel lines',       note: 'official assessor boundaries', svc: 'SDs/Parcels', op: 0.95 },
       { id: 'apn',     label: '# APN + acreage labels', note: '', svc: 'SDs/ParcelLabels', showLayers: '0,2', op: 0.95 },
       { id: 'zoning',  label: '⬛ Zoning',            note: 'base zone designations', svc: 'SDs/MyZoning', showLayers: '0', op: 0.5 },
       { id: 'ovz',     label: '🦌 Overlay zones',     note: 'habitat corridors, wildlife passage, Ojai dark sky', svc: 'SDs/OverlayZones', op: 0.45 },
+      { id: 'habitat', label: '🌿 Habitat & sensitive areas', note: 'ESHA, habitat connectivity, wildlife corridors', svc: 'SDs/CV_PlanningGIS', showLayers: '3,4,6', op: 0.42 },
+      { id: 'water',   label: '🏞️ Creeks & surface water', note: '', svc: 'SDs/CV_PlanningGIS', showLayers: '8', op: 0.8 },
       { id: 'flood',   label: '💧 Floodplain',        note: '100-year and 500-year', svc: 'SDs/PWA_Floodplain', op: 0.45 },
       { id: 'fire',    label: '🔥 CalFire SRA',       note: 'state fire responsibility area', svc: 'SDs/PWACalFireSRA', op: 0.35 }
     ];
@@ -3296,6 +3313,16 @@ app.get('/', (req, res) => {
       }
       h += '<div class="lp-op">Topo opacity <input type="range" id="lp-topo-op" min="20" max="100" value="'
         + Math.round(vcTopoOpacity * 100) + '"></div>';
+      h += '<div class="lp-group">What you are looking at</div>';
+      h += '<div class="lp-legend">'
+        + '<div class="lp-lg"><i style="background:#a900e6"></i>Contour line — each one a fixed step in elevation (100 ft far out, 5 ft up close)</div>'
+        + '<div class="lp-lg"><i style="background:#c8c8c8;border:1px solid #888"></i>Building footprint as the county has it mapped</div>'
+        + '<div class="lp-lg"><i style="background:#db0000"></i>Parcel line / APN label straight from the assessor</div>'
+        + '<div class="lp-lg"><i style="background:#4a9d5f"></i>Habitat, wildlife corridor and dark-sky overlays — these carry real design conditions</div>'
+        + '<div class="lp-lg"><i style="background:#3d7fd1"></i>Creek, floodplain and drainage</div>'
+        + '<div class="lp-lg"><i style="background:#d98324"></i>CalFire state responsibility area</div>'
+        + '<div class="lp-lg lp-lg-tip">⛰️ With contours on, click anywhere on the land to read its real elevation.</div>'
+        + '</div>';
       h += '<div class="lp-group">Base imagery</div>';
       for (var j = 0; j < VC_BASES.length; j++) {
         var b = VC_BASES[j];
@@ -3315,8 +3342,8 @@ app.get('/', (req, res) => {
         vcTopoOpacity = parseInt(this.value, 10) / 100;
         var t = vcOverlayCache['topo'];
         if (t && t.setOpacity) t.setOpacity(vcTopoOpacity);
-        if (window.earth3dRef && window.earth3dRef.getLayer && window.earth3dRef.getLayer('vc-topo')) {
-          try { window.earth3dRef.setPaintProperty('vc-topo', 'raster-opacity', vcTopoOpacity); } catch (e) {}
+        if (window.earth3dRef && window.earth3dRef.getLayer && window.earth3dRef.getLayer('vc-ov-topo')) {
+          try { window.earth3dRef.setPaintProperty('vc-ov-topo', 'raster-opacity', vcTopoOpacity); } catch (e) {}
         }
       });
     }
@@ -6922,7 +6949,10 @@ app.get('/', (req, res) => {
       var m = earth3dMap;
       if (!m || !earthReady || !m.getStyle) return;
       try {
-        ['vc-topo', 'vc-base'].forEach(function (id) {
+        // tear down every county layer we own, base first-in/last-out
+        var own = ['vc-base'];
+        for (var k = 0; k < VC_OVERLAYS.length; k++) own.push('vc-ov-' + VC_OVERLAYS[k].id);
+        own.forEach(function (id) {
           if (m.getLayer(id)) m.removeLayer(id);
           if (m.getSource(id)) m.removeSource(id);
         });
@@ -6937,9 +6967,16 @@ app.get('/', (req, res) => {
             : { type: 'raster', tiles: [VC_3D_DIRECT[bd.id]], tileSize: 256, maxzoom: 20 });
           m.addLayer({ id: 'vc-base', type: 'raster', source: 'vc-base', paint: { 'raster-opacity': 1 } }, before);
         }
-        if (vcActiveOverlays['topo']) {
-          m.addSource('vc-topo', vc3dSource({ svc: 'SDs/Topography' }, true));
-          m.addLayer({ id: 'vc-topo', type: 'raster', source: 'vc-topo', paint: { 'raster-opacity': vcTopoOpacity } }, before);
+        // every active overlay, in catalog order so topo stays under the rest
+        for (var j = 0; j < VC_OVERLAYS.length; j++) {
+          var d = VC_OVERLAYS[j];
+          if (!vcActiveOverlays[d.id]) continue;
+          var sid = 'vc-ov-' + d.id;
+          m.addSource(sid, vc3dSource(d, true));
+          m.addLayer({
+            id: sid, type: 'raster', source: sid,
+            paint: { 'raster-opacity': d.id === 'topo' ? vcTopoOpacity : (d.op || 0.9) }
+          }, before);
         }
       } catch (e) { console.warn('3D county layers:', e); }
     };
