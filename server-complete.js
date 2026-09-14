@@ -96,6 +96,8 @@ app.get('/', (req, res) => {
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
   <link rel="preconnect" href="https://wsrv.nl" crossorigin>
+  <link rel="preconnect" href="https://maps.ventura.org" crossorigin>
+  <link rel="dns-prefetch" href="https://elevation.nationalmap.gov">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -2650,6 +2652,11 @@ app.get('/', (req, res) => {
     }
     #layers-toggle:hover { box-shadow: 0 0 20px rgba(140, 220, 110, 0.55); transform: translateX(-50%) scale(1.05); }
     #layers-toggle.active { background: linear-gradient(135deg, #3c6a2d 0%, #7cb35f 100%); }
+    #layers-toggle.busy { animation: lpBusy 1.1s ease-in-out infinite; }
+    @keyframes lpBusy {
+      0%, 100% { box-shadow: 0 5px 16px rgba(0,0,0,0.35); }
+      50% { box-shadow: 0 0 20px rgba(160, 235, 120, 0.85); }
+    }
     #layers-panel {
       position: fixed; top: 132px; left: 50%; transform: translateX(-50%);
       z-index: 1250; display: none;
@@ -3215,20 +3222,20 @@ app.get('/', (req, res) => {
     function vcBaseLayer(def) {
       if (def.ready) return def.ready;
       if (!vcBaseCache[def.id]) {
-        vcBaseCache[def.id] = def.kind === 'xyz'
+        vcBaseCache[def.id] = vcTrackLoading(def.kind === 'xyz'
           ? vcXYZ(def.svc)
-          : vcExport(def.svc, { fmt: 'jpg', transparent: false, px: 512 });
+          : vcExport(def.svc, { fmt: 'jpg', transparent: false, px: 512 }));
       }
       return vcBaseCache[def.id];
     }
     function vcOverlayLayer(def) {
       if (!vcOverlayCache[def.id]) {
-        vcOverlayCache[def.id] = vcExport(def.svc, {
+        vcOverlayCache[def.id] = vcTrackLoading(vcExport(def.svc, {
           fmt: 'png32', transparent: true, px: 512,
           showLayers: def.showLayers || null,
           opacity: def.id === 'topo' ? vcTopoOpacity : (def.op || 0.9),
           pane: 'vcOverlayPane', zIndex: def.id === 'topo' ? 60 : 40
-        });
+        }));
       }
       return vcOverlayCache[def.id];
     }
@@ -3302,6 +3309,7 @@ app.get('/', (req, res) => {
           if (this.getAttribute('data-kind') === 'radio') vcSetBase(id); else vcToggleOverlay(id);
         });
       }
+      vcUpdateTopoHint();
       var op = document.getElementById('lp-topo-op');
       if (op) op.addEventListener('input', function () {
         vcTopoOpacity = parseInt(this.value, 10) / 100;
@@ -3323,6 +3331,31 @@ app.get('/', (req, res) => {
       }
       var btn = document.getElementById('layers-toggle');
       if (btn) btn.classList.toggle('active', Object.keys(vcActiveOverlays).length > 0 || vcActiveBase !== 'esri');
+    }
+
+    // The county only draws contours below roughly 1:9,000 — zoomed out past
+    // that the layer is genuinely empty, so say so instead of looking broken.
+    var VC_TOPO_MIN_ZOOM = 16;
+    function vcUpdateTopoHint() {
+      var row = document.querySelector('#lp-body .lp-row[data-id="topo"] .lp-note');
+      if (!row) return;
+      var far = map.getZoom() < VC_TOPO_MIN_ZOOM;
+      row.textContent = far
+        ? 'zoom in closer to see the contours'
+        : 'county contours — 100 ft, 20 ft then 5 ft as you zoom in';
+      row.style.color = far ? '#e8b964' : '';
+    }
+
+    // subtle activity light on the Layers button while county tiles are in flight
+    var vcPending = 0;
+    function vcTrackLoading(layer) {
+      layer.on('loading', function () { vcPending++; vcPaintBusy(); });
+      layer.on('load', function () { vcPending = Math.max(0, vcPending - 1); vcPaintBusy(); });
+      return layer;
+    }
+    function vcPaintBusy() {
+      var b = document.getElementById('layers-toggle');
+      if (b) b.classList.toggle('busy', vcPending > 0);
     }
 
     var vcPanelOpen = false;
@@ -3388,6 +3421,7 @@ app.get('/', (req, res) => {
       if (panel) panel.addEventListener('click', function (e) { e.stopPropagation(); });
       document.addEventListener('click', function () { if (vcPanelOpen) vcTogglePanel(false); });
 
+      map.on('zoomend', vcUpdateTopoHint);
       map.on('click', function (e) {
         if (!vcActiveOverlays['topo']) return;
         if (window.positionEditActive) return;
@@ -7365,7 +7399,37 @@ app.get('/', (req, res) => {
         }
       });
     }
-    setTimeout(prebuild3D, 2200);
+    // V0.21.1 — the pre-warm costs ~1.1MB (MapLibre + first tiles) and most
+    // visitors never open 3D, so only pay it where it is genuinely free:
+    // a roomy, fast, unmetered connection. Everyone else loads on demand
+    // (the pulsing orb already covers that), and hovering the 🌍 button
+    // starts the download early so the click still feels instant.
+    function should3DPrebuild() {
+      try {
+        var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+        if (c.saveData) return false;
+        if (c.effectiveType && /2g|3g/.test(c.effectiveType)) return false;
+        if (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory < 4) return false;
+        var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        if (coarse && Math.min(screen.width, screen.height) < 700) return false;   // phones
+        return true;
+      } catch (e) { return true; }
+    }
+    var earthPrefetched = false;
+    function prefetch3D() {
+      if (earthPrefetched || earth3dMap) return;
+      earthPrefetched = true;
+      try { loadMapLibre(function () {}); } catch (e) {}
+    }
+    if (should3DPrebuild()) {
+      setTimeout(prebuild3D, 2200);
+    } else {
+      var eb = document.getElementById('earth-toggle');
+      if (eb) {
+        eb.addEventListener('mouseenter', prefetch3D, { passive: true });
+        eb.addEventListener('touchstart', prefetch3D, { passive: true });
+      }
+    }
 
     // ---- Status cards, mode strips, documents, community preview cards (V0.17) ----
     window.modeStripHTML = function() {
