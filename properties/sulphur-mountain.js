@@ -21,11 +21,11 @@ const SULPHUR_PANEL_HTML = '<div class="image-gallery-section" style="margin-bot
         '</div>' +
         '<div class="property-detail-row">' +
           '<span class="property-detail-label">APN:</span>' +
-          '<span class="property-detail-value">Ventura County, CA</span>' +
+          '<span class="property-detail-value">037-0-012-125 (Ventura County)</span>' +
         '</div>' +
         '<div class="property-detail-row">' +
           '<span class="property-detail-label">Zoning:</span>' +
-          '<span class="property-detail-value">Unique Upper Ojai Zoning (Residential, Agricultural, Community)</span>' +
+          '<span class="property-detail-value">RA-5 ac / HCWC overlay — Rural Agricultural (per County GIS)</span>' +
         '</div>' +
         '<div class="property-detail-row">' +
           '<span class="property-detail-label">Location:</span>' +
