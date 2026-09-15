@@ -1,0 +1,783 @@
+{
+ "generated": "2026-09-15",
+ "overlays": [
+  {
+   "id": "topo",
+   "group": "county",
+   "label": "⛰️ Topo contours",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FTopography%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": 16,
+   "proxied": true
+  },
+  {
+   "id": "bldg",
+   "group": "county",
+   "label": "🏚️ Building footprints",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FDataDownloads%2FCommonData%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A0%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "parcels",
+   "group": "county",
+   "label": "▦ Parcel lines",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FParcels%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "apn",
+   "group": "county",
+   "label": "# APN + acreage labels",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FParcelLabels%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A0%2C2%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "recmaps",
+   "group": "county",
+   "label": "🗂️ Recorded maps index",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FDataDownloads%2FSurvey%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A4%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "zoning",
+   "group": "county",
+   "label": "⬛ Zoning",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FMyZoning%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A0%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "ovz",
+   "group": "county",
+   "label": "🦌 Overlay zones",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FOverlayZones%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "habitat",
+   "group": "county",
+   "label": "🌿 Habitat & sensitive areas",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FCV_PlanningGIS%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A3%2C4%2C6%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "water",
+   "group": "county",
+   "label": "🏞️ Creeks & surface water",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FCV_PlanningGIS%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A8%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "flood",
+   "group": "county",
+   "label": "💧 County floodplain",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FPWA_Floodplain%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "fire",
+   "group": "county",
+   "label": "🔥 CalFire SRA",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2FPWACalFireSRA%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "shade",
+   "group": "terrain",
+   "label": "🗻 Hillshade relief",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fbasemap.nationalmap.gov%2Farcgis%2Frest%2Fservices%2FUSGSShadedReliefOnly%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "usgstopo",
+   "group": "terrain",
+   "label": "🗺️ USGS topo (today)",
+   "tiles": [
+    "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 16,
+   "minZoom": null,
+   "proxied": false
+  },
+  {
+   "id": "histtopo",
+   "group": "terrain",
+   "label": "📜 Historic USGS topo",
+   "tiles": [
+    "https://historical1.arcgis.com/arcgis/rest/services/USA_Historical_Topo_Maps/ImageServer/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=512,512&f=image&format=jpgpng&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicAttribute%22%2C%22sortField%22%3A%22DateCurrent%22%2C%22sortValue%22%3A%221952%22%2C%22ascending%22%3Afalse%2C%22where%22%3A%22DateCurrent%20%3C%3D%201952%20AND%20Map_Scale%20%3C%3D%2062500%22%7D"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": false
+  },
+  {
+   "id": "geology",
+   "group": "geo",
+   "label": "🪨 Geologic map",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FGeologic_Map_of_California%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "quat",
+   "group": "geo",
+   "label": "🏜️ Quaternary deposits",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FQuaternarySurficialDepositsSouthernCA%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D256%2C256%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 256,
+   "maxzoom": 13,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "minerals",
+   "group": "geo",
+   "label": "⛏️ Mineral land classification",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FIW_MineralResourcesProgram%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A0%2C1%2C2%2C3%2C4%2C7%2C10%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "mines",
+   "group": "geo",
+   "label": "🚧 Active mines",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FMOL%2FMOLMines%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "wells",
+   "group": "geo",
+   "label": "🛢️ Oil & gas wells",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FWellSTAR%2FWells%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "radon",
+   "group": "geo",
+   "label": "☢️ Radon potential",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FRadonPotentialZones%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "faults",
+   "group": "seismic",
+   "label": "🌋 Fault activity map",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FFaultActivityMapCA%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D256%2C256%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 256,
+   "maxzoom": 12,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "ap",
+   "group": "seismic",
+   "label": "⚠️ Alquist-Priolo fault traces",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS_Earthquake_Hazard_Zones%2FSHP_Fault_Traces%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "qfaults",
+   "group": "seismic",
+   "label": "〰️ USGS Quaternary faults",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fearthquake.usgs.gov%2Farcgis%2Frest%2Fservices%2Fhaz%2Fhazfaults2014%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "nshm",
+   "group": "seismic",
+   "label": "📈 Fault slip rates",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FMS48_NSHM2023_Faults%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "quakes",
+   "group": "seismic",
+   "label": "💥 Historical earthquakes M3+",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FCA_HistEQs_M3Plus%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "lssusc",
+   "group": "ground",
+   "label": "⛰️ Landslide susceptibility",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FMS58_LandslideSusceptibility_Classes%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D256%2C256%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 256,
+   "maxzoom": 13,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "lsinv-p0",
+   "group": "ground",
+   "label": "🪨 Mapped landslides",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FLandslideInventory_DC1_Older%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "lsinv-p1",
+   "group": "ground",
+   "label": "🪨 Mapped landslides",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FLandslideInventory_DC1_Younger%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "lsinv-p2",
+   "group": "ground",
+   "label": "🪨 Mapped landslides",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FLandslideInventory_DC2%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "lsinv-p3",
+   "group": "ground",
+   "label": "🪨 Mapped landslides",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FCGS%2FLandslideInventory_DC3%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "soils",
+   "group": "ground",
+   "label": "🌱 Soil survey (SSURGO)",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2FSDMDataAccess.sc.egov.usda.gov%2FSpatial%2FSDM.wms%3FSERVICE%3DWMS%26VERSION%3D1.1.1%26REQUEST%3DGetMap%26LAYERS%3Dmapunitpoly%26STYLES%3D%26SRS%3DEPSG%3A3857%26BBOX%3D{bbox-epsg-3857}%26WIDTH%3D256%26HEIGHT%3D256%26FORMAT%3Dimage%2Fpng%26TRANSPARENT%3Dtrue"
+   ],
+   "tileSize": 256,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "farmland",
+   "group": "ground",
+   "label": "🌾 Important farmland",
+   "tiles": [
+    "https://gis.conservation.ca.gov/server/rest/services/DLRP/CaliforniaImportantFarmland_2022/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 16,
+   "minZoom": null,
+   "proxied": false
+  },
+  {
+   "id": "williamson",
+   "group": "ground",
+   "label": "📜 Williamson Act",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.conservation.ca.gov%2Fserver%2Frest%2Fservices%2FDLRP%2FCaliforniaWilliamsonActEnrollment_2025%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A9%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "nfhl",
+   "group": "water",
+   "label": "🌊 FEMA flood zones",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fhazards.fema.gov%2Farcgis%2Frest%2Fservices%2Fpublic%2FNFHL%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26layers%3Dshow%3A28%2C27%2C16%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "nhd",
+   "group": "water",
+   "label": "🏞️ Streams & waterbodies",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fhydro.nationalmap.gov%2Farcgis%2Frest%2Fservices%2Fnhd%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "gwbasin",
+   "group": "water",
+   "label": "🕳️ Groundwater basins",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.water.ca.gov%2Farcgis%2Frest%2Fservices%2FGeoscientific%2Fi08_B118_CA_GroundwaterBasins%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  },
+  {
+   "id": "blm",
+   "group": "land",
+   "label": "🏕️ Public land ownership",
+   "tiles": [
+    "https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_without_PriUnk/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 16,
+   "minZoom": null,
+   "proxied": false
+  },
+  {
+   "id": "plss",
+   "group": "land",
+   "label": "📐 Township · range · section",
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fgis.blm.gov%2Farcgis%2Frest%2Fservices%2FCadastral%2FBLM_Natl_PLSS_CadNSDI%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Dpng32%26transparent%3Dtrue%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 19,
+   "minZoom": null,
+   "proxied": true
+  }
+ ],
+ "flights": [
+  {
+   "id": "1945",
+   "year": 1945,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F1945Aerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2000",
+   "year": 2000,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2000AprAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2001",
+   "year": 2001,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2001DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2002",
+   "year": 2002,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2002OctAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2003",
+   "year": 2003,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2003JanAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2004",
+   "year": 2004,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2004SepAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2005",
+   "year": 2005,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2005SepAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2006",
+   "year": 2006,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2006JunAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2007",
+   "year": 2007,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2007JulAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2008",
+   "year": 2008,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2008AprAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2009",
+   "year": 2009,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2009AprAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2010",
+   "year": 2010,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2010DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2011",
+   "year": 2011,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2011DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2012",
+   "year": 2012,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2012DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2014",
+   "year": 2014,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2014FebAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2015",
+   "year": 2015,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2015DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2016m",
+   "year": 2016,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2016MarAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2016",
+   "year": 2016,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2016DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2017",
+   "year": 2017,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2017OctAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2018",
+   "year": 2018,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2018OctAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2018f",
+   "year": 2018,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2018NovDecPostFireAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2019v",
+   "year": 2019,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2019MarAprVexcelAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2019",
+   "year": 2019,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2019DecAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2020",
+   "year": 2020,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2020Vexcel3Inch2%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2021",
+   "year": 2021,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2021Vexcel3Inch%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2022v",
+   "year": 2022,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2022Vexcel3Inch%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2022",
+   "year": 2022,
+   "tiles": [
+    "/api/tile?u=https%3A%2F%2Fmaps.ventura.org%2Farcgis%2Frest%2Fservices%2FSDs%2F2022FullCountyAerial%2FMapServer%2Fexport%3Fbbox%3D{bbox-epsg-3857}%26bboxSR%3D3857%26imageSR%3D3857%26size%3D512%2C512%26f%3Dimage%26format%3Djpg%26transparent%3Dfalse%26dpi%3D96"
+   ],
+   "tileSize": 512,
+   "maxzoom": 20,
+   "proxied": true
+  },
+  {
+   "id": "2023u",
+   "year": 2023,
+   "tiles": [
+    "https://maps.ventura.org/arcgis/rest/services/SDs/2023UrbanAerial/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 21,
+   "proxied": false
+  },
+  {
+   "id": "2023",
+   "year": 2023,
+   "tiles": [
+    "https://maps.ventura.org/arcgis/rest/services/SDs/2023CountyWideAerial/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 21,
+   "proxied": false
+  },
+  {
+   "id": "2024u",
+   "year": 2024,
+   "tiles": [
+    "https://maps.ventura.org/arcgis/rest/services/SDs/2024UrbanAerial/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 21,
+   "proxied": false
+  },
+  {
+   "id": "2024",
+   "year": 2024,
+   "tiles": [
+    "https://maps.ventura.org/arcgis/rest/services/SDs/2024CountyWideAerial/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 21,
+   "proxied": false
+  },
+  {
+   "id": "2025",
+   "year": 2025,
+   "tiles": [
+    "https://maps.ventura.org/arcgis/rest/services/SDs/2025UrbanAerial/MapServer/tile/{z}/{y}/{x}"
+   ],
+   "tileSize": 256,
+   "maxzoom": 21,
+   "proxied": false
+  }
+ ]
+}

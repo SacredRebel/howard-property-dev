@@ -2,16 +2,18 @@
 // inspector (legend / parcel), bottom timeline (aerial flights + historic
 // topo), bottom-right controls (compass, 2D/3D, terrain, quality, fps) and
 // the hotkeys. Plain DOM, no framework, one CSS file.
+import maplibregl from 'maplibre-gl';
 import type { Engine } from '../engine/map';
 import { BASE_LABELS, ml } from '../engine/map';
 import { GROUPS, OVERLAYS, FLIGHTS, HIST_YEARS, HIST_NOTES, overlayById, histYear, type OverlayDef } from '../layers/registry';
 import { legendFor } from '../layers/legend';
-import type { PropertyLayer, Property, Zone } from '../data/properties';
+import type { PropertyLayer, Property, Zone, LotPick } from '../data/properties';
 import { galleryFor, galleryHTML, wireGallery, isOpen as lightboxOpen } from './gallery';
 import { Editor } from './editor';
 
 interface RichProperty extends Property { panel?: { title: string; html: string }; visionPanel?: { title: string; html: string }; cta?: { heading?: string; paragraph?: string; contacts?: { name: string; email: string }[]; buttons?: { label: string; url: string }[] }; }
 const stripClassicGallery = (html: string) => html.replace(/<div class="image-gallery-section"[\s\S]*?<\/div><\/div><\/div>/, '');
+function lotBoundsCenter(rings: [number, number][][]): [number, number] { let la = 0, lo = 0, n = 0; for (const r of rings) for (const q of r) { la += q[0]; lo += q[1]; n++; } return n ? [la / n, lo / n] : [0, 0]; }
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 const el = (html: string) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild as HTMLElement; };
 
@@ -25,7 +27,8 @@ export class Hud {
   private onMode: (m: 'today' | 'vision') => void;
   private peek = new Set<string>();
   private legendSig = '';
-  private selected: { kind: 'property' | 'zone' | 'lot'; payload: unknown } | null = null;
+  private selected: { kind: 'property' | 'zone' | 'lot' | 'ground'; payload: unknown } | null = null;
+  private groundPopup: maplibregl.Popup | null = null;
   private dockOpen = window.innerWidth > 760;
   private inspectorOpen = window.innerWidth > 1100;
   private dossierCache = new Map<string, Promise<unknown>>();
@@ -139,12 +142,14 @@ export class Hud {
     this.q('#inspector').addEventListener('click', e => {
       const t = e.target as HTMLElement;
       const tab = t.closest('[data-tab]') as HTMLElement | null; if (tab) { this.setTab(tab.dataset.tab as 'legend' | 'parcel'); return; }
-      if (t.closest('#insp-close')) { this.inspectorOpen = false; this.syncPanels(); return; }
+      if (t.closest('#insp-close')) { this.inspectorOpen = false; this.props.selectLot(null); this.syncPanels(); return; }
       const x = t.closest('.lg-x') as HTMLElement | null; if (x) { this.peek.delete(x.dataset.x!); this.renderLegend(true); return; }
       const more = t.closest('.lg-more') as HTMLElement | null; if (more) { const blk = more.closest('.lgb')!; blk.classList.toggle('all'); more.textContent = blk.classList.contains('all') ? 'show fewer' : more.dataset.all!; return; }
       const fly = t.closest('[data-fly]') as HTMLElement | null; if (fly) { const p = this.props.props.find(x => x.id === fly.dataset.fly); if (p) this.props.flyTo(p); return; }
       const off = t.closest('[data-off]') as HTMLElement | null; if (off) { eng.setOverlay(off.dataset.off!, false); return; }
       const dive = t.closest('[data-dive]') as HTMLElement | null; if (dive) { const p = this.props.props.find(x => x.id === dive.dataset.dive); if (p) this.enterVision(p); return; }
+      const lot = t.closest('[data-lot]') as HTMLElement | null; if (lot) { const [pid, lid] = lot.dataset.lot!.split('/'); this.props.flyToLot(pid, lid); return; }
+      const copy = t.closest('[data-copy]') as HTMLElement | null; if (copy) { try { navigator.clipboard?.writeText(copy.dataset.copy!); this.say('Copied ' + copy.dataset.copy); } catch { /* fine */ } return; }
     });
     this.q('#inspector').addEventListener('input', e => {
       const t = e.target as HTMLInputElement;
@@ -190,7 +195,9 @@ export class Hud {
       else this.lowFps = 0;
     });
     // selection from the map
-    this.props.onSelect = (kind, payload) => { this.selected = { kind, payload }; this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); };
+    this.props.onSelect = (kind, payload) => { if (kind !== 'lot') this.props.selectLot(null); this.groundPopup?.remove(); this.selected = { kind, payload }; this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); };
+    // click on open ground: the readout (coordinates, elevation, dossier for whatever parcel is there)
+    map.on('click', e => { if (this.editor.open || this.props.hitsOwn(e.point)) return; this.ground(e.lngLat); });
     // hotkeys
     window.addEventListener('keydown', e => this.key(e));
   }
@@ -240,7 +247,7 @@ export class Hud {
   }
   help() {
     const t = this.q('#toast');
-    t.innerHTML = `<b>Hotkeys</b> — W A S D pan · Q E rotate · R F tilt · + − zoom · T 2D/3D · X terrain · N north · L layers · I inspector · P position editor · 1–7 open a layer group · [ ] step the aerial year · H historic topo · Space Today/Vision · G open in Google Earth · Esc close. <br>Mouse: drag to pan, right-drag or Ctrl-drag to rotate and tilt, wheel to zoom.`;
+    t.innerHTML = `<b>Hotkeys</b> — W A S D pan · Q E rotate · R F tilt · + − zoom · T 2D/3D · X terrain · N north · L layers · I inspector · P position editor · 1–7 open a layer group · [ ] step the aerial year · H historic topo · Space Today/Vision · G open in Google Earth · Esc close. <br>Mouse: drag to pan, right-drag / Ctrl-drag / <b>middle-drag</b> to orbit (drag right = turn right), wheel to zoom, click open ground for elevation + the county dossier of any parcel. Touch: two fingers to rotate and tilt.`;
     t.hidden = false; window.clearTimeout((t as unknown as { _t: number })._t); (t as unknown as { _t: number })._t = window.setTimeout(() => { t.hidden = true; }, 9000);
   }
 
@@ -343,7 +350,9 @@ export class Hud {
     if (kind === 'property') {
       const p = payload as RichProperty, st = (this.mode === 'vision' ? p.status?.vision : p.status?.today) || p.status?.today;
       const panel = this.mode === 'vision' ? (p.visionPanel || p.panel) : p.panel;
-      let h = `<div class="card">${strip}<div class="card-head"><b>${esc(p.name)}</b>${p.apn ? `<span class="apn">APN ${esc(p.apn)}</span>` : ''}</div><div class="gal-slot"></div>`;
+      let h = `<div class="card">${strip}<div class="card-head"><b>${esc(p.name)}</b>${p.apn ? `<span class="apn">APN ${esc(p.apn)}</span>` : ''}</div>`;
+      if (p.footerInfo?.length) h += '<div class="facts">' + p.footerInfo.map(f => `<span>${esc(f)}</span>`).join('') + '</div>';
+      h += '<div class="gal-slot"></div>';
       if (st?.badge) h += `<div class="badge">${esc(st.badge)}</div>`;
       if (st?.rows?.length) h += '<div class="rows">' + st.rows.map(r => `<div class="r"><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('') + '</div>';
       if (st?.note) h += `<div class="note-p">${esc(st.note)}</div>`;
@@ -370,12 +379,51 @@ export class Hud {
       h += `<div class="acts"><button class="mini" data-fly="${p.id}">property</button><button class="mini violet" data-dive="${p.id}">🌀 Enter the Vision</button></div></div>`;
       box.innerHTML = h;
       this.fillGallery(box, p.id, z.id, token);
-    } else {
-      const l = payload as { apn: string; name: string; acreage: string; pid: string };
-      box.innerHTML = `<div class="card">${strip}<div class="card-head"><b>${esc(l.name)}</b><span class="apn">APN ${esc(l.apn)}</span></div><div class="rows"><div class="r"><span class="k">Acreage</span><span class="v">${esc(l.acreage)} ac</span></div></div>
-        <details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
+    } else if (kind === 'lot') {
+      const l = payload as LotPick, hit = this.props.lotOf(l.pid, l.lid), p = hit?.property;
+      const bk = /Bk\s*(\d+)\s*Pg\s*(\d+)/i.exec(l.name || ''), title = (l.name || '').replace(/\s*\(.*\)\s*$/, '');
+      const rows: [string, string][] = [['Acreage', `${l.acreage} ac`], ['APN', l.apn]];
+      if (bk) rows.push(['Assessor map', `Book ${bk[1]} · Page ${bk[2]}`]);
+      if (hit) { const c = lotBoundsCenter(hit.lot.rings); rows.push(['Centre', `${c[0].toFixed(5)}, ${c[1].toFixed(5)}`]); }
+      let h = `<div class="card">${strip}<div class="card-head"><b>${esc(title)}</b><span class="apn">${esc(p?.shortLabel || p?.name || '')}</span></div>`;
+      if (l.name && l.name !== title) h += `<p class="desc">${esc(l.name)}</p>`;
+      h += '<div class="rows">' + rows.map(r => `<div class="r"><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('') + '</div>';
+      h += `<div class="acts"><button class="mini" data-lot="${esc(l.pid)}/${esc(l.lid)}">fly to this lot</button>${p ? `<button class="mini" data-fly="${p.id}">whole ranch</button>` : ''}<button class="mini" data-copy="${esc(l.apn)}">copy APN</button></div>`;
+      h += `<p class="note-p">One of ${p?.lots?.length || '—'} county parcels drawn from the assessor fabric. The dossier below is resolved for this parcel alone.</p>`;
+      h += `<details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
+      box.innerHTML = h;
       this.loadDossier({ apn: l.apn } as Property);
+    } else {
+      const g = payload as { lat: number; lng: number; elev?: string };
+      box.innerHTML = `<div class="card">${strip}<div class="card-head"><b>Ground at ${g.lat.toFixed(5)}, ${g.lng.toFixed(5)}</b><span class="apn">any parcel</span></div>
+        <div class="rows"><div class="r"><span class="k">Elevation</span><span class="v" id="gr-elev">${esc(g.elev || 'measuring…')}</span></div></div>
+        <div class="acts"><button class="mini" data-copy="${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}">copy coordinates</button><a class="mini" href="https://earth.google.com/web/@${g.lat},${g.lng},0a,1200d,35y,0h,45t,0r" target="_blank" rel="noopener">Google Earth ↗</a></div>
+        <p class="note-p">The county dossier for whatever parcel lies under this point — zoning, plan, hazards, soils, water, recorded maps — resolved live from public sources.</p>
+        <details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
+      this.loadDossier({ center: [g.lat, g.lng] } as Property);
     }
+  }
+
+  // ---- the ground readout ------------------------------------------------------------
+  private async ground(ll: maplibregl.LngLat) {
+    const m = this.eng.map, lat = ll.lat, lng = ll.lng;
+    const fmt = (mtr: number, src: string) => `↑ ${Math.round(mtr * 3.28084).toLocaleString()} ft · ${Math.round(mtr)} m <i>${src}</i>`;
+    const est = this.eng.groundElevation(ll);
+    if (!this.groundPopup) this.groundPopup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, className: 'ground', maxWidth: '300px', offset: 8 });
+    const pop = this.groundPopup;
+    pop.setLngLat(ll).setHTML(`<div class="gp"><div class="gp-ll">${lat.toFixed(5)}, ${lng.toFixed(5)}</div><div class="gp-el" id="gp-el">${est != null ? fmt(est, '≈ terrain') : 'measuring…'}</div>
+      <div class="gp-acts"><button class="mini gold" id="gp-ds">🗂 county dossier here</button><button class="mini" id="gp-cp">copy</button></div></div>`).addTo(m);
+    const el = pop.getElement();
+    el.querySelector('#gp-ds')?.addEventListener('click', () => { this.selected = { kind: 'ground', payload: { lat, lng, elev: (el.querySelector('#gp-el')?.textContent || '').trim() } }; this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); });
+    el.querySelector('#gp-cp')?.addEventListener('click', () => { try { navigator.clipboard?.writeText(`${lat.toFixed(6)}, ${lng.toFixed(6)}`); this.say('Coordinates copied.'); } catch { /* fine */ } });
+    // refine with USGS 3DEP (1 m lidar where flown) - the classic page's elevation query
+    try {
+      const pt = encodeURIComponent(JSON.stringify({ x: lng, y: lat, spatialReference: { wkid: 4326 } }));
+      const r = await fetch(`https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/identify?geometry=${pt}&geometryType=esriGeometryPoint&returnGeometry=false&f=json`);
+      const j = await r.json() as { value?: string | number };
+      const v = parseFloat(String(j?.value));
+      if (isFinite(v) && pop.isOpen() && pop.getLngLat().lat === lat) { const e2 = el.querySelector('#gp-el'); if (e2) e2.innerHTML = fmt(v, 'USGS 3DEP'); const g = this.root.querySelector('#gr-elev'); if (g) g.innerHTML = fmt(v, 'USGS 3DEP'); }
+    } catch { /* offline or blocked - the terrain estimate stays */ }
   }
   private async fillGallery(box: HTMLElement, pid: string, zid: string, token: number) {
     const g = await galleryFor(pid, zid, this.mode);

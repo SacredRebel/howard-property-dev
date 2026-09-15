@@ -30,6 +30,15 @@ export const BASE_LABELS: Record<string, { label: string; note: string }> = {
 };
 
 const DEM_TILES = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+export const TERRAIN_EXAG = 1.5;
+// a starfield for the space around the globe: one 512-px tile drawn once, set as the container background
+function starfield(): string {
+  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d')!;
+  g.fillStyle = '#02030a'; g.fillRect(0, 0, 512, 512);
+  let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let i = 0; i < 420; i++) { const x = rnd() * 512, y = rnd() * 512, r = rnd() * 1.3 + 0.2, a = rnd() * 0.7 + 0.3; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = `rgba(${220 + Math.round(rnd() * 35)},${225 + Math.round(rnd() * 30)},255,${a.toFixed(2)})`; g.fill(); }
+  return c.toDataURL('image/png');
+}
 const OV_ANCHOR = 'ov-anchor';       // overlays are inserted before this
 export const PROP_ANCHOR = 'prop-anchor';   // property vectors are inserted before this (above overlays)
 // Leaflet-style (256-tile) zooms in the registry -> MapLibre (512-tile) zooms
@@ -79,6 +88,8 @@ export class Engine {
       canvasContextAttributes: { antialias: false, powerPreference: 'high-performance' } as never
     } as never);
     this.map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+    try { container.style.background = `#02030a url(${starfield()}) repeat`; } catch { /* no canvas */ }
+    this.enableOrbit(container);
     this.map.on('load', () => this.onLoad());
     this.map.on('zoomend', () => this.projectionFor(this.map.getZoom()));
     this.map.on('move', () => this.events.emit('view', { zoom: this.map.getZoom(), pitch: this.map.getPitch(), bearing: this.map.getBearing() }));
@@ -198,6 +209,7 @@ export class Engine {
         this.map.addLayer({ id: lid + '-line', type: 'line', source: vs, filter: ['==', ['get', 'k'], 'call'], paint: { 'line-color': '#7ff0ff', 'line-width': 2.5, 'line-dasharray': [3, 2] } }, before);
         this.map.addLayer({ id: lid + '-mon', type: 'circle', source: vs, filter: ['==', ['get', 'k'], 'mon'], paint: { 'circle-radius': 5, 'circle-color': '#7ff0ff', 'circle-stroke-color': '#fff', 'circle-stroke-width': 2 } }, before);
         layers.push(lid + '-ease', lid + '-line', lid + '-mon'); sources.push(vs);
+        for (const l of ['-line', '-mon', '-ease']) this.tipLayer(lid + l, p => String(p.tip || ''));
       }
     }
   }
@@ -267,6 +279,50 @@ export class Engine {
     };
     requestAnimationFrame(tick);
   }
+  // ground height under a point from the terrain DEM (exaggeration removed), metres; null when terrain is off / unknown
+  groundElevation(lngLat: LngLatLike): number | null {
+    if (!this.terrain) return null;
+    try { const v = this.map.queryTerrainElevation(lngLat); return v == null || !isFinite(v) ? null : v / TERRAIN_EXAG; } catch { return null; }
+  }
+
+  // ---- hover tips (survey calls, monuments, ...) ---------------------------
+  private tip: maplibregl.Popup | null = null;
+  private tipLayers = new Set<string>();
+  tipLayer(layerId: string, text: (p: Record<string, unknown>) => string) {
+    if (this.tipLayers.has(layerId)) return;
+    this.tipLayers.add(layerId);
+    const m = this.map;
+    m.on('mousemove', layerId, e => {
+      const f = e.features?.[0]; if (!f) return;
+      if (!this.tip) this.tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: 'tip', offset: 10, maxWidth: '260px' });
+      this.tip.setLngLat(e.lngLat).setText(text(f.properties as Record<string, unknown>)).addTo(m);
+      m.getCanvas().style.cursor = 'crosshair';
+    });
+    m.on('mouseleave', layerId, () => { this.tip?.remove(); m.getCanvas().style.cursor = ''; });
+  }
+
+  // ---- middle-mouse orbit: drag right = turn right, drag up = tilt up, with inertia ------
+  private enableOrbit(container: HTMLElement) {
+    const m = this.map; let on = false, lx = 0, ly = 0, vb = 0, vp = 0, last = 0, pend: number | null = null, db = 0, dp = 0;
+    const apply = () => { pend = null; if (!db && !dp) return; m.jumpTo({ bearing: m.getBearing() + db, pitch: Math.max(0, Math.min(80, m.getPitch() + dp)) }); db = dp = 0; };
+    container.addEventListener('mousedown', e => { if (e.button !== 1) return; e.preventDefault(); on = true; lx = e.clientX; ly = e.clientY; vb = vp = 0; last = performance.now(); container.style.cursor = 'grabbing'; });
+    window.addEventListener('mousemove', e => {
+      if (!on) return;
+      const dx = e.clientX - lx, dy = e.clientY - ly, now = performance.now(), dt = Math.max(1, now - last); lx = e.clientX; ly = e.clientY; last = now;
+      db += dx * 0.35; dp += -dy * 0.35; vb = dx * 0.35 / dt; vp = -dy * 0.35 / dt;
+      if (pend == null) pend = requestAnimationFrame(apply);
+    });
+    const end = () => {
+      if (!on) return; on = false; container.style.cursor = '';
+      const idle = performance.now() - last; if (idle > 80) return;      // the hand stopped before letting go
+      const k = 260;                                                       // ms of glide
+      m.easeTo({ bearing: m.getBearing() + vb * k, pitch: Math.max(0, Math.min(80, m.getPitch() + vp * k)), duration: 650, easing: t => 1 - Math.pow(1 - t, 3) });
+    };
+    window.addEventListener('mouseup', e => { if (e.button === 1) end(); });
+    window.addEventListener('blur', end);
+    container.addEventListener('auxclick', e => { if (e.button === 1) e.preventDefault(); });
+  }
+
   // tiles still loading right now, counted from the source caches (aborted requests never drift it)
   tilesLoading(): number {
     try {

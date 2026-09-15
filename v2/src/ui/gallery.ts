@@ -56,6 +56,15 @@ function ensure() {
   document.body.appendChild(box);
   box.addEventListener('click', e => { const t = e.target as HTMLElement; if (t.closest('.lb-x') || t === box) close(); else if (t.closest('.lb-prev')) show(cur - 1); else if (t.closest('.lb-next')) show(cur + 1); });
   window.addEventListener('keydown', e => { if (!box || box.hidden) return; if (e.key === 'Escape') { close(); e.stopPropagation(); } else if (e.key === 'ArrowLeft') show(cur - 1); else if (e.key === 'ArrowRight') show(cur + 1); });
+  // swipe on touch: a horizontal flick turns the page, a downward flick closes
+  let sx = 0, sy = 0, st = 0;
+  box.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; st = performance.now(); }, { passive: true });
+  box.addEventListener('touchend', e => {
+    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy, dt = performance.now() - st;
+    if (dt > 700) return;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) show(dx < 0 ? cur + 1 : cur - 1);
+    else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.4) close();
+  }, { passive: true });
   return box;
 }
 function show(i: number) {

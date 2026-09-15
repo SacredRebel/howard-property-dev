@@ -8658,6 +8658,41 @@ app.get('/api/properties', (req, res) => {
   res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
   res.json(PROPERTIES);
 });
+// Edge-cached tile proxy (V0.28): the slow dynamic GIS services (county + CGS /export, SSURGO WMS)
+// are fetched here once and cached at the CDN edge (s-maxage) - the first viewer pays the county's
+// render time, everyone after gets the tile in a few ms, and scripts/warm-tiles.mjs pre-bakes the
+// property areas. Allowlisted public hosts, GET, map-image endpoints only; never an open proxy.
+const TILE_HOSTS = new Set(['maps.ventura.org', 'gis.conservation.ca.gov', 'gis.water.ca.gov', 'hazards.fema.gov', 'earthquake.usgs.gov',
+  'hydro.nationalmap.gov', 'basemap.nationalmap.gov', 'sdmdataaccess.sc.egov.usda.gov', 'historical1.arcgis.com', 'gis.blm.gov']);
+app.get('/api/tile', async (req, res) => {
+  let url;
+  try { url = new URL(String(req.query.u || '')); } catch (e) { return res.status(400).json({ error: 'bad_url' }); }
+  const path = url.pathname.toLowerCase();
+  const allowed = url.protocol === 'https:' && TILE_HOSTS.has(url.hostname)
+    && (/\/(export|exportimage)$/.test(path) || /request=getmap/i.test(url.search));
+  if (!allowed) return res.status(400).json({ error: 'not_allowed' });
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const up = await fetch(url, { signal: ctl.signal, headers: { 'User-Agent': 'howard-property-atlas/1.0 (+https://howard-property-dev.vercel.app)', 'Accept': 'image/*' } });
+    clearTimeout(timer);
+    const ct = up.headers.get('content-type') || '';
+    if (!up.ok || !/^image\//i.test(ct)) { res.set('Cache-Control', 'no-store'); return res.status(up.ok ? 502 : up.status).end(); }
+    const buf = Buffer.from(await up.arrayBuffer());
+    res.set({
+      'Content-Type': ct,
+      'Content-Length': String(buf.length),
+      'Cache-Control': 'public, max-age=86400, s-maxage=2592000, stale-while-revalidate=604800',
+      'Access-Control-Allow-Origin': '*',
+      'X-Tile-Upstream': url.hostname
+    });
+    res.end(buf);
+  } catch (e) {
+    clearTimeout(timer);
+    res.set('Cache-Control', 'no-store');
+    res.status(504).end();
+  }
+});
 app.use('/v2/assets', express.static(join(__dirname, 'public', 'v2', 'assets'), { maxAge: '365d', immutable: true }));
 app.use('/v2', express.static(join(__dirname, 'public', 'v2'), { maxAge: 0, etag: true, index: 'index.html' }));
 

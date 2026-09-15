@@ -27,6 +27,16 @@ export function wmsUrl(def: RasterDef): string {
 
 export interface RasterOpts { transparent?: boolean; maxZoom?: number; }
 
+// Slow dynamic services (county + CGS /export, WMS) go through our own edge-cached
+// proxy: the first visitor pays the county's render time once, everyone after gets
+// the tile from the CDN edge, and scripts/warm-tiles.mjs pre-bakes the property areas.
+// Static caches (xyz) and the Esri image service stay direct - they are fast already.
+export const PROXY_KINDS = new Set<string>(['export', 'wms']);
+export function proxied(url: string): string {
+  return '/api/tile?u=' + encodeURIComponent(url).replace(/%7Bbbox-epsg-3857%7D/g, '{bbox-epsg-3857}');
+}
+export function shouldProxy(def: RasterDef): boolean { return !def.direct && PROXY_KINDS.has(def.kind || 'export'); }
+
 // the MapLibre source for one def (never a `parts` def)
 export function rasterSource(def: RasterDef, opts: RasterOpts = {}): RasterSourceSpecification {
   const attribution = def.attr || VC_ATTR;
@@ -34,13 +44,15 @@ export function rasterSource(def: RasterDef, opts: RasterOpts = {}): RasterSourc
     return { type: 'raster', tiles: [svcBase(def) + '/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: def.maxNative || 21, attribution };
   }
   if (def.kind === 'wms') {
-    return { type: 'raster', tiles: [wmsUrl(def)], tileSize: 256, maxzoom: 19, attribution };
+    const u = wmsUrl(def);
+    return { type: 'raster', tiles: [shouldProxy(def) ? proxied(u) : u], tileSize: 256, maxzoom: 19, attribution };
   }
   const px = def.px || 512;
   const transparent = opts.transparent !== false;
+  const u = exportBase(def) + '?bbox={bbox-epsg-3857}' + exportTail(def, transparent, px);
   return {
     type: 'raster', tileSize: px, attribution,
     maxzoom: opts.maxZoom ?? (def.root ? 19 : 20),
-    tiles: [exportBase(def) + '?bbox={bbox-epsg-3857}' + exportTail(def, transparent, px)]
+    tiles: [shouldProxy(def) ? proxied(u) : u]
   };
 }

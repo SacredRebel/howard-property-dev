@@ -250,3 +250,22 @@ button { font: inherit; color: inherit; }
 .ed-badge:active { cursor: grabbing; }
 @keyframes edpulse { 50% { box-shadow: 0 0 0 9px rgba(224, 182, 74, 0.12), 0 8px 20px rgba(0, 0, 0, 0.5); } }
 @media (max-width: 900px) { .editor { width: min(88vw, 300px); } .hud.dock-open .editor { left: 12px; } }
+
+/* ---- V0.28: facts, popups, chips that tuck away ---- */
+.facts { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 8px; }
+.facts span { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line); color: var(--ink-2); }
+.chip { transition: opacity 0.25s ease, transform 0.25s ease; }
+.chip.off { opacity: 0; pointer-events: none; transform: translateY(2px) scale(0.92); }
+.maplibregl-popup-content { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55); padding: 10px 12px; font: 500 12px var(--font); }
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: rgba(12, 16, 14, 0.92); }
+.maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: rgba(12, 16, 14, 0.92); }
+.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: rgba(12, 16, 14, 0.92); }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: rgba(12, 16, 14, 0.92); }
+.maplibregl-popup-close-button { color: var(--ink-3); font-size: 16px; padding: 2px 8px; }
+.maplibregl-popup-close-button:hover { background: transparent; color: var(--ink); }
+.tip .maplibregl-popup-content { padding: 5px 9px; font: 600 11px var(--mono); color: var(--cyan); pointer-events: none; }
+.ground .maplibregl-popup-content { min-width: 220px; }
+.gp-ll { font: 600 11px var(--mono); color: var(--ink-2); margin-right: 18px; }
+.gp-el { font-size: 13px; font-weight: 800; color: var(--gold); margin: 4px 0 8px; }
+.gp-el i { font-style: normal; font-size: 10px; font-weight: 600; color: var(--ink-3); margin-left: 4px; }
+.gp-acts { display: flex; gap: 6px; flex-wrap: wrap; }

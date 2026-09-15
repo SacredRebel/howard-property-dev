@@ -6,13 +6,14 @@
  * over ground already loaded). County / CGS / USGS dynamic `/export` images and
  * legend JSON are served stale-while-revalidate: the cached copy paints at once
  * and a fresh copy is fetched in the background for next time. Nothing under
- * /api/ is ever cached. Caches are capped so the browser's quota is respected.
+ * /api/ is ever cached except /api/tile (the edge-cached proxy, stale-while-revalidate).
+ * Caches are capped so the browser's quota is respected.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const TILES = 'atlas-tiles-' + VERSION;   // immutable tiles + images
 const DYN = 'atlas-dyn-' + VERSION;       // dynamic exports + legend json
 const APP = 'atlas-app-' + VERSION;       // hashed app bundle
-const TILES_MAX = 1800, DYN_MAX = 700, APP_MAX = 40;
+const TILES_MAX = 1800, DYN_MAX = 1500, APP_MAX = 40;
 
 const IMMUTABLE = [
   /^https:\/\/maps\.ventura\.org\/arcgis\/rest\/services\/.*\/tile\/\d+\/\d+\/\d+/,      // county flight caches
@@ -82,6 +83,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = req.url;
+  if (/\/api\/tile\?/.test(url)) { e.respondWith(staleWhileRevalidate(req, DYN, DYN_MAX)); return; }   // our edge-cached proxy
   if (url.includes('/api/')) return;                        // live data, never cached
   if (APP_RE.test(url)) { e.respondWith(cacheFirst(req, APP, APP_MAX)); return; }
   for (const re of IMMUTABLE) if (re.test(url)) { e.respondWith(cacheFirst(req, TILES, TILES_MAX)); return; }

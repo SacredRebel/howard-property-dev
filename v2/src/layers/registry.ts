@@ -11,6 +11,7 @@ export interface RasterDef {
   root?: string;            // service root, defaults to the county
   svc?: string;             // service path under the root
   kind?: Kind;              // transport (default 'export')
+  direct?: boolean;         // skip the edge-cached /api/tile proxy for this service
   showLayers?: string;      // ArcGIS sublayer ids, e.g. '28,27,16'
   px?: number;              // export tile size (512 = crisp, 256 = the server's honest CSS scale)
   maxNative?: number;       // xyz caches: deepest cached zoom
