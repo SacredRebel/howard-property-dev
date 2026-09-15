@@ -7804,7 +7804,6 @@ async function agsQuery(service, layer, geometry, opts = {}) {
     returnGeometry: opts.returnGeometry ? 'true' : 'false',
     outSR: '4326',
     f: 'json',
-    resultRecordCount: opts.limit || 40,
   }, geometry || {});
   if (opts.distance) { p.distance = opts.distance; p.units = 'esriSRUnit_Meter'; }
   const j = await agsPost(url, p);
@@ -7847,23 +7846,23 @@ const DOSSIER_SOURCES = [
   { sec: 'landuse', svc: 'DataDownloads/LandUse', layer: 0,
     hit: (a) => [['Area plan', a.name], ['Land use designation', clean(a.designat_2) || a.designatio]] },
 
-  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 6,
+  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 6, geom: 'poly',
     hit: (a) => [['Fire hazard severity', a.HAZ_CLASS + (a.SRA ? ' · State Responsibility Area' : '')]],
     miss: () => [['Fire hazard severity', 'Not in a mapped severity zone']] },
-  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 0,
-    hit: (a) => [['FEMA flood zone', 'Zone ' + a.FLD_ZONE + ' — ' + clean(a.FLOODHAZ)]],
-    miss: () => [['FEMA flood zone', 'Outside the mapped 100-year floodplain']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 6,
+  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 0, geom: 'poly',
+    hit: (a) => [['FEMA flood zone', 'Zone ' + a.FLD_ZONE + ' touches the parcel — ' + clean(a.FLOODHAZ)]],
+    miss: () => [['FEMA flood zone', 'No part of the parcel is in the mapped 100-year floodplain']] },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 6, geom: 'poly',
     hit: (a) => [['Earthquake Fault Zone', 'Inside a state Alquist-Priolo special study zone — a fault investigation is required before building']],
     miss: () => [['Earthquake Fault Zone', 'Not in an Alquist-Priolo zone']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 5,
-    hit: () => [['Liquefaction', 'Inside a mapped liquefaction zone']],
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 5, geom: 'poly',
+    hit: () => [['Liquefaction', 'A mapped liquefaction zone touches the parcel']],
     miss: () => [['Liquefaction', 'Not in a mapped liquefaction zone']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 4,
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 4, geom: 'poly',
     hit: () => [['Mapped landslide', 'A mapped landslide touches this parcel']],
     miss: () => [['Mapped landslide', 'None mapped on the parcel']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 3,
-    hit: () => [['Earthquake-induced landslide', 'Inside a potential earthquake-induced landslide zone']],
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 3, geom: 'poly',
+    hit: () => [['Earthquake-induced landslide', 'A potential earthquake-induced landslide zone touches the parcel']],
     miss: () => [['Earthquake-induced landslide', 'Not in a mapped zone']] },
   { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 2,
     hit: (a) => (a.venturapga == null ? [] : [['Ground shaking', (a.venturapga / 1000).toFixed(2) + ' g peak acceleration · county model value ' + a.venturapga]]) },
@@ -7872,13 +7871,13 @@ const DOSSIER_SOURCES = [
 
   { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 3,
     hit: (a) => {
-      const r = [['Soil map unit', clean(a.muname)]];
+      const r = [['Soil map unit', clean(a.muname).replace(/erode d\b/i, 'eroded')]];
       if (a.musym) r.push(['Soil symbol', a.musym + (a.mukey ? ' · mukey ' + a.mukey : '')]);
       if (a.slopegradw != null) r.push(['Representative slope', a.slopegradw + '%']);
       if (a.flodfreqdc) r.push(['Flooding frequency', a.flodfreqdc]);
       if (a.pondfreqpr) r.push(['Ponding frequency', a.pondfreqpr]);
       if (a.brockdepmi) r.push(['Depth to bedrock', a.brockdepmi + ' cm']);
-      if (a.aws050wta != null) r.push(['Available water, top 50 cm', a.aws050wta + ' cm']);
+      if (a.aws050wta != null) r.push(['Available water, top 50 cm', Number(a.aws050wta).toFixed(1) + ' cm']);
       return r;
     } },
   { sec: 'ground', svc: 'DataDownloads/Hazards', layer: 1,
@@ -7893,8 +7892,8 @@ const DOSSIER_SOURCES = [
     } },
   { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 0,
     hit: (a) => [['Farmland classification', clean(a.type_2)]] },
-  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 1,
-    hit: () => [['Habitat connectivity', 'Inside a mapped habitat connectivity area']] },
+  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 1, geom: 'poly',
+    hit: () => [['Habitat connectivity', 'A mapped habitat connectivity area touches the parcel']] },
 
   { sec: 'water', svc: 'SDs/Groundwater', layer: 0,
     hit: (a) => [['Groundwater basin', clean(a.BASIN_NAME) + ' · DWR basin ' + a.BASIN_NUMB]],
@@ -7955,12 +7954,12 @@ async function resolveDossier(q) {
   if (q.apn) {
     const apn10 = String(q.apn).replace(/[^0-9]/g, '');
     const rows = await agsQuery('SDs/Parcels', 0, null, {
-      where: "APN10='" + apn10 + "'", returnGeometry: true, limit: 1,
+      where: "APN10='" + apn10 + "'", returnGeometry: true,
     });
     parcel = rows[0];
   }
   if (!parcel && q.lat != null && q.lon != null) {
-    const rows = await agsQuery('SDs/Parcels', 0, ptGeom(q.lon, q.lat), { returnGeometry: true, limit: 1 });
+    const rows = await agsQuery('SDs/Parcels', 0, ptGeom(q.lon, q.lat), { returnGeometry: true });
     parcel = rows[0];
   }
   if (!parcel) { const e = new Error('No parcel found'); e.status = 404; throw e; }
@@ -8011,8 +8010,9 @@ async function resolveDossier(q) {
   // --- 3. fan out ---------------------------------------------------------
   const jobs = DOSSIER_SOURCES.map(async (s) => {
     try {
-      const g = s.dist ? Object.assign({}, point, { distance: s.dist, units: 'esriSRUnit_Meter' }) : point;
-      const fs = await agsQuery(s.svc, s.layer, g, { limit: s.dist ? 60 : 4 });
+      const g = s.dist ? Object.assign({}, point, { distance: s.dist, units: 'esriSRUnit_Meter' })
+        : (s.geom === 'poly' && rings ? polyGeom(rings) : point);
+      const fs = await agsQuery(s.svc, s.layer, g);
       const rows = fs.length ? (s.hit(fs[0].attributes, fs.length) || []) : (s.miss ? s.miss() || [] : []);
       rows.forEach((r) => { if (r && r[1] !== null && r[1] !== undefined && r[1] !== '') buckets[s.sec].push(r); });
       return 1;
@@ -8023,7 +8023,7 @@ async function resolveDossier(q) {
   jobs.push((async () => {
     try {
       if (!rings) return 0;
-      const fs = await agsQuery('DataDownloads/CommonData', 0, polyGeom(rings), { limit: 40 });
+      const fs = await agsQuery('DataDownloads/CommonData', 0, polyGeom(rings));
       if (!fs.length) {
         buckets.structures.push(['Buildings mapped by the county', 'None']);
         return 1;
@@ -8032,12 +8032,16 @@ async function resolveDossier(q) {
       const uses = {};
       fs.forEach((f) => {
         const at = f.attributes;
-        const u = clean(at.USE_ || at.use || at.BLDG_USE || at.DESCRIPT || at.descript || 'unclassified');
+        const u = clean(at.building_d || at.buildingty || at.BUILDING_D || 'unclassified');
         uses[u] = (uses[u] || 0) + 1;
       });
       Object.keys(uses).forEach((u) => buckets.structures.push(['— ' + titleish(u), uses[u] + (uses[u] > 1 ? ' structures' : ' structure')]));
-      const hs = fs.map((f) => f.attributes.HEIGHT || f.attributes.height).filter((h) => h != null && h > 0);
+      const hs = fs.map((f) => f.attributes.height || f.attributes.HEIGHT).filter((h) => h != null && h > 0);
       if (hs.length) buckets.structures.push(['Tallest mapped structure', Math.max.apply(null, hs) + ' ft']);
+      const area = fs.map((f) => f.attributes['st_area(shape)']).filter((v) => v > 0);
+      if (area.length) buckets.structures.push(['Total mapped footprint', Math.round(area.reduce((x, y) => x + y, 0)).toLocaleString('en-US') + ' sq ft']);
+      const yr = fs.map((f) => f.attributes.imagedate).filter(Boolean);
+      if (yr.length) buckets.structures.push(['Footprints traced from imagery of', yr.sort().slice(-1)[0]]);
       return 1;
     } catch (e) { return 0; }
   })());
@@ -8047,7 +8051,7 @@ async function resolveDossier(q) {
   jobs.push((async () => {
     try {
       if (!bbox) return 0;
-      const fs = await agsQuery('DataDownloads/Survey', 4, envGeom(bbox), { limit: 60 });
+      const fs = await agsQuery('DataDownloads/Survey', 4, envGeom(bbox));
       const seen = {};
       fs.forEach((f) => {
         const at = f.attributes;
