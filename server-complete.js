@@ -8633,6 +8633,15 @@ async function resolveDossier(q) {
 }
 
 const SURVEY_FILES = { 'sulphur-mountain': 'sulphur-survey.json' };
+// V2 engine (docs/engine-blueprint.md): the same properties as JSON, positions already applied,
+// and the built single-engine app served at /v2 (source in v2/, output committed to public/v2)
+app.get('/api/properties', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
+  res.json(PROPERTIES);
+});
+app.use('/v2/assets', express.static(join(__dirname, 'public', 'v2', 'assets'), { maxAge: '365d', immutable: true }));
+app.use('/v2', express.static(join(__dirname, 'public', 'v2'), { maxAge: 0, etag: true, index: 'index.html' }));
+
 app.get('/api/survey/:propertyId', (req, res) => {
   const f = SURVEY_FILES[req.params.propertyId];
   if (!f) return res.status(404).json({ error: 'No survey data for this property.' });
