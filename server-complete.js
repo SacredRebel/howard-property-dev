@@ -2725,6 +2725,45 @@ app.get('/', (req, res) => {
       background: rgba(124, 179, 95, 0.14); color: rgba(238, 242, 236, 0.85);
     }
     #layers-panel .lp-credit { margin: 12px 0 0; padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, 0.11); font-size: 10.5px; line-height: 1.5; color: rgba(238, 242, 236, 0.45); }
+    /* V0.25 — grouped layer library, live legends, per-layer opacity */
+    #layers-panel .lp-sec { margin: 0 0 4px; border-top: 1px solid rgba(255, 255, 255, 0.09); }
+    #layers-panel .lp-sec summary {
+      display: flex; align-items: center; gap: 9px; list-style: none;
+      padding: 9px 6px 8px; cursor: pointer; user-select: none; border-radius: 9px;
+    }
+    #layers-panel .lp-sec summary::-webkit-details-marker { display: none; }
+    #layers-panel .lp-sec summary:hover { background: rgba(255, 255, 255, 0.05); }
+    #layers-panel .lp-sec-ico { font-size: 16px; width: 22px; text-align: center; flex: 0 0 22px; }
+    #layers-panel .lp-sec-txt { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 800; letter-spacing: 0.3px; line-height: 1.3; }
+    #layers-panel .lp-sec-txt .lp-note { font-weight: 500; letter-spacing: 0; }
+    #layers-panel .lp-sec-n { font-size: 10px; font-weight: 800; letter-spacing: 0.6px; color: #14200e; background: #7cb35f; border-radius: 999px; padding: 2px 7px; min-width: 0; }
+    #layers-panel .lp-sec-n:empty { display: none; }
+    #layers-panel .lp-sec-arrow { width: 7px; height: 7px; border: solid rgba(238, 242, 236, 0.5); border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform 0.15s; flex: 0 0 7px; margin-right: 3px; }
+    #layers-panel .lp-sec[open] .lp-sec-arrow { transform: rotate(45deg); }
+    #layers-panel .lp-sec .lp-row { margin-left: 4px; }
+    #layers-panel .lp-info {
+      flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 800; font-style: italic; font-family: Georgia, serif;
+      color: rgba(238, 242, 236, 0.55); border: 1px solid rgba(238, 242, 236, 0.25); cursor: help;
+    }
+    #layers-panel .lp-info:hover, #layers-panel .lp-info.on { color: #14200e; background: #e0b64a; border-color: #e0b64a; }
+    #layers-panel .lp-lgb { margin: 0 0 10px; padding: 9px 10px 8px; border-radius: 11px; background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.07); }
+    #layers-panel .lp-lgb-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+    #layers-panel .lp-lgb-head b { font-weight: 800; }
+    #layers-panel .lp-lgb-x { cursor: pointer; opacity: 0.5; font-size: 12px; padding: 0 4px; }
+    #layers-panel .lp-lgb-x:hover { opacity: 1; }
+    #layers-panel .lp-src { font-size: 10.5px; color: rgba(238, 242, 236, 0.5); margin: 2px 0 0; line-height: 1.4; }
+    #layers-panel .lp-src a { color: #e0b64a; text-decoration: none; }
+    #layers-panel .lp-lgb .lp-op { padding: 6px 0 4px; }
+    #layers-panel .lp-lg img { width: 18px; height: 18px; flex: 0 0 18px; margin-top: 1px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); image-rendering: auto; }
+    #layers-panel .lp-lg-sub { font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; color: rgba(190, 220, 175, 0.75); padding: 6px 7px 1px; }
+    #layers-panel .lp-lg-more { display: none; }
+    #layers-panel .lp-lgb.all .lp-lg-more { display: flex; }
+    #layers-panel .lp-lg-showall { font-size: 11px; color: #e0b64a; cursor: pointer; padding: 5px 7px 2px; }
+    #layers-panel .lp-lg-showall:hover { text-decoration: underline; }
+    #layers-panel .lp-lg-wait { opacity: 0.55; font-style: italic; }
+    #layers-panel .lp-empty { font-size: 11.5px; color: rgba(238, 242, 236, 0.5); padding: 4px 7px 8px; line-height: 1.5; }
+    #layers-panel .lp-years.hist input[type=range] { accent-color: #c9a2ff; }
     .vc-elev-popup .leaflet-popup-content { margin: 10px 14px; font-size: 13px; font-weight: 700; }
     @media (max-width: 768px) {
       #layers-toggle { top: 92px; }
@@ -3087,9 +3126,9 @@ app.get('/', (req, res) => {
   <div id="layers-toggle" title="County GIS layers — topo contours, aerial imagery by year, parcels, zoning and hazards">🗺️ Layers</div>
   <div id="layers-panel">
     <div class="lp-head"><span>🗺️ Map Layers</span><span class="lp-close" id="lp-close">✕</span></div>
-    <p class="lp-sub">Live data from the Ventura County GIS — the same source the county uses for topographic review.</p>
+    <p class="lp-sub">Live public data — Ventura County GIS, the California Geological Survey, USGS, FEMA, NRCS and BLM — drawn straight from each agency’s own map server the moment you switch it on. Nothing is copied, nothing goes stale.</p>
     <div id="lp-body"></div>
-    <p class="lp-credit">Imagery &amp; topography: Ventura County GIS · Elevation readout: USGS 3DEP (1&nbsp;m)</p>
+    <p class="lp-credit">Imagery &amp; parcels: Ventura County GIS · Geology, faults, landslides, minerals: California Geological Survey · Relief, topo, hydrography, elevation: USGS · Flood: FEMA · Soils: USDA NRCS · Ownership, PLSS: BLM · Historic topo: USGS via Esri Living Atlas</p>
   </div>
   <div id="earth3d">
     <div id="earth3d-stars"></div>
@@ -3218,29 +3257,58 @@ app.get('/', (req, res) => {
     }
 
     // Everything else — the historic aerials (custom cache scheme) and every
-    // dynamic overlay — is tiled by us against the service's /export endpoint.
+    // dynamic overlay — is tiled by us against the service's export endpoint.
+    // V0.25: the same transport now speaks to any ArcGIS MapServer or ImageServer
+    // (CGS, USGS, FEMA, BLM, DWR, Esri Living Atlas) and to WMS (NRCS soils):
+    // a def carries root (defaults to the county), svc, and a kind.
+    function vcSvcBase(def) {
+      return (def.root || VC_ROOT) + def.svc + '/' + (def.kind === 'imgsvc' ? 'ImageServer' : 'MapServer');
+    }
+    function vcExportBase(def) { return vcSvcBase(def) + (def.kind === 'imgsvc' ? '/exportImage' : '/export'); }
+    // everything after the bbox — shared by the 2D tile layer and the 3D raster source
+    function vcExportTail(def, transparent, px) {
+      var q = '&bboxSR=3857&imageSR=3857&size=' + px + ',' + px + '&f=image';
+      if (def.kind === 'imgsvc') return q + '&format=jpgpng' + (typeof def.extra === 'function' ? def.extra() : (def.extra || ''));
+      return q + '&format=' + (transparent ? 'png32' : 'jpg')
+        + '&transparent=' + (transparent ? 'true' : 'false')
+        + (def.showLayers ? '&layers=show:' + def.showLayers : '')
+        + '&dpi=96';
+    }
+    function vcWmsUrl(def, bboxToken) {
+      return def.url + '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=' + encodeURIComponent(def.layers)
+        + '&STYLES=&SRS=EPSG:3857&BBOX=' + bboxToken + '&WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=true';
+    }
     var VCExportLayer = L.TileLayer.extend({
       options: {
-        minZoom: 1, maxZoom: 22, tileSize: 256, px: 512, fmt: 'png32',
-        transparent: true, showLayers: null, errorTileUrl: VC_BLANK,
-        updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 1
+        minZoom: 1, maxZoom: 22, tileSize: 256, px: 512, base: '', tail: '',
+        errorTileUrl: VC_BLANK, updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 1
       },
       getTileUrl: function (c) {
         var W = 40075016.685578488, half = W / 2;
         var span = W / Math.pow(2, c.z);            // tileSize is 256 => one tile per grid cell
         var xmin = -half + c.x * span, ymax = half - c.y * span;
-        var px = this.options.px;
-        return VC_ROOT + this.options.service + '/MapServer/export'
-          + '?bbox=' + xmin + ',' + (ymax - span) + ',' + (xmin + span) + ',' + ymax
-          + '&bboxSR=3857&imageSR=3857&size=' + px + ',' + px
-          + '&format=' + this.options.fmt
-          + '&transparent=' + (this.options.transparent ? 'true' : 'false')
-          + (this.options.showLayers ? '&layers=show:' + this.options.showLayers : '')
-          + '&dpi=96&f=image';
+        return this.options.base + '?bbox=' + xmin + ',' + (ymax - span) + ',' + (xmin + span) + ',' + ymax + this.options.tail;
       }
     });
-    function vcExport(svc, opts) {
-      return new VCExportLayer(null, Object.assign({ service: svc, attribution: VC_ATTR }, opts || {}));
+    // def is a catalog entry (or anything with kind/svc/root/showLayers)
+    function vcExport(def, opts) {
+      opts = opts || {};
+      var px = opts.px || 512, transparent = opts.transparent !== false;
+      return new VCExportLayer(null, Object.assign({
+        base: vcExportBase(def), tail: vcExportTail(def, transparent, px), px: px, attribution: def.attr || VC_ATTR
+      }, opts));
+    }
+    function vcXYZDef(def, opts) {
+      return L.tileLayer(vcSvcBase(def) + '/tile/{z}/{y}/{x}', Object.assign({
+        attribution: def.attr || VC_ATTR, minZoom: 1, maxZoom: 22, maxNativeZoom: def.maxNative || 21,
+        errorTileUrl: VC_BLANK, updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 2
+      }, opts || {}));
+    }
+    function vcWms(def, opts) {
+      return L.tileLayer.wms(def.url, Object.assign({
+        layers: def.layers, format: 'image/png', transparent: true, version: '1.1.1', uppercase: true,
+        attribution: def.attr || VC_ATTR, errorTileUrl: VC_BLANK, updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 1
+      }, opts || {}));
     }
 
     // ---- the catalog ----------------------------------------------------
@@ -3285,18 +3353,106 @@ app.get('/', (req, res) => {
     var VC_FLIGHTS = VC_BASES.filter(function (b) { return b.year; });
     var vcLastFlight = '2024';
 
+    // ---- the layer library (V0.25) ---------------------------------------
+    // Every entry is fetched live from the agency's own map server the moment
+    // it is switched on — nothing is copied, nothing goes stale. group files
+    // it in the panel, z fixes the draw order (fills low, lines high, labels
+    // top), src/srcUrl credit the publisher in the legend.
+    var R_CGS  = 'https://gis.conservation.ca.gov/server/rest/services/';
+    var R_USGS = 'https://basemap.nationalmap.gov/arcgis/rest/services/';
+    var R_FEMA = 'https://hazards.fema.gov/arcgis/rest/services/';
+    var R_NHD  = 'https://hydro.nationalmap.gov/arcgis/rest/services/';
+    var R_QF   = 'https://earthquake.usgs.gov/arcgis/rest/services/';
+    var R_BLM  = 'https://gis.blm.gov/arcgis/rest/services/';
+    var R_DWR  = 'https://gis.water.ca.gov/arcgis/rest/services/';
+    var R_HIST = 'https://historical1.arcgis.com/arcgis/rest/services/';
+    var S_VC   = 'Ventura County GIS', S_CGS = 'California Geological Survey', S_USGS = 'USGS', S_FEMA = 'FEMA', S_BLM = 'Bureau of Land Management';
+
+    var VC_GROUPS = [
+      { id: 'county',  icon: '🏛️', label: 'County & parcels',        note: 'what the county planner sees — parcels, zoning, contours, the survey' },
+      { id: 'terrain', icon: '🗻', label: 'Terrain & historic maps', note: 'USGS relief, today’s topo, and every USGS edition of this ground back to 1903' },
+      { id: 'geo',     icon: '⛏️', label: 'Geology & minerals',      note: 'what is under the ground — rock units, mineral studies, mines, oil & gas' },
+      { id: 'seismic', icon: '🌋', label: 'Faults & earthquakes',    note: 'every mapped fault, the regulated Alquist-Priolo traces, the historical shocks' },
+      { id: 'ground',  icon: '🪨', label: 'Landslides & soils',      note: 'slope stability, slides mapped in the field, the soil survey, farmland grades' },
+      { id: 'water',   icon: '💧', label: 'Water & flood',           note: 'FEMA flood zones, every named creek, groundwater basins' },
+      { id: 'land',    icon: '📏', label: 'Ownership & survey grid', note: 'who holds the land around you, and the township grid every deed refers to' }
+    ];
+
+    // the historic USGS topo editions on file over the Ojai valley (newest edition on or before the year is drawn)
+    var VC_HIST_YEARS = [1903, 1947, 1952, 1964, 1967, 1988, 1995];
+    var VC_HIST_NOTES = {
+      1903: '15-minute Santa Paula sheet — surveyed 1901–02, the first map of this ground',
+      1947: '15-minute sheet, 1947 revision',
+      1952: 'first 7.5-minute Ojai quad — aerial photos 1947',
+      1964: '15-minute sheet, 1964 edition',
+      1967: '7.5-minute Ojai quad, 1967 edition',
+      1988: '7.5-minute Ojai quad, 1988 edition — photos 1984',
+      1995: '7.5-minute Ojai quad, 1995 — the last paper edition'
+    };
+    var vcHistYear = 1952;
+    function vcHistRule() {
+      return '&mosaicRule=' + encodeURIComponent(JSON.stringify({
+        mosaicMethod: 'esriMosaicAttribute', sortField: 'DateCurrent', sortValue: String(vcHistYear), ascending: false,
+        where: 'DateCurrent <= ' + vcHistYear + ' AND Map_Scale <= 62500'
+      }));
+    }
+
     var VC_OVERLAYS = [
-      { id: 'topo',    label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92 },
-      { id: 'survey',  label: '📐 Survey sheet — Sulphur Mtn', note: 'Henry Land Surveying, Nov 2024 · 1 ft contours, structures, fences, poles · the surveyed boundary with every bearing, the 16 ft easement and the found monuments', kind: 'image', url: '/images/sulphur-mountain/survey/topo-survey-overlay.png', bounds: [[34.4315996, -119.1582952], [34.4336893, -119.1546039]], vector: '/api/survey/sulphur-mountain', op: 0.88, z: 360 },
-      { id: 'bldg',    label: '🏚️ Building footprints', note: 'every structure standing today, mapped by the county', svc: 'DataDownloads/CommonData', showLayers: '0', op: 0.95 },
-      { id: 'parcels', label: '▦ Parcel lines',       note: 'official assessor boundaries', svc: 'SDs/Parcels', op: 0.95 },
-      { id: 'apn',     label: '# APN + acreage labels', note: '', svc: 'SDs/ParcelLabels', showLayers: '0,2', op: 0.95 },
-      { id: 'zoning',  label: '⬛ Zoning',            note: 'base zone designations', svc: 'SDs/MyZoning', showLayers: '0', op: 0.5 },
-      { id: 'ovz',     label: '🦌 Overlay zones',     note: 'habitat corridors, wildlife passage, Ojai dark sky', svc: 'SDs/OverlayZones', op: 0.45 },
-      { id: 'habitat', label: '🌿 Habitat & sensitive areas', note: 'ESHA, habitat connectivity, wildlife corridors', svc: 'SDs/CV_PlanningGIS', showLayers: '3,4,6', op: 0.42 },
-      { id: 'water',   label: '🏞️ Creeks & surface water', note: '', svc: 'SDs/CV_PlanningGIS', showLayers: '8', op: 0.8 },
-      { id: 'flood',   label: '💧 Floodplain',        note: '100-year and 500-year', svc: 'SDs/PWA_Floodplain', op: 0.45 },
-      { id: 'fire',    label: '🔥 CalFire SRA',       note: 'state fire responsibility area', svc: 'SDs/PWACalFireSRA', op: 0.35 }
+      // —— county & parcels ————————————————————————————————————————————————
+      { id: 'topo',    group: 'county', label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92, z: 350, src: S_VC, minZoom: 16, farNote: 'zoom in closer to see the contours',
+        legendText: 'Contour lines — each one a fixed step in elevation: 100 ft far out, 20 ft, then 5 ft up close. With contours on, click anywhere on the land to read its real elevation (USGS 3DEP, 1 m).' },
+      { id: 'survey',  group: 'county', label: '📐 Survey sheet — Sulphur Mtn', note: 'Henry Land Surveying, Nov 2024 · 1 ft contours, structures, fences, poles · the surveyed boundary with every bearing, the 16 ft easement and the found monuments', kind: 'image', url: '/images/sulphur-mountain/survey/topo-survey-overlay.png', bounds: [[34.4315996, -119.1582952], [34.4336893, -119.1546039]], vector: '/api/survey/sulphur-mountain', op: 0.88, z: 360, src: 'Henry Land Surveying · record map 14-PM-15', srcUrl: 'https://maps.ventura.org/recordmaps/pm/014/014pm015.pdf',
+        legendText: 'The survey sheet, registered to its own surveyed corners (within about 0.3 m on the parcel body). Hover the dashed cyan boundary for each bearing and distance; amber is the 16 ft access easement; white dots are the monuments the surveyor found.' },
+      { id: 'bldg',    group: 'county', label: '🏚️ Building footprints', note: 'every structure standing today, mapped by the county', svc: 'DataDownloads/CommonData', showLayers: '0', op: 0.95, z: 330, src: S_VC },
+      { id: 'parcels', group: 'county', label: '▦ Parcel lines',       note: 'official assessor boundaries', svc: 'SDs/Parcels', op: 0.95, z: 345, src: S_VC },
+      { id: 'apn',     group: 'county', label: '# APN + acreage labels', note: '', svc: 'SDs/ParcelLabels', showLayers: '0,2', op: 0.95, z: 370, src: S_VC },
+      { id: 'recmaps', group: 'county', label: '🗂️ Recorded maps index', note: 'every recorded parcel map, tract and record of survey — the sheets a surveyor starts from', svc: 'DataDownloads/Survey', showLayers: '4', op: 0.55, z: 331, src: S_VC + ' · Surveyor', srcUrl: 'https://maps.ventura.org/recordmaps/' },
+      { id: 'zoning',  group: 'county', label: '⬛ Zoning',            note: 'base zone designations', svc: 'SDs/MyZoning', showLayers: '0', op: 0.5, z: 305, src: S_VC + ' · Planning' },
+      { id: 'ovz',     group: 'county', label: '🦌 Overlay zones',     note: 'habitat corridors, wildlife passage, Ojai dark sky', svc: 'SDs/OverlayZones', op: 0.45, z: 306, src: S_VC + ' · Planning' },
+      { id: 'habitat', group: 'county', label: '🌿 Habitat & sensitive areas', note: 'ESHA, habitat connectivity, wildlife corridors', svc: 'SDs/CV_PlanningGIS', showLayers: '3,4,6', op: 0.42, z: 307, src: S_VC + ' · Planning' },
+      { id: 'water',   group: 'county', label: '🏞️ Creeks & surface water', note: 'county drainage lines', svc: 'SDs/CV_PlanningGIS', showLayers: '8', op: 0.8, z: 338, src: S_VC },
+      { id: 'flood',   group: 'county', label: '💧 County floodplain', note: '100-year and 500-year, county mapping', svc: 'SDs/PWA_Floodplain', op: 0.45, z: 321, src: S_VC + ' · Public Works' },
+      { id: 'fire',    group: 'county', label: '🔥 CalFire SRA',       note: 'state fire responsibility area', svc: 'SDs/PWACalFireSRA', op: 0.35, z: 308, src: S_VC + ' · CAL FIRE' },
+      // —— terrain & historic maps ————————————————————————————————————————
+      { id: 'shade',    group: 'terrain', label: '🗻 Hillshade relief',   note: 'USGS 3DEP shaded relief — the lay of the land without leaving 2D', root: R_USGS, svc: 'USGSShadedReliefOnly', kind: 'export', op: 0.55, z: 302, src: S_USGS + ' 3DEP', srcUrl: 'https://www.usgs.gov/3d-elevation-program', attr: 'USGS',
+        legendText: 'Light from the north-west; brighter slopes face the light, darker slopes fall away from it. Turn it on under any base to make the terrain read.' },
+      { id: 'usgstopo', group: 'terrain', label: '🗺️ USGS topo (today)', note: 'the current US Topo — contours, trails, place names', root: R_USGS, svc: 'USGSTopo', kind: 'xyz', maxNative: 16, op: 0.85, z: 304, src: S_USGS + ' The National Map', srcUrl: 'https://www.usgs.gov/programs/national-geospatial-program/us-topo-maps-america', attr: 'USGS',
+        legendText: 'The standard USGS quadrangle style: brown contours, blue water, green woodland, black culture. Drawn to about 1:24,000.' },
+      { id: 'histtopo', group: 'terrain', label: '📜 Historic USGS topo', note: 'every USGS edition of this ground since 1903 — drag the year', root: R_HIST, svc: 'USA_Historical_Topo_Maps', kind: 'imgsvc', extra: vcHistRule, op: 0.85, z: 306, src: S_USGS + ' Historical Topographic Map Collection · Esri Living Atlas', srcUrl: 'https://www.usgs.gov/programs/national-geospatial-program/historical-topographic-maps-preserving-past', attr: 'USGS / Esri',
+        legendText: 'Scanned and georeferenced USGS sheets. The slider picks the newest edition published on or before that year at 1:62,500 or larger — old sheets are hand-drawn, so expect roads and creeks to sit a few metres off today’s imagery.' },
+      // —— geology & minerals —————————————————————————————————————————————
+      { id: 'geology',  group: 'geo', label: '🪨 Geologic map',       note: 'rock units, contacts, folds — Geologic Map of California (CGS, 2010)', root: R_CGS, svc: 'CGS/Geologic_Map_of_California', kind: 'export', op: 0.55, z: 310, src: S_CGS, srcUrl: 'https://maps.conservation.ca.gov/cgs/gmc/', attr: 'CGS' },
+      { id: 'quat',     group: 'geo', label: '🏜️ Quaternary deposits', note: 'the young surface — alluvium, fans, terraces, landslide debris (CGS)', root: R_CGS, svc: 'CGS/QuaternarySurficialDepositsSouthernCA', kind: 'export', px: 256, maxZoom: 13, nearNote: 'CGS drew this at 1:36,000 and wider — it softens as you zoom in closer', op: 0.55, z: 311, src: S_CGS, srcUrl: 'https://www.conservation.ca.gov/cgs', attr: 'CGS' },
+      { id: 'minerals', group: 'geo', label: '⛏️ Mineral land classification', note: 'CGS mineral studies, production areas and classification reports · geothermal springs and wells', root: R_CGS, svc: 'CGS/IW_MineralResourcesProgram', kind: 'export', showLayers: '0,1,2,3,4,7,10', op: 0.6, z: 312, src: S_CGS + ' Mineral Resources Program', srcUrl: 'https://www.conservation.ca.gov/cgs/minerals', attr: 'CGS' },
+      { id: 'mines',    group: 'geo', label: '🚧 Active mines',        note: 'permitted surface mines — Mines Online, Division of Mine Reclamation', root: R_CGS, svc: 'MOL/MOLMines', kind: 'export', op: 0.95, z: 336, src: 'CA Division of Mine Reclamation', srcUrl: 'https://maps.conservation.ca.gov/mol/', attr: 'DMR' },
+      { id: 'wells',    group: 'geo', label: '🛢️ Oil & gas wells',     note: 'every CalGEM well — active, idle, plugged (the Ojai oil field is next door)', root: R_CGS, svc: 'WellSTAR/Wells', kind: 'export', op: 0.95, z: 337, src: 'CalGEM WellSTAR', srcUrl: 'https://www.conservation.ca.gov/calgem', attr: 'CalGEM' },
+      { id: 'radon',    group: 'geo', label: '☢️ Radon potential',     note: 'CGS radon potential zones', root: R_CGS, svc: 'CGS/RadonPotentialZones', kind: 'export', op: 0.45, z: 313, src: S_CGS, srcUrl: 'https://www.conservation.ca.gov/cgs/radon', attr: 'CGS' },
+      // —— faults & earthquakes ——————————————————————————————————————————
+      { id: 'faults',  group: 'seismic', label: '🌋 Fault activity map',  note: 'every mapped fault, colored by how recently it moved (CGS, 2010)', root: R_CGS, svc: 'CGS/FaultActivityMapCA', kind: 'export', px: 256, maxZoom: 12, nearNote: 'a regional map, drawn at 1:150,000 — softens as you zoom in; for close work use Alquist-Priolo and USGS Quaternary faults', op: 0.95, z: 340, src: S_CGS + ' Fault Activity Map', srcUrl: 'https://maps.conservation.ca.gov/cgs/fam/', attr: 'CGS' },
+      { id: 'ap',      group: 'seismic', label: '⚠️ Alquist-Priolo fault traces', note: 'state-regulated surface-rupture traces — habitable buildings need a fault study and a 50 ft setback', root: R_CGS, svc: 'CGS_Earthquake_Hazard_Zones/SHP_Fault_Traces', kind: 'export', op: 0.95, z: 342, src: S_CGS + ' Seismic Hazards Program', srcUrl: 'https://www.conservation.ca.gov/cgs/alquist-priolo', attr: 'CGS' },
+      { id: 'qfaults', group: 'seismic', label: '〰️ USGS Quaternary faults', note: 'national Quaternary fault and fold database, 2014 hazard model', root: R_QF, svc: 'haz/hazfaults2014', kind: 'export', op: 0.9, z: 341, src: S_USGS + ' Earthquake Hazards Program', srcUrl: 'https://www.usgs.gov/programs/earthquake-hazards/faults', attr: 'USGS' },
+      { id: 'nshm',    group: 'seismic', label: '📈 Fault slip rates',    note: 'preferred slip rate on each fault — 2023 National Seismic Hazard Model', root: R_CGS, svc: 'CGS/MS48_NSHM2023_Faults', kind: 'export', op: 0.9, z: 341, src: S_CGS + ' Map Sheet 48', attr: 'CGS' },
+      { id: 'quakes',  group: 'seismic', label: '💥 Historical earthquakes M3+', note: 'every recorded shock of magnitude 3 and up (CGS catalog)', root: R_CGS, svc: 'CGS/CA_HistEQs_M3Plus', kind: 'export', op: 0.9, z: 343, src: S_CGS, attr: 'CGS' },
+      // —— landslides & soils ———————————————————————————————————————————
+      { id: 'lssusc',  group: 'ground', label: '⛰️ Landslide susceptibility', note: 'CGS Map Sheet 58 — slope and rock strength ranked 0 to X', root: R_CGS, svc: 'CGS/MS58_LandslideSusceptibility_Classes', kind: 'export', px: 256, maxZoom: 13, nearNote: 'CGS drew this at 1:36,000 and wider — it softens as you zoom in closer', op: 0.55, z: 314, src: S_CGS + ' Map Sheet 58', srcUrl: 'https://www.conservation.ca.gov/cgs/landslides', attr: 'CGS' },
+      { id: 'lsinv',   group: 'ground', label: '🪨 Mapped landslides',   note: 'CGS landslide inventory — deposits, scarps and source areas actually mapped in the field', op: 0.8, z: 335, src: S_CGS + ' Landslide Inventory', srcUrl: 'https://www.conservation.ca.gov/cgs/landslides', attr: 'CGS',
+        parts: [
+          { root: R_CGS, svc: 'CGS/LandslideInventory_DC1_Older', kind: 'export' },
+          { root: R_CGS, svc: 'CGS/LandslideInventory_DC1_Younger', kind: 'export' },
+          { root: R_CGS, svc: 'CGS/LandslideInventory_DC2', kind: 'export' },
+          { root: R_CGS, svc: 'CGS/LandslideInventory_DC3', kind: 'export' }
+        ] },
+      { id: 'soils',   group: 'ground', label: '🌱 Soil survey (SSURGO)', note: 'USDA NRCS soil map units — the dossier names the unit under each property', kind: 'wms', url: 'https://SDMDataAccess.sc.egov.usda.gov/Spatial/SDM.wms', layers: 'mapunitpoly', op: 0.7, z: 315, src: 'USDA NRCS Soil Survey', srcUrl: 'https://websoilsurvey.nrcs.usda.gov/', attr: 'USDA NRCS',
+        legendText: 'Each outlined area is one soil map unit; the code inside it (e.g. 190, "Sespe–Castaic") is what the county and the septic engineer look up. Open the dossier for the unit under the property.' },
+      { id: 'farmland', group: 'ground', label: '🌾 Important farmland', note: 'Prime · Statewide · Unique · Local · Grazing — Farmland Mapping 2022', root: R_CGS, svc: 'DLRP/CaliforniaImportantFarmland_2022', kind: 'xyz', maxNative: 16, op: 0.55, z: 316, src: 'CA Dept of Conservation · Farmland Mapping & Monitoring', srcUrl: 'https://www.conservation.ca.gov/dlrp/fmmp', attr: 'CA DOC' },
+      { id: 'williamson', group: 'ground', label: '📜 Williamson Act', note: 'agricultural preserve contracts — lower taxes, restricted use', root: R_CGS, svc: 'DLRP/CaliforniaWilliamsonActEnrollment_2025', kind: 'export', showLayers: '9', op: 0.5, z: 317, src: 'CA Dept of Conservation · Williamson Act 2025', srcUrl: 'https://www.conservation.ca.gov/dlrp/wa', attr: 'CA DOC' },
+      // —— water & flood ——————————————————————————————————————————————
+      { id: 'nfhl',    group: 'water', label: '🌊 FEMA flood zones',   note: 'the National Flood Hazard Layer — A / AE / X zones and base flood elevations', root: R_FEMA, svc: 'public/NFHL', kind: 'export', showLayers: '28,27,16', op: 0.55, z: 320, src: S_FEMA + ' National Flood Hazard Layer', srcUrl: 'https://msc.fema.gov/portal/home', attr: 'FEMA' },
+      { id: 'nhd',     group: 'water', label: '🏞️ Streams & waterbodies', note: 'National Hydrography Dataset — every named creek and drainage', root: R_NHD, svc: 'nhd', kind: 'export', op: 0.9, z: 339, src: S_USGS + ' National Hydrography Dataset', srcUrl: 'https://www.usgs.gov/national-hydrography', attr: 'USGS' },
+      { id: 'gwbasin', group: 'water', label: '🕳️ Groundwater basins', note: 'DWR Bulletin 118 basins and subbasins', root: R_DWR, svc: 'Geoscientific/i08_B118_CA_GroundwaterBasins', kind: 'export', op: 0.4, z: 318, src: 'CA Dept of Water Resources · Bulletin 118', srcUrl: 'https://water.ca.gov/programs/groundwater-management/bulletin-118', attr: 'CA DWR' },
+      // —— ownership & survey grid ————————————————————————————————————————
+      { id: 'blm',     group: 'land', label: '🏕️ Public land ownership', note: 'Forest Service, BLM, Park Service and other federal land', root: R_BLM, svc: 'lands/BLM_Natl_SMA_Cached_without_PriUnk', kind: 'xyz', maxNative: 16, op: 0.5, z: 319, src: S_BLM + ' Surface Management Agency', srcUrl: 'https://gbp-blm-egis.hub.arcgis.com/', attr: 'BLM' },
+      { id: 'plss',    group: 'land', label: '📐 Township · range · section', note: 'the PLSS grid every legal description refers to (BLM CadNSDI)', root: R_BLM, svc: 'Cadastral/BLM_Natl_PLSS_CadNSDI', kind: 'export', op: 0.85, z: 339, src: S_BLM + ' Cadastral NSDI', srcUrl: 'https://gbp-blm-egis.hub.arcgis.com/', attr: 'BLM' }
     ];
 
     var vcBaseCache = {}, vcOverlayCache = {};
@@ -3309,7 +3465,7 @@ app.get('/', (req, res) => {
       if (!vcBaseCache[def.id]) {
         vcBaseCache[def.id] = vcTrackLoading(def.kind === 'xyz'
           ? vcXYZ(def.svc)
-          : vcExport(def.svc, { fmt: 'jpg', transparent: false, px: 512 }));
+          : vcExport(def, { transparent: false, px: 512 }));
       }
       return vcBaseCache[def.id];
     }
@@ -3340,15 +3496,32 @@ app.get('/', (req, res) => {
         if (window.vcSync3DLayers) window.vcSync3DLayers();
       }).catch(function (e) { console.warn('survey vectors:', e); });
     }
+    // per-layer opacity: user setting wins, then the catalog default; topo keeps its own slider
+    var vcOverlayOp = {};
+    function vcOvOpacity(def) {
+      if (vcOverlayOp[def.id] != null) return vcOverlayOp[def.id];
+      if (def.id === 'topo') return vcTopoOpacity;
+      return def.op || 0.9;
+    }
+    // one raster for one def (never a parts def) — the transport is chosen by kind
+    function vcRasterFor(def, opacity, zIndex) {
+      var o = { opacity: opacity, pane: 'vcOverlayPane', zIndex: zIndex };
+      if (def.kind === 'xyz') return vcTrackLoading(vcXYZDef(def, o));
+      if (def.kind === 'wms') return vcTrackLoading(vcWms(def, o));
+      // scale-limited services (CGS regional sheets) are requested at their native scale and overzoomed from there
+      if (def.maxZoom) o.maxNativeZoom = def.maxZoom;
+      return vcTrackLoading(vcExport(def, Object.assign({ transparent: true, px: def.px || 512 }, o)));
+    }
     function vcOverlayLayer(def) {
       if (!vcOverlayCache[def.id]) {
+        var op = vcOvOpacity(def), z = def.z || 300;
         if (def.kind === 'image') {
           var scan = L.imageOverlay(def.url, def.bounds, {
-            opacity: def.op || 0.9,
+            opacity: op,
             pane: 'vcOverlayPane',
             interactive: false,
             className: 'vc-scan',
-            zIndex: def.z || 340,
+            zIndex: z,
             alt: 'Recorded topographic survey traced onto the map'
           });
           var grp = L.layerGroup([scan]);
@@ -3356,15 +3529,64 @@ app.get('/', (req, res) => {
           vcOverlayCache[def.id] = grp;
           return grp;
         }
-        vcOverlayCache[def.id] = vcTrackLoading(vcExport(def.svc, {
-          fmt: 'png32', transparent: true, px: 512,
-          showLayers: def.showLayers || null,
-          opacity: def.id === 'topo' ? vcTopoOpacity : (def.op || 0.9),
-          pane: 'vcOverlayPane', zIndex: def.id === 'topo' ? 60 : 40
-        }));
+        if (def.parts) {
+          vcOverlayCache[def.id] = L.layerGroup(def.parts.map(function (p) { return vcRasterFor(p, op, z); }));
+          return vcOverlayCache[def.id];
+        }
+        vcOverlayCache[def.id] = vcRasterFor(def, op, z);
       }
       return vcOverlayCache[def.id];
     }
+    // every raster inside a cached overlay (a plain tile layer, or the rasters of a group)
+    function vcRastersOf(lyr) {
+      if (!lyr) return [];
+      if (lyr.setOpacity && !(lyr instanceof L.Path)) return [lyr];
+      var out = [];
+      if (lyr.eachLayer) lyr.eachLayer(function (l) { if (l.setOpacity && !(l instanceof L.Path)) out.push(l); });
+      return out;
+    }
+    function vcSetOverlayOpacity(id, v) {
+      var def = vcDefById(VC_OVERLAYS, id);
+      if (!def) return;
+      vcOverlayOp[id] = v;
+      if (id === 'topo') { vcTopoOpacity = v; var t = document.getElementById('lp-topo-op'); if (t && Math.abs(parseInt(t.value, 10) / 100 - v) > 0.011) t.value = Math.round(v * 100); }
+      vcRastersOf(vcOverlayCache[id]).forEach(function (l) { l.setOpacity(v); });
+      var m = window.earth3dRef;
+      if (m && m.getLayer) {
+        var ids = ['vc-ov-' + id];
+        (def.parts || []).forEach(function (_, i) { ids.push('vc-ov-' + id + '-p' + i); });
+        ids.forEach(function (lid) { try { if (m.getLayer(lid)) m.setPaintProperty(lid, 'raster-opacity', v); } catch (e) {} });
+      }
+      try { localStorage.setItem('ojaiMapOverlayOp', JSON.stringify(vcOverlayOp)); } catch (e) {}
+    }
+    // the historic-topo year changed: rebuild that one layer, new above old, old removed once the new has drawn
+    function vcSetHistYear(year, immediate) {
+      year = Number(year);
+      if (VC_HIST_YEARS.indexOf(year) < 0) return;
+      var big = document.getElementById('lp-hist-big'), lab = document.getElementById('lp-hist-label');
+      if (big) big.textContent = year;
+      if (lab) lab.textContent = VC_HIST_NOTES[year] || '';
+      clearTimeout(vcHistTimer);
+      var apply = function () {
+        if (vcHistYear === year && vcOverlayCache['histtopo']) return;
+        vcHistYear = year;
+        try { localStorage.setItem('ojaiMapHistYear', String(year)); } catch (e) {}
+        var def = vcDefById(VC_OVERLAYS, 'histtopo');
+        var old = vcOverlayCache['histtopo'];
+        delete vcOverlayCache['histtopo'];
+        if (vcActiveOverlays['histtopo']) {
+          var nu = vcOverlayLayer(def);
+          if (nu.setZIndex) nu.setZIndex((def.z || 300) + 1);
+          nu.addTo(map);
+          var settle = function () { if (old && map.hasLayer(old)) map.removeLayer(old); if (nu.setZIndex) nu.setZIndex(def.z || 300); };
+          if (old && nu.once) { nu.once('load', settle); setTimeout(settle, 3500); } else settle();
+        } else if (old && map.hasLayer(old)) map.removeLayer(old);
+        vcSyncPanel();
+        if (window.vcSync3DLayers) window.vcSync3DLayers();
+      };
+      if (immediate) apply(); else vcHistTimer = setTimeout(apply, 180);
+    }
+    var vcHistTimer = null;
     function vcDefById(list, id) {
       for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
       return null;
@@ -3425,7 +3647,9 @@ app.get('/', (req, res) => {
       } else {
         vcActiveOverlays[id] = true;
         lyr.addTo(map);
-        if (lyr.setZIndex) lyr.setZIndex(def.z || (id === 'topo' ? 350 : 300));
+        if (lyr.setZIndex) lyr.setZIndex(def.z || 300);
+        // a regional sheet switched on while zoomed in tight: pull back so it can actually be seen
+        if (def.maxZoom && map.getZoom() > def.maxZoom + 1.5) map.flyTo(map.getCenter(), def.maxZoom + 0.5, { duration: 1.1 });
         if (def.bounds) {
           try {
             var bb = L.latLngBounds(def.bounds);
@@ -3439,34 +3663,29 @@ app.get('/', (req, res) => {
     }
 
     // ---- panel UI -------------------------------------------------------
-    function vcRow(kind, id, label, note, on) {
+    function vcRow(kind, id, label, note, on, info) {
       return '<div class="lp-row ' + kind + (on ? ' on' : '') + '" data-kind="' + kind + '" data-id="' + id + '">'
         + '<span class="lp-dot"></span>'
         + '<span class="lp-txt">' + label + (note ? '<span class="lp-note">' + note + '</span>' : '') + '</span>'
+        + (info ? '<span class="lp-info' + (vcPeek[id] ? ' on' : '') + '" data-info="' + id + '" title="legend, source and opacity">i</span>' : '')
+        + '</div>';
+    }
+    var vcPeek = {};        // layers whose legend is pinned open even while the layer is off
+    var vcSecOpen = {};     // remembered open/closed state per section
+    var vcLegendCache = {}; // id -> Promise<[{layer,label,img}]>
+    var vcLegendSig = '';
+    function vcHistBlock() {
+      var on = !!vcActiveOverlays['histtopo'], yi = VC_HIST_YEARS.indexOf(vcHistYear);
+      return '<div class="lp-years hist' + (on ? ' live' : '') + '">'
+        + '<div class="lp-year-head"><b id="lp-hist-big">' + vcHistYear + '</b><span id="lp-hist-label">' + (VC_HIST_NOTES[vcHistYear] || '') + '</span></div>'
+        + '<input type="range" id="lp-hist-year" min="0" max="' + (VC_HIST_YEARS.length - 1) + '" value="' + (yi < 0 ? 0 : yi) + '" step="1" aria-label="Historic topo edition year">'
+        + '<div class="lp-year-ticks"><span>1903</span><span>1952</span><span>1967</span><span>1995</span></div>'
         + '</div>';
     }
     function vcBuildPanel() {
       var body = document.getElementById('lp-body');
       if (!body) return;
-      var h = '<div class="lp-group">Overlays</div>';
-      for (var i = 0; i < VC_OVERLAYS.length; i++) {
-        var o = VC_OVERLAYS[i];
-        h += vcRow('check', o.id, o.label, o.note, !!vcActiveOverlays[o.id]);
-      }
-      h += '<div class="lp-op">Topo opacity <input type="range" id="lp-topo-op" min="20" max="100" value="'
-        + Math.round(vcTopoOpacity * 100) + '"></div>';
-      h += '<div class="lp-group">What you are looking at</div>';
-      h += '<div class="lp-legend">'
-        + '<div class="lp-lg"><i style="background:#a900e6"></i>Contour line — each one a fixed step in elevation (100 ft far out, 5 ft up close)</div>'
-        + '<div class="lp-lg"><i style="background:#c8c8c8;border:1px solid #888"></i>Building footprint as the county has it mapped</div>'
-        + '<div class="lp-lg"><i style="background:#db0000"></i>Parcel line / APN label straight from the assessor</div>'
-        + '<div class="lp-lg"><i style="background:#4a9d5f"></i>Habitat, wildlife corridor and dark-sky overlays — these carry real design conditions</div>'
-        + '<div class="lp-lg"><i style="background:#3d7fd1"></i>Creek, floodplain and drainage</div>'
-        + '<div class="lp-lg"><i style="background:#d98324"></i>CalFire state responsibility area</div>'
-        + '<div class="lp-lg"><i style="background:#7ff0ff;border:1px solid #2a2054"></i>The survey sheet, registered to its own surveyed corners (within about 0.3 m on the parcel body). Hover the dashed boundary for each bearing and distance; amber is the 16 ft access easement; white dots are the monuments the surveyor found.</div>'
-        + '<div class="lp-lg lp-lg-tip">⛰️ With contours on, click anywhere on the land to read its real elevation.</div>'
-        + '</div>';
-      h += '<div class="lp-group">Base imagery</div>';
+      var h = '<div class="lp-group">Base imagery</div>';
       for (var j = 0; j < VC_BASES.length; j++) {
         var b = VC_BASES[j];
         if (b.year) continue;
@@ -3476,40 +3695,168 @@ app.get('/', (req, res) => {
       var fi = vcFlightIndexOf(onFlight ? vcActiveBase : vcLastFlight), fcur = VC_FLIGHTS[fi];
       h += '<div class="lp-row radio lp-flight' + (onFlight ? ' on' : '') + '" data-kind="radio" data-id="' + fcur.id + '">'
          + '<span class="lp-dot"></span>'
-         + '<span class="lp-txt">🛩️ County aerial flights<span class="lp-note">' + VC_FLIGHTS.length + ' flights, 1945 to 2025 \u2014 drag the year</span></span>'
+         + '<span class="lp-txt">🛩️ County aerial flights<span class="lp-note">' + VC_FLIGHTS.length + ' flights, 1945 to 2025 — drag the year</span></span>'
          + '</div>';
       h += '<div class="lp-years' + (onFlight ? ' live' : '') + '">'
          + '<div class="lp-year-head"><b id="lp-year-big">' + fcur.year + '</b><span id="lp-year-label">' + vcFlightLabel(fcur) + '</span></div>'
          + '<input type="range" id="lp-year" min="0" max="' + (VC_FLIGHTS.length - 1) + '" value="' + fi + '" step="1" aria-label="Aerial flight year">'
          + '<div class="lp-year-ticks"><span>1945</span><span>2005</span><span>2015</span><span>2025</span></div>'
          + '</div>';
+
+      h += '<div class="lp-group">Layers</div>';
+      for (var g = 0; g < VC_GROUPS.length; g++) {
+        var grp = VC_GROUPS[g], defs = [], nOn = 0;
+        for (var i = 0; i < VC_OVERLAYS.length; i++) if (VC_OVERLAYS[i].group === grp.id) { defs.push(VC_OVERLAYS[i]); if (vcActiveOverlays[VC_OVERLAYS[i].id]) nOn++; }
+        var open = vcSecOpen[grp.id] != null ? vcSecOpen[grp.id] : (grp.id === 'county' || nOn > 0);
+        h += '<details class="lp-sec" data-sec="' + grp.id + '"' + (open ? ' open' : '') + '>'
+          + '<summary><span class="lp-sec-ico">' + grp.icon + '</span>'
+          + '<span class="lp-sec-txt">' + grp.label + '<span class="lp-note">' + grp.note + '</span></span>'
+          + '<span class="lp-sec-n" data-n="' + grp.id + '">' + (nOn ? nOn + ' on' : '') + '</span><span class="lp-sec-arrow"></span></summary>';
+        for (var d = 0; d < defs.length; d++) {
+          var o = defs[d];
+          h += vcRow('check', o.id, o.label, o.note, !!vcActiveOverlays[o.id], true);
+          if (o.id === 'topo') h += '<div class="lp-op">Topo opacity <input type="range" id="lp-topo-op" min="20" max="100" value="' + Math.round(vcTopoOpacity * 100) + '"></div>';
+          if (o.id === 'histtopo') h += vcHistBlock();
+        }
+        h += '</details>';
+      }
+      h += '<div class="lp-group">What you are looking at</div>';
+      h += '<div class="lp-legend" id="lp-legend-live"></div>';
       body.innerHTML = h;
+
       var yr = document.getElementById('lp-year');
       if (yr) {
         yr.addEventListener('input', function () { vcSetFlight(parseInt(this.value, 10), false); });
         yr.addEventListener('change', function () { vcSetFlight(parseInt(this.value, 10), true); });
         yr.addEventListener('click', function (e) { e.stopPropagation(); });
       }
+      var hy = document.getElementById('lp-hist-year');
+      if (hy) {
+        hy.addEventListener('input', function () { vcSetHistYear(VC_HIST_YEARS[parseInt(this.value, 10)], false); });
+        hy.addEventListener('change', function () { vcSetHistYear(VC_HIST_YEARS[parseInt(this.value, 10)], true); });
+        hy.addEventListener('click', function (e) { e.stopPropagation(); });
+      }
       var rows = body.querySelectorAll('.lp-row');
       for (var k = 0; k < rows.length; k++) {
-        rows[k].addEventListener('click', function () {
+        rows[k].addEventListener('click', function (e) {
+          if (e && e.target && e.target.closest && e.target.closest('.lp-info')) return;   // the i button has its own handler
           var id = this.getAttribute('data-id');
           if (this.classList.contains('lp-flight')) { vcSetFlight(vcFlightIndexOf(vcLastFlight), true); return; }
           if (this.getAttribute('data-kind') === 'radio') vcSetBase(id); else vcToggleOverlay(id);
         });
       }
-      vcUpdateTopoHint();
-      var op = document.getElementById('lp-topo-op');
-      if (op) op.addEventListener('input', function () {
-        vcTopoOpacity = parseInt(this.value, 10) / 100;
-        var t = vcOverlayCache['topo'];
-        if (t && t.setOpacity) t.setOpacity(vcTopoOpacity);
-        if (window.earth3dRef && window.earth3dRef.getLayer && window.earth3dRef.getLayer('vc-ov-topo')) {
-          try { window.earth3dRef.setPaintProperty('vc-ov-topo', 'raster-opacity', vcTopoOpacity); } catch (e) {}
+      var secs = body.querySelectorAll('details.lp-sec');
+      for (var s = 0; s < secs.length; s++) {
+        secs[s].addEventListener('toggle', function () {
+          vcSecOpen[this.getAttribute('data-sec')] = this.open;
+          try { localStorage.setItem('ojaiMapSections', JSON.stringify(vcSecOpen)); } catch (e) {}
+        });
+      }
+      // one delegated handler for the legend affordances (they are re-rendered often)
+      body.addEventListener('click', function (e) {
+        var t = e.target.closest ? e.target.closest('.lp-info, .lp-lgb-x, .lp-lg-showall') : null;
+        if (!t) return;
+        e.stopPropagation(); e.preventDefault();
+        if (t.classList.contains('lp-info')) {
+          var id = t.getAttribute('data-info');
+          if (vcPeek[id]) delete vcPeek[id]; else vcPeek[id] = true;
+          vcSyncPanel(true);
+          var blk = body.querySelector('.lp-lgb[data-lg="' + id + '"]');
+          if (blk && blk.scrollIntoView) blk.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else if (t.classList.contains('lp-lgb-x')) {
+          delete vcPeek[t.getAttribute('data-x')];
+          vcSyncPanel(true);
+        } else if (t.classList.contains('lp-lg-showall')) {
+          var blk2 = t.closest('.lp-lgb'); if (blk2) { blk2.classList.toggle('all'); t.textContent = blk2.classList.contains('all') ? 'show fewer' : t.getAttribute('data-all'); }
         }
       });
+      body.addEventListener('input', function (e) {
+        var t = e.target;
+        if (t && t.classList && t.classList.contains('lp-op-in')) vcSetOverlayOpacity(t.getAttribute('data-op'), parseInt(t.value, 10) / 100);
+      });
+      vcUpdateTopoHint();
+      var op = document.getElementById('lp-topo-op');
+      if (op) op.addEventListener('input', function () { vcSetOverlayOpacity('topo', parseInt(this.value, 10) / 100); });
+      vcSyncPanel(true);
     }
-    function vcSyncPanel() {
+    // ---- live legend: one block per layer that is on (or pinned with the i button) ----
+    function vcLegendFetch(def) {
+      if (vcLegendCache[def.id]) return vcLegendCache[def.id];
+      var parts = def.parts || [def];
+      vcLegendCache[def.id] = Promise.all(parts.map(function (p) {
+        if (p.kind === 'wms' || p.kind === 'imgsvc' || p.kind === 'image') return [];
+        var want = p.showLayers ? p.showLayers.split(',').map(Number) : null;
+        var base = vcSvcBase(p);
+        var meta = want ? Promise.resolve(null) : fetch(base + '?f=json').then(function (r) { return r.json(); }).catch(function () { return null; });
+        return Promise.all([fetch(base + '/legend?f=json').then(function (r) { return r.json(); }), meta]).then(function (res) {
+          var j = res[0], info = res[1], vis = null;
+          if (info && info.layers) {
+            // only the layers the service draws by default (a parent group must be visible too)
+            var byId = {}; info.layers.forEach(function (l) { byId[l.id] = l; });
+            vis = {};
+            info.layers.forEach(function (l) {
+              var ok = l.defaultVisibility !== false, par = l.parentLayerId;
+              while (ok && par != null && par >= 0 && byId[par]) { ok = byId[par].defaultVisibility !== false; par = byId[par].parentLayerId; }
+              if (ok && (!l.subLayerIds || !l.subLayerIds.length)) vis[l.id] = true;
+            });
+          }
+          var out = [], seen = {};
+          (j.layers || []).forEach(function (l) {
+            if (want && want.indexOf(l.layerId) < 0) return;
+            if (vis && !vis[l.layerId]) return;
+            (l.legend || []).forEach(function (e) {
+              var key = (e.label || l.layerName) + '|' + (e.imageData || '').slice(0, 64);
+              if (seen[key]) return; seen[key] = true;
+              out.push({ layer: l.layerName, label: e.label || l.layerName, img: 'data:' + (e.contentType || 'image/png') + ';base64,' + e.imageData });
+            });
+          });
+          return out;
+        }).catch(function () { return []; });
+      })).then(function (arrs) { return [].concat.apply([], arrs); });
+      return vcLegendCache[def.id];
+    }
+    function vcLegendBlock(def) {
+      var op = Math.round(vcOvOpacity(def) * 100);
+      return '<div class="lp-lgb" data-lg="' + def.id + '">'
+        + '<div class="lp-lgb-head"><b>' + def.label + '</b><span class="lp-lgb-x" data-x="' + def.id + '" title="hide this legend">✕</span></div>'
+        + (def.src ? '<div class="lp-src">' + def.src + (def.srcUrl ? ' · <a href="' + def.srcUrl + '" target="_blank" rel="noopener">source ↗</a>' : '') + '</div>' : '')
+        + (def.id === 'topo' ? '' : '<div class="lp-op">Opacity <input type="range" class="lp-op-in" data-op="' + def.id + '" min="10" max="100" value="' + op + '"></div>')
+        + '<div class="lp-lg-list" data-list="' + def.id + '">'
+        + (def.legendText ? '<div class="lp-lg">' + def.legendText + '</div>' : '<div class="lp-lg lp-lg-wait">loading the legend from ' + (def.src || 'the source') + '…</div>')
+        + '</div></div>';
+    }
+    function vcFillLegend(def) {
+      if (def.legendText) return;
+      vcLegendFetch(def).then(function (items) {
+        var box = document.querySelector('#lp-body .lp-lg-list[data-list="' + def.id + '"]');
+        if (!box) return;
+        if (!items.length) { box.innerHTML = '<div class="lp-lg">' + (def.note || 'no legend published for this layer') + '</div>'; return; }
+        var CAP = 24, h = '', last = null, multi = false;
+        for (var i = 1; i < items.length; i++) if (items[i].layer !== items[0].layer) { multi = true; break; }
+        items.forEach(function (it, i) {
+          var more = i >= CAP ? ' lp-lg-more' : '';
+          if (multi && it.layer !== last) { h += '<div class="lp-lg-sub' + more + '">' + it.layer + '</div>'; last = it.layer; }
+          h += '<div class="lp-lg' + more + '"><img src="' + it.img + '" alt="">' + it.label + '</div>';
+        });
+        if (items.length > CAP) h += '<div class="lp-lg-showall" data-all="show all ' + items.length + ' entries">show all ' + items.length + ' entries</div>';
+        box.innerHTML = h;
+      });
+    }
+    function vcRenderLegend(force) {
+      var live = document.getElementById('lp-legend-live');
+      if (!live) return;
+      var ids = [];
+      for (var i = 0; i < VC_OVERLAYS.length; i++) { var id = VC_OVERLAYS[i].id; if (vcActiveOverlays[id] || vcPeek[id]) ids.push(id); }
+      var sig = ids.join(',');
+      if (!force && sig === vcLegendSig) return;
+      vcLegendSig = sig;
+      if (!ids.length) { live.innerHTML = '<div class="lp-empty">Switch a layer on — its legend, its source and an opacity control appear here. The <b>i</b> on any row shows the legend without switching the layer on.</div>'; return; }
+      var h = '';
+      ids.forEach(function (id) { h += vcLegendBlock(vcDefById(VC_OVERLAYS, id)); });
+      live.innerHTML = h;
+      ids.forEach(function (id) { vcFillLegend(vcDefById(VC_OVERLAYS, id)); });
+    }
+    function vcSyncPanel(forceLegend) {
       var body = document.getElementById('lp-body');
       if (!body) return;
       var rows = body.querySelectorAll('.lp-row');
@@ -3519,12 +3866,22 @@ app.get('/', (req, res) => {
         var on = r.classList.contains('lp-flight') ? onFlight
           : (r.getAttribute('data-kind') === 'radio' ? (vcActiveBase === id) : !!vcActiveOverlays[id]);
         r.classList.toggle('on', on);
+        var inf = r.querySelector('.lp-info'); if (inf) inf.classList.toggle('on', !!vcPeek[id]);
       }
-      var yrs = body.querySelector('.lp-years'); if (yrs) yrs.classList.toggle('live', onFlight);
+      var yrs = body.querySelector('.lp-years:not(.hist)'); if (yrs) yrs.classList.toggle('live', onFlight);
       var yr = document.getElementById('lp-year');
       if (yr && onFlight) { var fi = vcFlightIndexOf(vcActiveBase); if (parseInt(yr.value, 10) !== fi) yr.value = fi;
         var big = document.getElementById('lp-year-big'), lab = document.getElementById('lp-year-label');
         if (big) big.textContent = VC_FLIGHTS[fi].year; if (lab) lab.textContent = vcFlightLabel(VC_FLIGHTS[fi]); }
+      var hys = body.querySelector('.lp-years.hist'); if (hys) hys.classList.toggle('live', !!vcActiveOverlays['histtopo']);
+      var hy = document.getElementById('lp-hist-year');
+      if (hy) { var hi = VC_HIST_YEARS.indexOf(vcHistYear); if (hi >= 0 && parseInt(hy.value, 10) !== hi) hy.value = hi; }
+      for (var g = 0; g < VC_GROUPS.length; g++) {
+        var n = 0;
+        for (var k = 0; k < VC_OVERLAYS.length; k++) if (VC_OVERLAYS[k].group === VC_GROUPS[g].id && vcActiveOverlays[VC_OVERLAYS[k].id]) n++;
+        var badge = body.querySelector('.lp-sec-n[data-n="' + VC_GROUPS[g].id + '"]'); if (badge) badge.textContent = n ? n + ' on' : '';
+      }
+      vcRenderLegend(!!forceLegend);
       var btn = document.getElementById('layers-toggle');
       if (btn) btn.classList.toggle('active', Object.keys(vcActiveOverlays).length > 0 || vcActiveBase !== 'esri');
     }
@@ -3533,13 +3890,16 @@ app.get('/', (req, res) => {
     // that the layer is genuinely empty, so say so instead of looking broken.
     var VC_TOPO_MIN_ZOOM = 16;
     function vcUpdateTopoHint() {
-      var row = document.querySelector('#lp-body .lp-row[data-id="topo"] .lp-note');
-      if (!row) return;
-      var far = map.getZoom() < VC_TOPO_MIN_ZOOM;
-      row.textContent = far
-        ? 'zoom in closer to see the contours'
-        : 'county contours — 100 ft, 20 ft then 5 ft as you zoom in';
-      row.style.color = far ? '#e8b964' : '';
+      var z = map.getZoom();
+      for (var i = 0; i < VC_OVERLAYS.length; i++) {
+        var d = VC_OVERLAYS[i];
+        if (d.minZoom == null && d.maxZoom == null) continue;
+        var row = document.querySelector('#lp-body .lp-row[data-id="' + d.id + '"] .lp-note');
+        if (!row) continue;
+        var far = d.minZoom != null && z < d.minZoom, near = d.maxZoom != null && z > d.maxZoom + 1.5;
+        row.textContent = far ? (d.farNote || 'zoom in closer to see this') : near ? (d.nearNote || 'drawn for a wider view — softer this close') : d.note;
+        row.style.color = (far || near) ? '#e8b964' : '';
+      }
     }
 
     // subtle activity light on the Layers button while county tiles are in flight
@@ -3598,6 +3958,12 @@ app.get('/', (req, res) => {
         if (savedBase && vcDefById(VC_BASES, savedBase)) vcActiveBase = savedBase;
         var savedOv = JSON.parse(localStorage.getItem('ojaiMapOverlays') || '[]');
         for (var i = 0; i < savedOv.length; i++) if (vcDefById(VC_OVERLAYS, savedOv[i])) vcActiveOverlays[savedOv[i]] = true;
+        var savedOp = JSON.parse(localStorage.getItem('ojaiMapOverlayOp') || '{}');
+        for (var oid in savedOp) if (vcDefById(VC_OVERLAYS, oid) && isFinite(savedOp[oid])) vcOverlayOp[oid] = Math.max(0.1, Math.min(1, Number(savedOp[oid])));
+        if (vcOverlayOp['topo'] != null) vcTopoOpacity = vcOverlayOp['topo'];
+        vcSecOpen = JSON.parse(localStorage.getItem('ojaiMapSections') || '{}') || {};
+        var savedHy = parseInt(localStorage.getItem('ojaiMapHistYear') || '', 10);
+        if (VC_HIST_YEARS.indexOf(savedHy) >= 0) vcHistYear = savedHy;
       } catch (e) {}
 
       vcBuildPanel();
@@ -3605,7 +3971,7 @@ app.get('/', (req, res) => {
       var restore = Object.keys(vcActiveOverlays);
       for (var k = 0; k < restore.length; k++) {
         var d = vcDefById(VC_OVERLAYS, restore[k]);
-        if (d) { var l = vcOverlayLayer(d); l.addTo(map); if (l.setZIndex) l.setZIndex(d.id === 'topo' ? 350 : 300); }
+        if (d) { var l = vcOverlayLayer(d); l.addTo(map); if (l.setZIndex) l.setZIndex(d.z || 300); }
       }
       vcSyncPanel();
 
@@ -3628,7 +3994,10 @@ app.get('/', (req, res) => {
     window.leafletMap = map;
     window.vcSetBase = vcSetBase;
     window.vcToggleOverlay = vcToggleOverlay;
-    window.vcState = function () { return { base: vcActiveBase, overlays: Object.keys(vcActiveOverlays) }; };
+    window.vcState = function () { return { base: vcActiveBase, overlays: Object.keys(vcActiveOverlays), histYear: vcHistYear, opacity: vcOverlayOp }; };
+    window.vcSetHistYear = vcSetHistYear;
+    window.vcSetOverlayOpacity = vcSetOverlayOpacity;
+    window.vcCatalog = function () { return { groups: VC_GROUPS, overlays: VC_OVERLAYS.map(function (o) { return { id: o.id, group: o.group, kind: o.kind || 'export', z: o.z, parts: (o.parts || []).length }; }) }; };
     
     // Prevent accidental map clicks during panel swipes and track panel state
     window.ignoreMapClicksUntil = 0;
@@ -7104,16 +7473,16 @@ app.get('/', (req, res) => {
     };
     function vc3dSource(def, transparent) {
       if (def.kind === 'xyz') {
-        return { type: 'raster', tiles: [VC_ROOT + def.svc + '/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 21 };
+        return { type: 'raster', tiles: [vcSvcBase(def) + '/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: def.maxNative || 21 };
       }
+      if (def.kind === 'wms') {
+        return { type: 'raster', tiles: [vcWmsUrl(def, '{bbox-epsg-3857}')], tileSize: 256, maxzoom: 19 };
+      }
+      // MapLibre expands {bbox-epsg-3857} per tile, so any export endpoint works here too
+      var px = def.px || 512;
       return {
-        type: 'raster', tileSize: 512, maxzoom: 21,
-        tiles: [VC_ROOT + def.svc + '/MapServer/export?bbox={bbox-epsg-3857}'
-          + '&bboxSR=3857&imageSR=3857&size=512,512'
-          + '&format=' + (transparent ? 'png32' : 'jpg')
-          + '&transparent=' + (transparent ? 'true' : 'false')
-          + (def.showLayers ? '&layers=show:' + def.showLayers : '')
-          + '&dpi=96&f=image']
+        type: 'raster', tileSize: px, maxzoom: def.maxZoom || (def.root ? 19 : 21),
+        tiles: [vcExportBase(def) + '?bbox={bbox-epsg-3857}' + vcExportTail(def, transparent, px)]
       };
     }
     window.vcSync3DLayers = function () {
@@ -7122,7 +7491,11 @@ app.get('/', (req, res) => {
       try {
         // tear down every county layer we own, base first-in/last-out
         var own = ['vc-base'];
-        for (var k = 0; k < VC_OVERLAYS.length; k++) own.push('vc-ov-' + VC_OVERLAYS[k].id);
+        for (var k = 0; k < VC_OVERLAYS.length; k++) {
+          var oid = 'vc-ov-' + VC_OVERLAYS[k].id;
+          own.push(oid);
+          (VC_OVERLAYS[k].parts || []).forEach(function (_, pi) { own.push(oid + '-p' + pi); });
+        }
         own.forEach(function (id) {
           [id, id + '-line', id + '-ease'].forEach(function (l) { if (m.getLayer(l)) m.removeLayer(l); });
           [id, id + '-vec'].forEach(function (src) { if (m.getSource(src)) m.removeSource(src); });
@@ -7138,11 +7511,11 @@ app.get('/', (req, res) => {
             : { type: 'raster', tiles: [VC_3D_DIRECT[bd.id]], tileSize: 256, maxzoom: 20 });
           m.addLayer({ id: 'vc-base', type: 'raster', source: 'vc-base', paint: { 'raster-opacity': 1 } }, before);
         }
-        // every active overlay, in catalog order so topo stays under the rest
-        for (var j = 0; j < VC_OVERLAYS.length; j++) {
-          var d = VC_OVERLAYS[j];
-          if (!vcActiveOverlays[d.id]) continue;
-          var sid = 'vc-ov-' + d.id;
+        // every active overlay in draw order (z), so fills stay under lines and labels
+        var active = VC_OVERLAYS.filter(function (d) { return vcActiveOverlays[d.id]; })
+          .sort(function (a, b) { return (a.z || 300) - (b.z || 300); });
+        for (var j = 0; j < active.length; j++) {
+          var d = active[j], sid = 'vc-ov-' + d.id, op = vcOvOpacity(d);
           if (d.kind === 'image') {
             var bb = d.bounds;
             m.addSource(sid, { type: 'image', url: d.url, coordinates: [
@@ -7160,13 +7533,16 @@ app.get('/', (req, res) => {
               m.addLayer({ id: sid + '-ease', type: 'fill', source: sid + '-vec', filter: ['==', 'k', 'ease'], paint: { 'fill-color': '#ffc24d', 'fill-opacity': 0.3 } }, before);
               m.addLayer({ id: sid + '-line', type: 'line', source: sid + '-vec', filter: ['==', 'k', 'line'], paint: { 'line-color': '#7ff0ff', 'line-width': 2.5, 'line-dasharray': [3, 2] } }, before);
             }
+            m.addLayer({ id: sid, type: 'raster', source: sid, paint: { 'raster-opacity': op } }, before);
+          } else if (d.parts) {
+            for (var pi = 0; pi < d.parts.length; pi++) {
+              m.addSource(sid + '-p' + pi, vc3dSource(d.parts[pi], true));
+              m.addLayer({ id: sid + '-p' + pi, type: 'raster', source: sid + '-p' + pi, paint: { 'raster-opacity': op } }, before);
+            }
           } else {
             m.addSource(sid, vc3dSource(d, true));
+            m.addLayer({ id: sid, type: 'raster', source: sid, paint: { 'raster-opacity': op } }, before);
           }
-          m.addLayer({
-            id: sid, type: 'raster', source: sid,
-            paint: { 'raster-opacity': d.id === 'topo' ? vcTopoOpacity : (d.op || 0.9) }
-          }, before);
         }
       } catch (e) { console.warn('3D county layers:', e); }
     };
