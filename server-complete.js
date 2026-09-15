@@ -2858,6 +2858,41 @@ app.get('/', (req, res) => {
     .doc-link:last-child { margin-bottom: 0; }
     .doc-link:hover { background: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44, 110, 158, 0.22); }
     .doc-dl { font-size: 12.5px; font-weight: 700; color: #2c6e9e; white-space: nowrap; background: rgba(44, 110, 158, 0.14); padding: 5px 11px; border-radius: 999px; }
+    .dossier-section { margin: 22px 0 6px; padding: 20px 22px; border-radius: 18px; background: linear-gradient(160deg, rgba(193, 144, 74, 0.11), rgba(193, 144, 74, 0.03)); border: 1px solid rgba(193, 144, 74, 0.30); box-shadow: 0 4px 18px rgba(31, 28, 46, 0.06); }
+    .dossier-section h4 { margin: 0 0 4px; font-size: 17px; font-weight: 700; color: #8a6423; letter-spacing: 0.2px; }
+    .dossier-section .section-sub { margin: 0 0 14px; font-size: 13.5px; color: #6c7a86; font-weight: 500; }
+    .ds-wait { font-size: 14px; color: #6c7a86; font-weight: 600; display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+    .ds-spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(193, 144, 74, 0.3); border-top-color: #b8862f; animation: dsspin 0.8s linear infinite; flex: none; }
+    @keyframes dsspin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .ds-spin { animation: none; } }
+    .ds-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(193, 144, 74, 0.26); }
+    .ds-apn { font-size: 15.5px; font-weight: 800; color: #4a3a1c; letter-spacing: 0.3px; font-variant-numeric: tabular-nums; }
+    .ds-situs { font-size: 13px; font-weight: 600; color: #7d8792; }
+    .ds-flag { font-size: 13.5px; line-height: 1.55; font-weight: 600; color: #3c4650; background: rgba(255, 255, 255, 0.72); border-left: 3px solid #b8862f; border-radius: 0 10px 10px 0; padding: 10px 14px; margin-bottom: 9px; }
+    .ds-flag.watch { border-left-color: #c1553f; }
+    .ds-flag.note { border-left-color: #5f79c0; }
+    .ds-flag.good { border-left-color: #6b8f6b; }
+    .ds-fold { border-top: 1px solid rgba(193, 144, 74, 0.22); }
+    .ds-fold:first-of-type { border-top: none; }
+    .ds-fold > summary { cursor: pointer; list-style: none; padding: 11px 2px; font-size: 14.5px; font-weight: 700; color: #4a3a1c; display: flex; align-items: center; gap: 9px; }
+    .ds-fold > summary::-webkit-details-marker { display: none; }
+    .ds-fold > summary::before { content: '+'; color: #b8862f; font-weight: 800; width: 11px; font-size: 15px; flex: none; }
+    .ds-fold[open] > summary::before { content: '\\2013'; }
+    .ds-fold > summary:hover { color: #8a6423; }
+    .ds-count { margin-left: auto; font-size: 11.5px; font-weight: 700; color: #a08652; background: rgba(193, 144, 74, 0.16); border-radius: 999px; padding: 2px 9px; }
+    .ds-rows { padding: 2px 0 14px 20px; }
+    .ds-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 6px 0; border-bottom: 1px dotted rgba(120, 110, 90, 0.22); }
+    .ds-row:last-child { border-bottom: none; }
+    .ds-k { font-size: 13px; font-weight: 600; color: #7d8792; flex: none; max-width: 48%; }
+    .ds-v { font-size: 13.5px; font-weight: 700; color: #2b3540; text-align: right; line-height: 1.45; }
+    .ds-note { font-size: 13px; color: #6c7a86; font-weight: 500; margin: 0 0 10px; line-height: 1.55; }
+    .ds-doc { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 13px; margin-bottom: 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.72); border: 1px solid rgba(193, 144, 74, 0.28); text-decoration: none; }
+    .ds-doc:hover { background: #fff; box-shadow: 0 5px 14px rgba(193, 144, 74, 0.22); }
+    .ds-doc-l { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .ds-doc-l b { font-size: 14px; font-weight: 800; color: #2b3540; letter-spacing: 0.2px; }
+    .ds-doc-l i { font-style: normal; font-size: 12px; color: #7d8792; font-weight: 600; }
+    .ds-doc-o { font-size: 12px; font-weight: 700; color: #8a6423; white-space: nowrap; background: rgba(193, 144, 74, 0.16); padding: 5px 10px; border-radius: 999px; flex: none; }
+    .ds-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(193, 144, 74, 0.26); font-size: 11.5px; line-height: 1.6; color: #8d97a1; font-weight: 500; }
     #community-card {
       position: fixed; inset: 0; z-index: 2500; display: none;
       align-items: center; justify-content: center;
@@ -4078,9 +4113,11 @@ app.get('/', (req, res) => {
         contentEl.innerHTML = (window.modeStripHTML ? window.modeStripHTML() : '')
           + (window.statusCardHTML ? window.statusCardHTML(prop) : '')
           + panelData.html
+          + (window.dossierSectionHTML ? window.dossierSectionHTML(prop) : '')
           + (window.docsSectionHTML ? window.docsSectionHTML(prop) : '')
           + '<div class="portal-btn" onclick="window.enterPortal(&quot;' + prop.id + '&quot;)">' + (window.visionMode ? '🌍 Fly the Vision in 3D' : '🌀 Enter the Vision') + '</div>';
         loadPropertyImages(prop.id);
+        if (window.loadDossier) window.loadDossier(prop);
         requestAnimationFrame(function() {
           if (panel) panel.scrollTop = 0;
           if (contentEl) contentEl.scrollTop = 0;
@@ -7512,6 +7549,78 @@ app.get('/', (req, res) => {
       h += '</div>';
       return h;
     };
+    // ---- county dossier card ------------------------------------------
+    window.dossierSectionHTML = function(prop) {
+      if (!prop || (!prop.apn && !prop.center)) return '';
+      return '<div class="dossier-section" id="dossier-section">'
+        + '<h4>&#128451;&#65039; The County Record</h4>'
+        + '<p class="section-sub">' + (prop.lots && prop.lots.length > 1
+            ? 'This property is ' + prop.lots.length + ' separate parcels. Shown below is the one under the centre pin — pulled live from Ventura County GIS, FEMA and USGS.'
+            : 'Everything the public record holds on this parcel — pulled live from Ventura County GIS, FEMA and USGS when you opened this panel.') + '</p>'
+        + '<div id="dossier-body"><div class="ds-wait"><span class="ds-spin"></span>Reading the county…</div></div>'
+        + '</div>';
+    };
+    function dsEsc(s) {
+      return String(s === null || s === undefined ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    window.dossierHTML = function(d) {
+      var h = '';
+      h += '<div class="ds-head"><span class="ds-apn">' + dsEsc(d.apn) + '</span>'
+         + (d.situs ? '<span class="ds-situs">' + dsEsc(d.situs) + '</span>' : '')
+         + (d.acreage ? '<span class="ds-situs">' + d.acreage.toFixed(2) + ' ac</span>' : '')
+         + '</div>';
+      (d.flags || []).forEach(function(f) {
+        h += '<div class="ds-flag ' + dsEsc(f.level) + '">' + dsEsc(f.text) + '</div>';
+      });
+      (d.sections || []).forEach(function(s, i) {
+        h += '<details class="ds-fold"' + (i < 2 ? ' open' : '') + '>'
+           + '<summary>' + dsEsc(s.label) + '<span class="ds-count">' + s.rows.length + '</span></summary>'
+           + '<div class="ds-rows">';
+        s.rows.forEach(function(r) {
+          h += '<div class="ds-row"><span class="ds-k">' + dsEsc(r[0]) + '</span><span class="ds-v">' + dsEsc(r[1]) + '</span></div>';
+        });
+        h += '</div></details>';
+      });
+      if (d.records && d.records.length) {
+        h += '<details class="ds-fold"><summary>Recorded maps &amp; surveys<span class="ds-count">' + d.records.length + '</span></summary><div class="ds-rows">';
+        h += '<p class="ds-note">Every map ever filed over this land — the same documents a surveyor retraces. Each one opens as the county’s own scan.</p>';
+        d.records.forEach(function(r) {
+          var meta = [r.year, r.surveyor, r.note, (r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null)]
+            .filter(Boolean).join(' · ');
+          if (r.url) {
+            h += '<a class="ds-doc" href="' + dsEsc(r.url) + '" target="_blank" rel="noopener">'
+               + '<span class="ds-doc-l"><b>' + dsEsc(r.label) + '</b><i>' + dsEsc(meta) + '</i></span>'
+               + '<span class="ds-doc-o">open ↗</span></a>';
+          } else {
+            h += '<div class="ds-row"><span class="ds-k">' + dsEsc(r.label) + '</span><span class="ds-v">' + dsEsc(meta) + '</span></div>';
+          }
+        });
+        h += '</div></details>';
+      }
+      h += '<div class="ds-foot">Resolved from ' + (d.sourcesAnswered || 0) + ' public sources on '
+         + new Date(d.resolvedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+         + '. County assessor figures are not an appraisal; recorded documents, not GIS, are the authority on boundaries.</div>';
+      return h;
+    };
+    window.loadDossier = function(prop) {
+      var body = document.getElementById('dossier-body');
+      if (!body || !prop) return;
+      var q = prop.apn ? 'apn=' + encodeURIComponent(prop.apn)
+            : (prop.center ? 'lat=' + prop.center[0] + '&lon=' + prop.center[1] : null);
+      if (!q) { body.innerHTML = '<div class="ds-wait">No parcel reference for this property yet.</div>'; return; }
+      fetch('/api/dossier?' + q)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (!document.getElementById('dossier-body')) return;
+          if (d.error) throw new Error(d.error);
+          document.getElementById('dossier-body').innerHTML = window.dossierHTML(d);
+        })
+        .catch(function(e) {
+          var b = document.getElementById('dossier-body');
+          if (b) b.innerHTML = '<div class="ds-wait">Could not reach the county records right now. ' + dsEsc(e.message || '') + '</div>';
+        });
+    };
     window.docsSectionHTML = function(prop) {
       if (!prop.docs || !prop.docs.length) return '';
       var h = '<div class="docs-section"><h4>📄 Documents &amp; Proposals</h4><p class="section-sub">Full write-ups and supporting materials — open any of these for the complete picture.</p>';
@@ -7652,6 +7761,391 @@ function parseBudget(budgetStr) {
 }
 
 // API endpoint for project zones data
+// ============================================================================
+//  COUNTY DOSSIER RESOLVER  (V0.22)
+//  Given an APN or a point, pull everything the public record holds about a
+//  parcel and normalise it into one shape. Resolve on demand, cache the result
+//  - never bulk-copy the county.
+// ============================================================================
+const VC_AGS = 'https://maps.ventura.org/arcgis/rest/services/';
+const RECORDMAP_BASE = 'https://maps.ventura.org/recordmaps/';
+const DOSSIER_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+const dossierCache = new Map();
+
+function agsForm(params) {
+  const b = new URLSearchParams();
+  Object.keys(params).forEach((k) => { if (params[k] !== undefined && params[k] !== null) b.append(k, String(params[k])); });
+  return b;
+}
+
+async function agsPost(url, params, ms = 12000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: agsForm(params),
+      signal: ctl.signal,
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if (j.error) throw new Error(j.error.message || 'ags error');
+    return j;
+  } finally { clearTimeout(t); }
+}
+
+// one spatial query against an ArcGIS MapServer layer
+async function agsQuery(service, layer, geometry, opts = {}) {
+  const url = (opts.root || VC_AGS) + service + '/MapServer/' + layer + '/query';
+  const p = Object.assign({
+    where: opts.where || '1=1',
+    outFields: '*',
+    returnGeometry: opts.returnGeometry ? 'true' : 'false',
+    outSR: '4326',
+    f: 'json',
+    resultRecordCount: opts.limit || 40,
+  }, geometry || {});
+  if (opts.distance) { p.distance = opts.distance; p.units = 'esriSRUnit_Meter'; }
+  const j = await agsPost(url, p);
+  return (j.features || []);
+}
+
+const ptGeom = (lon, lat) => ({
+  geometry: lon + ',' + lat, geometryType: 'esriGeometryPoint',
+  inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
+});
+const envGeom = (b) => ({
+  geometry: [b.xmin, b.ymin, b.xmax, b.ymax].join(','), geometryType: 'esriGeometryEnvelope',
+  inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
+});
+const polyGeom = (rings) => ({
+  geometry: JSON.stringify({ rings: rings, spatialReference: { wkid: 4326 } }),
+  geometryType: 'esriGeometryPolygon', inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
+});
+
+const money = (v) => (v === null || v === undefined || v === '' ? null : '$' + Number(v).toLocaleString('en-US'));
+const clean = (s) => (typeof s === 'string' ? s.replace(/\s+/g, ' ').trim() : s);
+const titleish = (s) => (typeof s === 'string' ? s.charAt(0) + s.slice(1).toLowerCase() : s);
+
+// California Wildlife Habitat Relationships codes that actually occur around Ojai
+const WHR = {
+  COW: 'Coastal Oak Woodland', BOW: 'Blue Oak Woodland', VOW: 'Valley Oak Woodland',
+  MHC: 'Mixed Chaparral', CRC: 'Chamise-Redshank Chaparral', CSC: 'Coastal Scrub',
+  ASP: 'Aspen', MHW: 'Montane Hardwood', MHF: 'Montane Hardwood-Conifer',
+  AGS: 'Annual Grassland', PGS: 'Perennial Grassland', VRI: 'Valley Foothill Riparian',
+  MRI: 'Montane Riparian', URB: 'Urban', AGR: 'Agriculture', BAR: 'Barren',
+};
+
+// Declarative source table - each entry contributes rows to one dossier section.
+// `hit` formats a found feature; `miss` states the (useful) fact that nothing was found.
+const DOSSIER_SOURCES = [
+  { sec: 'landuse', svc: 'SDs/MyZoning', layer: 0,
+    hit: (a) => [['Zoning', a.ZONE], ['Base zone', a.DEFINITION]] },
+  { sec: 'landuse', svc: 'DataDownloads/LandUse', layer: 1,
+    hit: (a) => [['General Plan', a.genplandes], ['2040 General Plan', a.f2040gp]] },
+  { sec: 'landuse', svc: 'DataDownloads/LandUse', layer: 0,
+    hit: (a) => [['Area plan', a.name], ['Land use designation', clean(a.designat_2) || a.designatio]] },
+
+  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 6,
+    hit: (a) => [['Fire hazard severity', a.HAZ_CLASS + (a.SRA ? ' · State Responsibility Area' : '')]],
+    miss: () => [['Fire hazard severity', 'Not in a mapped severity zone']] },
+  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 0,
+    hit: (a) => [['FEMA flood zone', 'Zone ' + a.FLD_ZONE + ' — ' + clean(a.FLOODHAZ)]],
+    miss: () => [['FEMA flood zone', 'Outside the mapped 100-year floodplain']] },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 6,
+    hit: (a) => [['Earthquake Fault Zone', 'Inside a state Alquist-Priolo special study zone — a fault investigation is required before building']],
+    miss: () => [['Earthquake Fault Zone', 'Not in an Alquist-Priolo zone']] },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 5,
+    hit: () => [['Liquefaction', 'Inside a mapped liquefaction zone']],
+    miss: () => [['Liquefaction', 'Not in a mapped liquefaction zone']] },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 4,
+    hit: () => [['Mapped landslide', 'A mapped landslide touches this parcel']],
+    miss: () => [['Mapped landslide', 'None mapped on the parcel']] },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 3,
+    hit: () => [['Earthquake-induced landslide', 'Inside a potential earthquake-induced landslide zone']],
+    miss: () => [['Earthquake-induced landslide', 'Not in a mapped zone']] },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 2,
+    hit: (a) => (a.venturapga == null ? [] : [['Ground shaking', (a.venturapga / 1000).toFixed(2) + ' g peak acceleration · county model value ' + a.venturapga]]) },
+  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 7,
+    hit: () => [['Subsidence', 'Inside a mapped subsidence zone']] },
+
+  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 3,
+    hit: (a) => {
+      const r = [['Soil map unit', clean(a.muname)]];
+      if (a.musym) r.push(['Soil symbol', a.musym + (a.mukey ? ' · mukey ' + a.mukey : '')]);
+      if (a.slopegradw != null) r.push(['Representative slope', a.slopegradw + '%']);
+      if (a.flodfreqdc) r.push(['Flooding frequency', a.flodfreqdc]);
+      if (a.pondfreqpr) r.push(['Ponding frequency', a.pondfreqpr]);
+      if (a.brockdepmi) r.push(['Depth to bedrock', a.brockdepmi + ' cm']);
+      if (a.aws050wta != null) r.push(['Available water, top 50 cm', a.aws050wta + ' cm']);
+      return r;
+    } },
+  { sec: 'ground', svc: 'DataDownloads/Hazards', layer: 1,
+    hit: (a) => [['Expansive soils', titleish(a.name)]] },
+  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 2,
+    hit: (a) => {
+      const t = WHR[a.whrtype] || a.whrtype;
+      if (!t) return [];
+      const bits = [t];
+      if (a.whr_range) bits.push(a.whr_range + '% canopy cover');
+      return [['Habitat type', bits.join(' · ')]];
+    } },
+  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 0,
+    hit: (a) => [['Farmland classification', clean(a.type_2)]] },
+  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 1,
+    hit: () => [['Habitat connectivity', 'Inside a mapped habitat connectivity area']] },
+
+  { sec: 'water', svc: 'SDs/Groundwater', layer: 0,
+    hit: (a) => [['Groundwater basin', clean(a.BASIN_NAME) + ' · DWR basin ' + a.BASIN_NUMB]],
+    miss: () => [['Groundwater basin', 'Outside a DWR-defined groundwater basin']] },
+  { sec: 'water', svc: 'SDs/Groundwater', layer: 1,
+    hit: (a) => [['Sustainability agency', clean(a.GSA_Name || a.AGENCYNAME || a.NAME || 'mapped GSA')]] },
+  { sec: 'water', svc: 'SDs/Watershed', layer: 0,
+    hit: (a) => [['Watershed', clean(a.NAME || a.WATERSHED || a.Name)]] },
+
+  { sec: 'permits', svc: 'DataDownloads/Permitting', layer: 1, dist: 1600,
+    hit: (a, n) => [['Mining permits within 1 mile', String(n)]] },
+  { sec: 'permits', svc: 'DataDownloads/Permitting', layer: 2, dist: 1600,
+    hit: (a, n) => [['Oil permits within 1 mile', String(n)]] },
+  { sec: 'permits', svc: 'DataDownloads/Permitting', layer: 0, dist: 3200,
+    hit: (a, n) => [['Communication facilities within 2 miles', String(n)]] },
+];
+
+const SECTION_META = [
+  ['identity',   'Identity & location'],
+  ['valuation',  'Valuation & transfer'],
+  ['landuse',    'Land use & entitlement'],
+  ['hazards',    'Hazards'],
+  ['ground',     'Ground, soil & habitat'],
+  ['water',      'Water'],
+  ['structures', 'Structures on record'],
+  ['permits',    'Nearby permits'],
+  ['records',    'Recorded maps'],
+];
+
+async function sampleElevation(bbox) {
+  const url = 'https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/identify';
+  const pts = [];
+  for (let i = 0; i <= 2; i++) {
+    for (let k = 0; k <= 2; k++) {
+      pts.push([bbox.xmin + (bbox.xmax - bbox.xmin) * (i / 2), bbox.ymin + (bbox.ymax - bbox.ymin) * (k / 2)]);
+    }
+  }
+  const vals = await Promise.all(pts.map(async (p) => {
+    try {
+      const j = await agsPost(url, {
+        geometry: JSON.stringify({ x: p[0], y: p[1], spatialReference: { wkid: 4326 } }),
+        geometryType: 'esriGeometryPoint', returnGeometry: 'false', f: 'json',
+      }, 9000);
+      const v = parseFloat(j.value);
+      return isFinite(v) ? v : null;
+    } catch (e) { return null; }
+  }));
+  const ok = vals.filter((v) => v !== null);
+  if (ok.length < 3) return null;
+  const lo = Math.min.apply(null, ok), hi = Math.max.apply(null, ok);
+  const m2ft = (m) => Math.round(m * 3.28084);
+  return { lowFt: m2ft(lo), highFt: m2ft(hi), reliefFt: m2ft(hi - lo), samples: ok.length };
+}
+
+async function resolveDossier(q) {
+  // --- 1. anchor on the parcel -------------------------------------------
+  let parcel = null;
+  if (q.apn) {
+    const apn10 = String(q.apn).replace(/[^0-9]/g, '');
+    const rows = await agsQuery('SDs/Parcels', 0, null, {
+      where: "APN10='" + apn10 + "'", returnGeometry: true, limit: 1,
+    });
+    parcel = rows[0];
+  }
+  if (!parcel && q.lat != null && q.lon != null) {
+    const rows = await agsQuery('SDs/Parcels', 0, ptGeom(q.lon, q.lat), { returnGeometry: true, limit: 1 });
+    parcel = rows[0];
+  }
+  if (!parcel) { const e = new Error('No parcel found'); e.status = 404; throw e; }
+
+  const a = parcel.attributes;
+  const rings = (parcel.geometry && parcel.geometry.rings) || null;
+  let bbox = null, cx = q.lon, cy = q.lat;
+  if (rings) {
+    let xmin = 1e9, ymin = 1e9, xmax = -1e9, ymax = -1e9;
+    rings.forEach((r) => r.forEach((p) => {
+      if (p[0] < xmin) xmin = p[0]; if (p[0] > xmax) xmax = p[0];
+      if (p[1] < ymin) ymin = p[1]; if (p[1] > ymax) ymax = p[1];
+    }));
+    bbox = { xmin, ymin, xmax, ymax };
+    cx = (xmin + xmax) / 2; cy = (ymin + ymax) / 2;
+  }
+  const point = ptGeom(cx, cy);
+  const buckets = {}; SECTION_META.forEach(([id]) => { buckets[id] = []; });
+
+  // --- 2. identity + valuation from the assessor record -------------------
+  const apnPretty = a.APN10 ? a.APN10.replace(/^(\d{3})(\d)(\d{3})(\d{3})$/, '$1-$2-$3-$4') : (a.APN || '');
+  buckets.identity.push(['APN', apnPretty]);
+  if (a.APN10) buckets.identity.push(['APN (unformatted)', a.APN10]);
+  if (a.SITUS) buckets.identity.push(['Situs address', clean(a.SITUS)]);
+  if (a.BOOK) buckets.identity.push(['Book · page · block · parcel', [a.BOOK, a.PAGE, a.BLOCK, a.PARCEL].filter(Boolean).join(' · ')]);
+  if (a.ACREAGE) buckets.identity.push(['Acreage', parseFloat(a.ACREAGE).toFixed(2) + ' ac']);
+  if (a['SHAPE.AREA']) buckets.identity.push(['Parcel area', Math.round(a['SHAPE.AREA']).toLocaleString('en-US') + ' sq ft']);
+  if (a['SHAPE.LEN']) buckets.identity.push(['Perimeter', Math.round(a['SHAPE.LEN']).toLocaleString('en-US') + ' ft']);
+  if (a.TRA) buckets.identity.push(['Tax rate area', a.TRA]);
+  if (a.TRACT) buckets.identity.push(['Tract', clean(a.TRACT)]);
+
+  const lv = a.L_V ? Number(a.L_V) : null, iv = a.I_V ? Number(a.I_V) : null;
+  if (lv) buckets.valuation.push(['Assessed land value', money(lv)]);
+  if (iv !== null) buckets.valuation.push(['Assessed improvement value', money(iv)]);
+  if (lv) buckets.valuation.push(['Total assessed value', money((lv || 0) + (iv || 0))]);
+  if (lv && a.ACREAGE && parseFloat(a.ACREAGE) > 0) {
+    buckets.valuation.push(['Assessed land per acre', money(Math.round(lv / parseFloat(a.ACREAGE)))]);
+  }
+  if (a.SQ_FT_I) buckets.valuation.push(['Improved floor area on record', Number(a.SQ_FT_I).toLocaleString('en-US') + ' sq ft']);
+  if (a.DOC_NR) buckets.valuation.push(['Last recorded document', a.DOC_NR + (a.DOC_TYPE ? ' · type ' + a.DOC_TYPE : '')]);
+  if (a.DOC_DT && /^\d{8}$/.test(a.DOC_DT)) {
+    const d = a.DOC_DT;
+    buckets.valuation.push(['Document date', new Date(d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6, 8) + 'T12:00:00Z')
+      .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })]);
+  }
+  if (a.CL) buckets.valuation.push(['Assessor class code', a.CL + (a.QC ? ' · qual ' + a.QC : '')]);
+
+  // --- 3. fan out ---------------------------------------------------------
+  const jobs = DOSSIER_SOURCES.map(async (s) => {
+    try {
+      const g = s.dist ? Object.assign({}, point, { distance: s.dist, units: 'esriSRUnit_Meter' }) : point;
+      const fs = await agsQuery(s.svc, s.layer, g, { limit: s.dist ? 60 : 4 });
+      const rows = fs.length ? (s.hit(fs[0].attributes, fs.length) || []) : (s.miss ? s.miss() || [] : []);
+      rows.forEach((r) => { if (r && r[1] !== null && r[1] !== undefined && r[1] !== '') buckets[s.sec].push(r); });
+      return 1;
+    } catch (e) { return 0; }
+  });
+
+  // structures actually inside the parcel polygon
+  jobs.push((async () => {
+    try {
+      if (!rings) return 0;
+      const fs = await agsQuery('DataDownloads/CommonData', 0, polyGeom(rings), { limit: 40 });
+      if (!fs.length) {
+        buckets.structures.push(['Buildings mapped by the county', 'None']);
+        return 1;
+      }
+      buckets.structures.push(['Buildings mapped by the county', String(fs.length)]);
+      const uses = {};
+      fs.forEach((f) => {
+        const at = f.attributes;
+        const u = clean(at.USE_ || at.use || at.BLDG_USE || at.DESCRIPT || at.descript || 'unclassified');
+        uses[u] = (uses[u] || 0) + 1;
+      });
+      Object.keys(uses).forEach((u) => buckets.structures.push(['— ' + titleish(u), uses[u] + (uses[u] > 1 ? ' structures' : ' structure')]));
+      const hs = fs.map((f) => f.attributes.HEIGHT || f.attributes.height).filter((h) => h != null && h > 0);
+      if (hs.length) buckets.structures.push(['Tallest mapped structure', Math.max.apply(null, hs) + ' ft']);
+      return 1;
+    } catch (e) { return 0; }
+  })());
+
+  // recorded maps - the chain of prior surveys, with links to the scans
+  const records = [];
+  jobs.push((async () => {
+    try {
+      if (!bbox) return 0;
+      const fs = await agsQuery('DataDownloads/Survey', 4, envGeom(bbox), { limit: 60 });
+      const seen = {};
+      fs.forEach((f) => {
+        const at = f.attributes;
+        if (!at.recordlabel || seen[at.recordlabel]) return;
+        seen[at.recordlabel] = 1;
+        records.push({
+          label: at.recordlabel,
+          type: at.documenttype,
+          year: at.year ? String(Math.round(at.year)) : null,
+          surveyor: clean(at.surveyor) || null,
+          note: clean(at.description) || (clean(at.recordmap) && clean(at.recordmap) !== 'PM UA' ? clean(at.recordmap) : null),
+          pages: at.numberpages ? Math.round(at.numberpages) : null,
+          url: at.documentlink ? RECORDMAP_BASE + at.documentlink : null,
+        });
+      });
+      records.sort((x, y) => (Number(y.year || 0) - Number(x.year || 0)));
+      return 1;
+    } catch (e) { return 0; }
+  })());
+
+  // elevation profile across the parcel
+  let elev = null;
+  jobs.push((async () => {
+    try { if (bbox) elev = await sampleElevation(bbox); return 1; } catch (e) { return 0; }
+  })());
+
+  const done = await Promise.all(jobs);
+
+  if (elev) {
+    buckets.ground.unshift(['Elevation range', elev.lowFt.toLocaleString('en-US') + '–' + elev.highFt.toLocaleString('en-US') + ' ft'],
+      ['Relief across the parcel', elev.reliefFt + ' ft']);
+  }
+
+  // --- 4. flags - the things a buyer or a lender would want surfaced ------
+  const flags = [];
+  const flat = [].concat.apply([], SECTION_META.map(([id]) => buckets[id]));
+  const findRow = (k) => { const r = flat.find((x) => x[0] === k); return r ? String(r[1]) : ''; };
+  if (/very high|high/i.test(findRow('Fire hazard severity'))) {
+    flags.push({ level: 'watch', text: findRow('Fire hazard severity') + ' fire severity — expect defensible-space and ignition-resistant construction requirements, and check insurability early.' });
+  }
+  if (/^Zone /.test(findRow('FEMA flood zone'))) {
+    flags.push({ level: 'watch', text: findRow('FEMA flood zone') + ' — flood insurance is normally required by a lender, and habitable floors must sit above the base flood elevation.' });
+  }
+  if (/Inside a state Alquist/.test(findRow('Earthquake Fault Zone'))) {
+    flags.push({ level: 'watch', text: 'Alquist-Priolo zone — a fault investigation by a licensed geologist is required before a building permit.' });
+  }
+  if (a.SQ_FT_I && Number(a.SQ_FT_I) > 0 && /None/.test(findRow('Buildings mapped by the county'))) {
+    flags.push({ level: 'note', text: 'The assessor records ' + Number(a.SQ_FT_I).toLocaleString('en-US') + ' sq ft of improvement, but the county maps no building footprint here. Worth reconciling before a lender does.' });
+  }
+  if (records.length) {
+    flags.push({ level: 'good', text: records.length + ' recorded maps cover this parcel, back to ' + (records[records.length - 1].year || 'the earliest on file') + '. Each one is a downloadable scan.' });
+  }
+
+  const sections = SECTION_META
+    .map(([id, label]) => ({ id, label, rows: buckets[id] }))
+    .filter((s) => s.rows.length);
+
+  return {
+    apn: apnPretty,
+    apn10: a.APN10 || null,
+    situs: clean(a.SITUS) || null,
+    acreage: a.ACREAGE ? parseFloat(a.ACREAGE) : null,
+    center: [cy, cx],
+    bbox: bbox,
+    flags: flags,
+    sections: sections,
+    records: records,
+    sourcesQueried: done.length,
+    sourcesAnswered: done.reduce((n, v) => n + v, 0),
+    resolvedAt: new Date().toISOString(),
+  };
+}
+
+app.get('/api/dossier', async (req, res) => {
+  const apn = req.query.apn ? String(req.query.apn) : null;
+  const lat = req.query.lat != null ? parseFloat(req.query.lat) : null;
+  const lon = req.query.lon != null ? parseFloat(req.query.lon) : null;
+  if (!apn && (lat === null || lon === null || !isFinite(lat) || !isFinite(lon))) {
+    return res.status(400).json({ error: 'Pass either apn, or lat and lon.' });
+  }
+  const key = apn ? 'apn:' + String(apn).replace(/[^0-9]/g, '') : 'pt:' + lat.toFixed(5) + ',' + lon.toFixed(5);
+  const fresh = req.query.refresh === '1';
+  const hit = dossierCache.get(key);
+  if (hit && !fresh && Date.now() - hit.ts < DOSSIER_TTL_MS) {
+    res.set('Cache-Control', 'public, max-age=86400');
+    return res.json(Object.assign({ cached: true }, hit.data));
+  }
+  try {
+    const data = await resolveDossier({ apn, lat, lon });
+    dossierCache.set(key, { ts: Date.now(), data });
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.json(Object.assign({ cached: false }, data));
+  } catch (e) {
+    console.error('dossier:', e.message);
+    res.status(e.status || 502).json({ error: e.message || 'Could not resolve this parcel.' });
+  }
+});
+
 app.get('/api/project-zones', (req, res) => {
   try {
     const totalInvestment = PROJECT_ZONES.reduce((sum, zone) => {
