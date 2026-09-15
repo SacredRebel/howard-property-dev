@@ -1,0 +1,244 @@
+{
+ "source": "Henry Land Surveying Inc., Jeremy Henry PLS 8135",
+ "dateOfSurvey": "2024-11-14",
+ "horizontalDatum": "NAD 83, California State Plane Zone 5, US survey feet",
+ "verticalDatum": "NAVD 88",
+ "contourInterval": "1 ft",
+ "legalDescription": "Parcel 2, per map filed June 15, 1973 in Book 14, Page 15 of Parcel Maps, Ventura County Recorder",
+ "recordMap": "14-PM-15",
+ "recordMapUrl": "https://maps.ventura.org/recordmaps/pm/014/014pm015.pdf",
+ "countyApproval": "County of Ventura RMA, Building and Safety Division \u2014 Travis Volaski PE, 2026-01-30",
+ "areaAcres": 9.465,
+ "perimeterFt": 2999,
+ "closureFt": 0.007,
+ "placement": "Traverse anchored to the county parcel fabric on the Sulphur Mountain Rd frontage (agreement there under 1 ft); the county fabric drifts up to 29 ft west of the record line along the west side.",
+ "corners": [
+  {
+   "name": "NE corner (found iron pipe)",
+   "latlng": [
+    34.4335522,
+    -119.1548396
+   ]
+  },
+  {
+   "name": "NW corner (found iron pipe)",
+   "latlng": [
+    34.4335632,
+    -119.1569291
+   ]
+  },
+  {
+   "name": "W line / panhandle top",
+   "latlng": [
+    34.4325257,
+    -119.1569371
+   ]
+  },
+  {
+   "name": "panhandle tip N (found iron pipe)",
+   "latlng": [
+    34.4323837,
+    -119.1578497
+   ]
+  },
+  {
+   "name": "panhandle tip S",
+   "latlng": [
+    34.4322793,
+    -119.1578505
+   ]
+  },
+  {
+   "name": "W line / panhandle bottom",
+   "latlng": [
+    34.432141,
+    -119.15694
+   ]
+  },
+  {
+   "name": "SW corner",
+   "latlng": [
+    34.4317976,
+    -119.1569426
+   ]
+  },
+  {
+   "name": "SE corner",
+   "latlng": [
+    34.4317873,
+    -119.1549996
+   ]
+  },
+  {
+   "name": "notch, lower inner",
+   "latlng": [
+    34.4326631,
+    -119.1549928
+   ]
+  },
+  {
+   "name": "notch, upper inner",
+   "latlng": [
+    34.4328552,
+    -119.1549783
+   ]
+  },
+  {
+   "name": "notch, outer",
+   "latlng": [
+    34.4328545,
+    -119.154845
+   ]
+  }
+ ],
+ "calls": [
+  {
+   "from": "NE corner (found iron pipe)",
+   "to": "NW corner (found iron pipe)",
+   "bearing": "N90\u00b000'00 W\"",
+   "distance_ft": 630.04
+  },
+  {
+   "from": "NW corner (found iron pipe)",
+   "to": "W line / panhandle top",
+   "bearing": "N00\u00b000'00 E\"",
+   "distance_ft": 377.58
+  },
+  {
+   "from": "W line / panhandle top",
+   "to": "panhandle tip N (found iron pipe)",
+   "bearing": "N79\u00b000'00 E\"",
+   "distance_ft": 280.0
+  },
+  {
+   "from": "panhandle tip N (found iron pipe)",
+   "to": "panhandle tip S",
+   "bearing": "N00\u00b000'00 E\"",
+   "distance_ft": 38.0
+  },
+  {
+   "from": "panhandle tip S",
+   "to": "W line / panhandle bottom",
+   "bearing": "N79\u00b058'41 W\"",
+   "distance_ft": 279.12
+  },
+  {
+   "from": "W line / panhandle bottom",
+   "to": "SW corner",
+   "bearing": "N00\u00b000'00 E\"",
+   "distance_ft": 125.0
+  },
+  {
+   "from": "SW corner",
+   "to": "SE corner",
+   "bearing": "N90\u00b000'00 E\"",
+   "distance_ft": 585.92
+  },
+  {
+   "from": "SE corner",
+   "to": "notch, lower inner",
+   "bearing": "N00\u00b000'00 E\"",
+   "distance_ft": 318.72
+  },
+  {
+   "from": "notch, lower inner",
+   "to": "notch, upper inner",
+   "bearing": "N03\u00b013'00 E\"",
+   "distance_ft": 70.06
+  },
+  {
+   "from": "notch, upper inner",
+   "to": "notch, outer",
+   "bearing": "N90\u00b000'00 E\"",
+   "distance_ft": 40.19
+  },
+  {
+   "from": "notch, outer",
+   "to": "NE corner (found iron pipe)",
+   "bearing": "N00\u00b000'00 E\"",
+   "distance_ft": 253.91
+  }
+ ],
+ "easement16": [
+  [
+   [
+    34.4324054,
+    -119.1578545
+   ],
+   [
+    34.4325474,
+    -119.1569419
+   ],
+   [
+    34.4325041,
+    -119.1569321
+   ],
+   [
+    34.4323621,
+    -119.1578447
+   ]
+  ],
+  [
+   [
+    34.4325259,
+    -119.1569635
+   ],
+   [
+    34.4335634,
+    -119.1569556
+   ],
+   [
+    34.4335631,
+    -119.1569025
+   ],
+   [
+    34.4325256,
+    -119.1569105
+   ]
+  ]
+ ],
+ "monuments": [
+  {
+   "at": [
+    34.4335522,
+    -119.1548396
+   ],
+   "label": "Found iron pipe, 0.75 ft from corner"
+  },
+  {
+   "at": [
+    34.4335633,
+    -119.156929
+   ],
+   "label": "Found iron pipe, 3.72 ft from corner"
+  },
+  {
+   "at": [
+    34.4333737,
+    -119.1569305
+   ],
+   "label": "Found lead & tack in concrete footing"
+  },
+  {
+   "at": [
+    34.4323838,
+    -119.1578496
+   ],
+   "label": "Found iron pipe (panhandle tip)"
+  }
+ ],
+ "overlay": {
+  "file": "images/sulphur-mountain/survey/topo-survey-overlay.png",
+  "bounds": [
+   [
+    34.431599606560226,
+    -119.15829520556211
+   ],
+   [
+    34.433689309352765,
+    -119.15460387385882
+   ]
+  ],
+  "registration": "perspective fit on the four surveyed corners; held-out notch corners land within 0.3 m"
+ }
+}
