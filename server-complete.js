@@ -2858,6 +2858,8 @@ app.get('/', (req, res) => {
     .doc-link:last-child { margin-bottom: 0; }
     .doc-link:hover { background: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44, 110, 158, 0.22); }
     .doc-dl { font-size: 12.5px; font-weight: 700; color: #2c6e9e; white-space: nowrap; background: rgba(44, 110, 158, 0.14); padding: 5px 11px; border-radius: 999px; }
+    .vc-survey-tip { background: rgba(14, 18, 26, 0.94); color: #dff7ff; border: 1px solid rgba(127, 240, 255, 0.45); border-radius: 8px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.2px; padding: 5px 9px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+    .vc-survey-tip::before { border-top-color: rgba(14, 18, 26, 0.94); }
     .dossier-section { margin: 22px 0 6px; padding: 20px 22px; border-radius: 18px; background: linear-gradient(160deg, rgba(193, 144, 74, 0.11), rgba(193, 144, 74, 0.03)); border: 1px solid rgba(193, 144, 74, 0.30); box-shadow: 0 4px 18px rgba(31, 28, 46, 0.06); }
     .dossier-section h4 { margin: 0 0 4px; font-size: 17px; font-weight: 700; color: #8a6423; letter-spacing: 0.2px; }
     .dossier-section .section-sub { margin: 0 0 14px; font-size: 13.5px; color: #6c7a86; font-weight: 500; }
@@ -3255,7 +3257,7 @@ app.get('/', (req, res) => {
 
     var VC_OVERLAYS = [
       { id: 'topo',    label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92 },
-      { id: 'survey',  label: '📐 Survey sheet — Sulphur Mtn', note: 'the recorded topo survey traced onto the map — structures, easement, fencelines, poles', kind: 'image', url: '/images/sulphur-mountain/survey/topo-survey-overlay.png', bounds: [[34.4316390, -119.1581234], [34.4336947, -119.1546317]], op: 0.88, z: 360 },
+      { id: 'survey',  label: '📐 Survey sheet — Sulphur Mtn', note: 'Henry Land Surveying, Nov 2024 · 1 ft contours, structures, fences, poles · the surveyed boundary with every bearing, the 16 ft easement and the found monuments', kind: 'image', url: '/images/sulphur-mountain/survey/topo-survey-overlay.png', bounds: [[34.4315996, -119.1582952], [34.4336893, -119.1546039]], vector: '/api/survey/sulphur-mountain', op: 0.88, z: 360 },
       { id: 'bldg',    label: '🏚️ Building footprints', note: 'every structure standing today, mapped by the county', svc: 'DataDownloads/CommonData', showLayers: '0', op: 0.95 },
       { id: 'parcels', label: '▦ Parcel lines',       note: 'official assessor boundaries', svc: 'SDs/Parcels', op: 0.95 },
       { id: 'apn',     label: '# APN + acreage labels', note: '', svc: 'SDs/ParcelLabels', showLayers: '0,2', op: 0.95 },
@@ -3281,17 +3283,48 @@ app.get('/', (req, res) => {
       }
       return vcBaseCache[def.id];
     }
+    // the surveyed boundary as drawn on the sheet: one segment per call so each carries its bearing
+    // and distance, the 16 ft access easement, and the monuments the surveyor actually found
+    function vcSurveyVectors(def, group) {
+      if (def._vecLoaded) return;
+      def._vecLoaded = true;
+      fetch(def.vector).then(function (r) { return r.json(); }).then(function (s) {
+        def._vec = s;
+        var ring = (s.corners || []).map(function (c) { return c.latlng; });
+        for (var i = 0; i < ring.length; i++) {
+          var call = (s.calls || [])[i];
+          L.polyline([ring[i], ring[(i + 1) % ring.length]], { color: '#7ff0ff', weight: 3, opacity: 0.95, dashArray: '10 7', lineCap: 'butt' })
+            .bindTooltip(call ? (call.bearing + ' · ' + Number(call.distance_ft).toFixed(2) + ' ft') : 'surveyed line', { sticky: true, className: 'vc-survey-tip' })
+            .addTo(group);
+        }
+        (s.easement16 || []).forEach(function (poly) {
+          L.polygon(poly, { color: '#ffc24d', weight: 1, opacity: 0.9, fillColor: '#ffc24d', fillOpacity: 0.28 })
+            .bindTooltip('16 ft access easement — as drawn on the survey', { sticky: true, className: 'vc-survey-tip' })
+            .addTo(group);
+        });
+        (s.monuments || []).forEach(function (mo) {
+          L.circleMarker(mo.at, { radius: 5, color: '#ffffff', weight: 2, fillColor: '#7ff0ff', fillOpacity: 1 })
+            .bindTooltip(mo.label, { className: 'vc-survey-tip' })
+            .addTo(group);
+        });
+        if (window.vcSync3DLayers) window.vcSync3DLayers();
+      }).catch(function (e) { console.warn('survey vectors:', e); });
+    }
     function vcOverlayLayer(def) {
       if (!vcOverlayCache[def.id]) {
         if (def.kind === 'image') {
-          vcOverlayCache[def.id] = L.imageOverlay(def.url, def.bounds, {
+          var scan = L.imageOverlay(def.url, def.bounds, {
             opacity: def.op || 0.9,
             pane: 'vcOverlayPane',
             interactive: false,
             className: 'vc-scan',
+            zIndex: def.z || 340,
             alt: 'Recorded topographic survey traced onto the map'
           });
-          return vcOverlayCache[def.id];
+          var grp = L.layerGroup([scan]);
+          if (def.vector) vcSurveyVectors(def, grp);
+          vcOverlayCache[def.id] = grp;
+          return grp;
         }
         vcOverlayCache[def.id] = vcTrackLoading(vcExport(def.svc, {
           fmt: 'png32', transparent: true, px: 512,
@@ -3373,7 +3406,7 @@ app.get('/', (req, res) => {
         + '<div class="lp-lg"><i style="background:#4a9d5f"></i>Habitat, wildlife corridor and dark-sky overlays — these carry real design conditions</div>'
         + '<div class="lp-lg"><i style="background:#3d7fd1"></i>Creek, floodplain and drainage</div>'
         + '<div class="lp-lg"><i style="background:#d98324"></i>CalFire state responsibility area</div>'
-        + '<div class="lp-lg"><i style="background:#2a2054"></i>Recorded survey sheet, traced and fitted — sits within about 3–7 m of true. Fine for siting and design, not for staking a line.</div>'
+        + '<div class="lp-lg"><i style="background:#7ff0ff;border:1px solid #2a2054"></i>The survey sheet, registered to its own surveyed corners (within about 0.3 m on the parcel body). Hover the dashed boundary for each bearing and distance; amber is the 16 ft access easement; white dots are the monuments the surveyor found.</div>'
         + '<div class="lp-lg lp-lg-tip">⛰️ With contours on, click anywhere on the land to read its real elevation.</div>'
         + '</div>';
       h += '<div class="lp-group">Base imagery</div>';
@@ -7008,8 +7041,8 @@ app.get('/', (req, res) => {
         var own = ['vc-base'];
         for (var k = 0; k < VC_OVERLAYS.length; k++) own.push('vc-ov-' + VC_OVERLAYS[k].id);
         own.forEach(function (id) {
-          if (m.getLayer(id)) m.removeLayer(id);
-          if (m.getSource(id)) m.removeSource(id);
+          [id, id + '-line', id + '-ease'].forEach(function (l) { if (m.getLayer(l)) m.removeLayer(l); });
+          [id, id + '-vec'].forEach(function (src) { if (m.getSource(src)) m.removeSource(src); });
         });
         // sit above the built-in satellite but under boundaries, lots and markers
         var before = null, ls = (m.getStyle().layers || []);
@@ -7032,6 +7065,18 @@ app.get('/', (req, res) => {
             m.addSource(sid, { type: 'image', url: d.url, coordinates: [
               [bb[0][1], bb[1][0]], [bb[1][1], bb[1][0]], [bb[1][1], bb[0][0]], [bb[0][1], bb[0][0]]
             ] });
+            if (d._vec) {
+              var ring3 = (d._vec.corners || []).map(function (c) { return [c.latlng[1], c.latlng[0]]; });
+              if (ring3.length) ring3.push(ring3[0]);
+              var feats = [{ type: 'Feature', properties: { k: 'line' }, geometry: { type: 'LineString', coordinates: ring3 } }];
+              (d._vec.easement16 || []).forEach(function (p) {
+                var r = p.map(function (q) { return [q[1], q[0]]; }); r.push(r[0]);
+                feats.push({ type: 'Feature', properties: { k: 'ease' }, geometry: { type: 'Polygon', coordinates: [r] } });
+              });
+              m.addSource(sid + '-vec', { type: 'geojson', data: { type: 'FeatureCollection', features: feats } });
+              m.addLayer({ id: sid + '-ease', type: 'fill', source: sid + '-vec', filter: ['==', 'k', 'ease'], paint: { 'fill-color': '#ffc24d', 'fill-opacity': 0.3 } }, before);
+              m.addLayer({ id: sid + '-line', type: 'line', source: sid + '-vec', filter: ['==', 'k', 'line'], paint: { 'line-color': '#7ff0ff', 'line-width': 2.5, 'line-dasharray': [3, 2] } }, before);
+            }
           } else {
             m.addSource(sid, vc3dSource(d, true));
           }
@@ -8095,6 +8140,9 @@ async function resolveDossier(q) {
   if (/^Zone /.test(findRow('FEMA flood zone'))) {
     flags.push({ level: 'watch', text: findRow('FEMA flood zone') + ' — flood insurance is normally required by a lender, and habitable floors must sit above the base flood elevation.' });
   }
+  if (/touches/.test(findRow('Mapped landslide')) || /touches/.test(findRow('Earthquake-induced landslide'))) {
+    flags.push({ level: 'watch', text: 'Mapped landslide terrain on or touching the parcel \u2014 a geotechnical report will be part of any building permit; site the structure on the flat ground and keep the toe of the slope clear.' });
+  }
   if (/Inside a state Alquist/.test(findRow('Earthquake Fault Zone'))) {
     flags.push({ level: 'watch', text: 'Alquist-Priolo zone — a fault investigation by a licensed geologist is required before a building permit.' });
   }
@@ -8124,6 +8172,17 @@ async function resolveDossier(q) {
     resolvedAt: new Date().toISOString(),
   };
 }
+
+const SURVEY_FILES = { 'sulphur-mountain': 'sulphur-survey.json' };
+app.get('/api/survey/:propertyId', (req, res) => {
+  const f = SURVEY_FILES[req.params.propertyId];
+  if (!f) return res.status(404).json({ error: 'No survey data for this property.' });
+  try {
+    const body = readFileSync(join(__dirname, 'data', f), 'utf8');
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.type('application/json').send(body);
+  } catch (e) { res.status(500).json({ error: 'Survey data unavailable.' }); }
+});
 
 app.get('/api/dossier', async (req, res) => {
   const apn = req.query.apn ? String(req.query.apn) : null;

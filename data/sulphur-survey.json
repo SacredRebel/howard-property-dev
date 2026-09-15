@@ -95,67 +95,67 @@
   {
    "from": "NE corner (found iron pipe)",
    "to": "NW corner (found iron pipe)",
-   "bearing": "N90\u00b000'00 W\"",
+   "bearing": "N90\u00b000'00\"W",
    "distance_ft": 630.04
   },
   {
    "from": "NW corner (found iron pipe)",
    "to": "W line / panhandle top",
-   "bearing": "N00\u00b000'00 E\"",
+   "bearing": "N00\u00b000'00\"E",
    "distance_ft": 377.58
   },
   {
    "from": "W line / panhandle top",
    "to": "panhandle tip N (found iron pipe)",
-   "bearing": "N79\u00b000'00 E\"",
+   "bearing": "N79\u00b000'00\"E",
    "distance_ft": 280.0
   },
   {
    "from": "panhandle tip N (found iron pipe)",
    "to": "panhandle tip S",
-   "bearing": "N00\u00b000'00 E\"",
+   "bearing": "N00\u00b000'00\"E",
    "distance_ft": 38.0
   },
   {
    "from": "panhandle tip S",
    "to": "W line / panhandle bottom",
-   "bearing": "N79\u00b058'41 W\"",
+   "bearing": "N79\u00b058'41\"W",
    "distance_ft": 279.12
   },
   {
    "from": "W line / panhandle bottom",
    "to": "SW corner",
-   "bearing": "N00\u00b000'00 E\"",
+   "bearing": "N00\u00b000'00\"E",
    "distance_ft": 125.0
   },
   {
    "from": "SW corner",
    "to": "SE corner",
-   "bearing": "N90\u00b000'00 E\"",
+   "bearing": "N90\u00b000'00\"E",
    "distance_ft": 585.92
   },
   {
    "from": "SE corner",
    "to": "notch, lower inner",
-   "bearing": "N00\u00b000'00 E\"",
+   "bearing": "N00\u00b000'00\"E",
    "distance_ft": 318.72
   },
   {
    "from": "notch, lower inner",
    "to": "notch, upper inner",
-   "bearing": "N03\u00b013'00 E\"",
+   "bearing": "N03\u00b013'00\"E",
    "distance_ft": 70.06
   },
   {
    "from": "notch, upper inner",
    "to": "notch, outer",
-   "bearing": "N90\u00b000'00 E\"",
+   "bearing": "N90\u00b000'00\"E",
    "distance_ft": 40.19
   },
   {
    "from": "notch, outer",
    "to": "NE corner (found iron pipe)",
-   "bearing": "N00\u00b000'00 E\"",
+   "bearing": "N00\u00b000'00\"E",
    "distance_ft": 253.91
   }
  ],
