@@ -3220,6 +3220,7 @@ app.get('/', (req, res) => {
 
     var VC_OVERLAYS = [
       { id: 'topo',    label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92 },
+      { id: 'survey',  label: '📐 Survey sheet — Sulphur Mtn', note: 'the recorded topo survey traced onto the map — structures, easement, fencelines, poles', kind: 'image', url: '/images/sulphur-mountain/survey/topo-survey-overlay.png', bounds: [[34.4316390, -119.1581234], [34.4336947, -119.1546317]], op: 0.88, z: 360 },
       { id: 'bldg',    label: '🏚️ Building footprints', note: 'every structure standing today, mapped by the county', svc: 'DataDownloads/CommonData', showLayers: '0', op: 0.95 },
       { id: 'parcels', label: '▦ Parcel lines',       note: 'official assessor boundaries', svc: 'SDs/Parcels', op: 0.95 },
       { id: 'apn',     label: '# APN + acreage labels', note: '', svc: 'SDs/ParcelLabels', showLayers: '0,2', op: 0.95 },
@@ -3247,6 +3248,16 @@ app.get('/', (req, res) => {
     }
     function vcOverlayLayer(def) {
       if (!vcOverlayCache[def.id]) {
+        if (def.kind === 'image') {
+          vcOverlayCache[def.id] = L.imageOverlay(def.url, def.bounds, {
+            opacity: def.op || 0.9,
+            pane: 'vcOverlayPane',
+            interactive: false,
+            className: 'vc-scan',
+            alt: 'Recorded topographic survey traced onto the map'
+          });
+          return vcOverlayCache[def.id];
+        }
         vcOverlayCache[def.id] = vcTrackLoading(vcExport(def.svc, {
           fmt: 'png32', transparent: true, px: 512,
           showLayers: def.showLayers || null,
@@ -3289,7 +3300,13 @@ app.get('/', (req, res) => {
       } else {
         vcActiveOverlays[id] = true;
         lyr.addTo(map);
-        if (lyr.setZIndex) lyr.setZIndex(id === 'topo' ? 350 : 300);
+        if (lyr.setZIndex) lyr.setZIndex(def.z || (id === 'topo' ? 350 : 300));
+        if (def.bounds) {
+          try {
+            var bb = L.latLngBounds(def.bounds);
+            if (!map.getBounds().intersects(bb)) map.fitBounds(bb, { padding: [50, 50] });
+          } catch (e) {}
+        }
       }
       try { localStorage.setItem('ojaiMapOverlays', JSON.stringify(Object.keys(vcActiveOverlays))); } catch (e) {}
       vcSyncPanel();
@@ -3321,6 +3338,7 @@ app.get('/', (req, res) => {
         + '<div class="lp-lg"><i style="background:#4a9d5f"></i>Habitat, wildlife corridor and dark-sky overlays — these carry real design conditions</div>'
         + '<div class="lp-lg"><i style="background:#3d7fd1"></i>Creek, floodplain and drainage</div>'
         + '<div class="lp-lg"><i style="background:#d98324"></i>CalFire state responsibility area</div>'
+        + '<div class="lp-lg"><i style="background:#2a2054"></i>Recorded survey sheet, traced and fitted — sits within about 3–7 m of true. Fine for siting and design, not for staking a line.</div>'
         + '<div class="lp-lg lp-lg-tip">⛰️ With contours on, click anywhere on the land to read its real elevation.</div>'
         + '</div>';
       h += '<div class="lp-group">Base imagery</div>';
@@ -6972,7 +6990,14 @@ app.get('/', (req, res) => {
           var d = VC_OVERLAYS[j];
           if (!vcActiveOverlays[d.id]) continue;
           var sid = 'vc-ov-' + d.id;
-          m.addSource(sid, vc3dSource(d, true));
+          if (d.kind === 'image') {
+            var bb = d.bounds;
+            m.addSource(sid, { type: 'image', url: d.url, coordinates: [
+              [bb[0][1], bb[1][0]], [bb[1][1], bb[1][0]], [bb[1][1], bb[0][0]], [bb[0][1], bb[0][0]]
+            ] });
+          } else {
+            m.addSource(sid, vc3dSource(d, true));
+          }
           m.addLayer({
             id: sid, type: 'raster', source: sid,
             paint: { 'raster-opacity': d.id === 'topo' ? vcTopoOpacity : (d.op || 0.9) }
