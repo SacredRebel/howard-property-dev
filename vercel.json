@@ -9,7 +9,8 @@
         "includeFiles": [
           "public/v2/**",
           "data/**"
-        ]
+        ],
+        "maxDuration": 30
       }
     }
   ],

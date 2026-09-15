@@ -566,6 +566,8 @@ const VISION_PANEL_HTML =
 
 export const HOWARD_PROPERTY = {
   id: 'howard',
+  apn: '032-0-010-090',           // Ventura County assessor parcel — the county record anchors here (docs/property-intake.md)
+  county: '06111',              // FIPS: Ventura County, CA
   name: 'Howard Property',
   shortLabel: '🏔️ Howard',
   labelChip: '🏔️ Howard Property',

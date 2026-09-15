@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { IMAGE_URLS } from './image-urls.js';
+import { resolveCore, resolveDeep, resolveParcel, mergeRecord, readFrom, COUNTY_ADAPTERS } from './lib/dossier.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -8285,372 +8286,33 @@ function parseBudget(budgetStr) {
 
 // API endpoint for project zones data
 // ============================================================================
-//  COUNTY DOSSIER RESOLVER  (V0.22)
-//  Given an APN or a point, pull everything the public record holds about a
-//  parcel and normalise it into one shape. Resolve on demand, cache the result
-//  - never bulk-copy the county.
+//  THE COUNTY RECORD  (V0.22 → V0.29) — the resolver lives in lib/dossier.js
+//  (county adapters, state + federal layers, the terrain grid, the read).
+//  Here: the routes and the 30-day in-memory cache, per part.
 // ============================================================================
-const VC_AGS = 'https://maps.ventura.org/arcgis/rest/services/';
-const RECORDMAP_BASE = 'https://maps.ventura.org/recordmaps/';
 const DOSSIER_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 const dossierCache = new Map();
-
-function agsForm(params) {
-  const b = new URLSearchParams();
-  Object.keys(params).forEach((k) => { if (params[k] !== undefined && params[k] !== null) b.append(k, String(params[k])); });
-  return b;
+function dossierKey(q, part) {
+  return part + ':' + (q.apn ? 'apn:' + String(q.apn).replace(/[^0-9]/g, '') + (q.county ? '@' + q.county : '') : 'pt:' + q.lat.toFixed(5) + ',' + q.lon.toFixed(5));
 }
-
-async function agsPost(url, params, ms = 12000) {
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), ms);
-  try {
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: agsForm(params),
-      signal: ctl.signal,
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    if (j.error) throw new Error(j.error.message || 'ags error');
-    return j;
-  } finally { clearTimeout(t); }
+async function cachedPart(q, part, fresh) {
+  const key = dossierKey(q, part);
+  const hit = dossierCache.get(key);
+  if (hit && !fresh && Date.now() - hit.ts < DOSSIER_TTL_MS) return Object.assign({ cached: true }, hit.data);
+  const data = part === 'deep' ? await resolveDeep(q) : await resolveCore(q);
+  if (!data.partial) dossierCache.set(key, { ts: Date.now(), data });     // a partial answer is never cached
+  return Object.assign({ cached: false }, data);
 }
-
-// one spatial query against an ArcGIS MapServer layer
-async function agsQuery(service, layer, geometry, opts = {}) {
-  const url = (opts.root || VC_AGS) + service + '/MapServer/' + layer + '/query';
-  const p = Object.assign({
-    where: opts.where || '1=1',
-    outFields: '*',
-    returnGeometry: opts.returnGeometry ? 'true' : 'false',
-    outSR: '4326',
-    f: 'json',
-  }, geometry || {});
-  if (opts.distance) { p.distance = opts.distance; p.units = 'esriSRUnit_Meter'; }
-  const j = await agsPost(url, p);
-  return (j.features || []);
+function dossierQuery(req) {
+  const apn = req.query.apn ? String(req.query.apn) : null;
+  const lat = req.query.lat != null ? parseFloat(req.query.lat) : null;
+  const lon = req.query.lon != null ? parseFloat(req.query.lon) : null;
+  if (!apn && (lat === null || lon === null || !isFinite(lat) || !isFinite(lon))) return null;
+  const q = { apn, lat, lon };
+  if (req.query.county && /^\d{5}$/.test(String(req.query.county))) q.county = String(req.query.county);
+  if (req.query.debug === '1') q.debug = true;
+  return q;
 }
-
-const ptGeom = (lon, lat) => ({
-  geometry: lon + ',' + lat, geometryType: 'esriGeometryPoint',
-  inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
-});
-const envGeom = (b) => ({
-  geometry: [b.xmin, b.ymin, b.xmax, b.ymax].join(','), geometryType: 'esriGeometryEnvelope',
-  inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
-});
-const polyGeom = (rings) => ({
-  geometry: JSON.stringify({ rings: rings, spatialReference: { wkid: 4326 } }),
-  geometryType: 'esriGeometryPolygon', inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
-});
-
-const money = (v) => (v === null || v === undefined || v === '' ? null : '$' + Number(v).toLocaleString('en-US'));
-const clean = (s) => (typeof s === 'string' ? s.replace(/\s+/g, ' ').trim() : s);
-const titleish = (s) => (typeof s === 'string' ? s.charAt(0) + s.slice(1).toLowerCase() : s);
-
-// California Wildlife Habitat Relationships codes that actually occur around Ojai
-const WHR = {
-  COW: 'Coastal Oak Woodland', BOW: 'Blue Oak Woodland', VOW: 'Valley Oak Woodland',
-  MHC: 'Mixed Chaparral', CRC: 'Chamise-Redshank Chaparral', CSC: 'Coastal Scrub',
-  ASP: 'Aspen', MHW: 'Montane Hardwood', MHF: 'Montane Hardwood-Conifer',
-  AGS: 'Annual Grassland', PGS: 'Perennial Grassland', VRI: 'Valley Foothill Riparian',
-  MRI: 'Montane Riparian', URB: 'Urban', AGR: 'Agriculture', BAR: 'Barren',
-};
-
-// Declarative source table - each entry contributes rows to one dossier section.
-// `hit` formats a found feature; `miss` states the (useful) fact that nothing was found.
-const DOSSIER_SOURCES = [
-  { sec: 'landuse', svc: 'SDs/MyZoning', layer: 0,
-    hit: (a) => [['Zoning', a.ZONE], ['Base zone', a.DEFINITION]] },
-  { sec: 'landuse', svc: 'DataDownloads/LandUse', layer: 1,
-    hit: (a) => [['General Plan', a.genplandes], ['2040 General Plan', a.f2040gp]] },
-  { sec: 'landuse', svc: 'DataDownloads/LandUse', layer: 0,
-    hit: (a) => [['Area plan', a.name], ['Land use designation', clean(a.designat_2) || a.designatio]] },
-
-  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 6, geom: 'poly',
-    hit: (a) => [['Fire hazard severity', a.HAZ_CLASS + (a.SRA ? ' · State Responsibility Area' : '')]],
-    miss: () => [['Fire hazard severity', 'Not in a mapped severity zone']] },
-  { sec: 'hazards', svc: 'SDs/CV_Hazards', layer: 0, geom: 'poly',
-    hit: (a) => [['FEMA flood zone', 'Zone ' + a.FLD_ZONE + ' touches the parcel — ' + clean(a.FLOODHAZ)]],
-    miss: () => [['FEMA flood zone', 'No part of the parcel is in the mapped 100-year floodplain']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 6, geom: 'poly',
-    hit: (a) => [['Earthquake Fault Zone', 'Inside a state Alquist-Priolo special study zone — a fault investigation is required before building']],
-    miss: () => [['Earthquake Fault Zone', 'Not in an Alquist-Priolo zone']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 5, geom: 'poly',
-    hit: () => [['Liquefaction', 'A mapped liquefaction zone touches the parcel']],
-    miss: () => [['Liquefaction', 'Not in a mapped liquefaction zone']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 4, geom: 'poly',
-    hit: () => [['Mapped landslide', 'A mapped landslide touches this parcel']],
-    miss: () => [['Mapped landslide', 'None mapped on the parcel']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 3, geom: 'poly',
-    hit: () => [['Earthquake-induced landslide', 'A potential earthquake-induced landslide zone touches the parcel']],
-    miss: () => [['Earthquake-induced landslide', 'Not in a mapped zone']] },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 2,
-    hit: (a) => (a.venturapga == null ? [] : [['Ground shaking', (a.venturapga / 1000).toFixed(2) + ' g peak acceleration · county model value ' + a.venturapga]]) },
-  { sec: 'hazards', svc: 'DataDownloads/Hazards', layer: 7,
-    hit: () => [['Subsidence', 'Inside a mapped subsidence zone']] },
-
-  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 3,
-    hit: (a) => {
-      const r = [['Soil map unit', clean(a.muname).replace(/erode d\b/i, 'eroded')]];
-      if (a.musym) r.push(['Soil symbol', a.musym + (a.mukey ? ' · mukey ' + a.mukey : '')]);
-      if (a.slopegradw != null) r.push(['Representative slope', a.slopegradw + '%']);
-      if (a.flodfreqdc) r.push(['Flooding frequency', a.flodfreqdc]);
-      if (a.pondfreqpr) r.push(['Ponding frequency', a.pondfreqpr]);
-      if (a.brockdepmi) r.push(['Depth to bedrock', a.brockdepmi + ' cm']);
-      if (a.aws050wta != null) r.push(['Available water, top 50 cm', Number(a.aws050wta).toFixed(1) + ' cm']);
-      return r;
-    } },
-  { sec: 'ground', svc: 'DataDownloads/Hazards', layer: 1,
-    hit: (a) => [['Expansive soils', titleish(a.name)]] },
-  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 2,
-    hit: (a) => {
-      const t = WHR[a.whrtype] || a.whrtype;
-      if (!t) return [];
-      const bits = [t];
-      if (a.whr_range) bits.push(a.whr_range + '% canopy cover');
-      return [['Habitat type', bits.join(' · ')]];
-    } },
-  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 0,
-    hit: (a) => [['Farmland classification', clean(a.type_2)]] },
-  { sec: 'ground', svc: 'DataDownloads/NaturalResources', layer: 1, geom: 'poly',
-    hit: () => [['Habitat connectivity', 'A mapped habitat connectivity area touches the parcel']] },
-
-  { sec: 'water', svc: 'SDs/Groundwater', layer: 0,
-    hit: (a) => [['Groundwater basin', clean(a.BASIN_NAME) + ' · DWR basin ' + a.BASIN_NUMB]],
-    miss: () => [['Groundwater basin', 'Outside a DWR-defined groundwater basin']] },
-  { sec: 'water', svc: 'SDs/Groundwater', layer: 1,
-    hit: (a) => [['Sustainability agency', clean(a.GSA_Name || a.AGENCYNAME || a.NAME || 'mapped GSA')]] },
-  { sec: 'water', svc: 'SDs/Watershed', layer: 0,
-    hit: (a) => [['Watershed', clean(a.NAME || a.WATERSHED || a.Name)]] },
-
-  { sec: 'permits', svc: 'DataDownloads/Permitting', layer: 1, dist: 1600,
-    hit: (a, n) => [['Mining permits within 1 mile', String(n)]] },
-  { sec: 'permits', svc: 'DataDownloads/Permitting', layer: 2, dist: 1600,
-    hit: (a, n) => [['Oil permits within 1 mile', String(n)]] },
-  { sec: 'permits', svc: 'DataDownloads/Permitting', layer: 0, dist: 3200,
-    hit: (a, n) => [['Communication facilities within 2 miles', String(n)]] },
-];
-
-const SECTION_META = [
-  ['identity',   'Identity & location'],
-  ['valuation',  'Valuation & transfer'],
-  ['landuse',    'Land use & entitlement'],
-  ['hazards',    'Hazards'],
-  ['ground',     'Ground, soil & habitat'],
-  ['water',      'Water'],
-  ['structures', 'Structures on record'],
-  ['permits',    'Nearby permits'],
-  ['records',    'Recorded maps'],
-];
-
-async function sampleElevation(bbox) {
-  const url = 'https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/identify';
-  const pts = [];
-  for (let i = 0; i <= 2; i++) {
-    for (let k = 0; k <= 2; k++) {
-      pts.push([bbox.xmin + (bbox.xmax - bbox.xmin) * (i / 2), bbox.ymin + (bbox.ymax - bbox.ymin) * (k / 2)]);
-    }
-  }
-  const vals = await Promise.all(pts.map(async (p) => {
-    try {
-      const j = await agsPost(url, {
-        geometry: JSON.stringify({ x: p[0], y: p[1], spatialReference: { wkid: 4326 } }),
-        geometryType: 'esriGeometryPoint', returnGeometry: 'false', f: 'json',
-      }, 9000);
-      const v = parseFloat(j.value);
-      return isFinite(v) ? v : null;
-    } catch (e) { return null; }
-  }));
-  const ok = vals.filter((v) => v !== null);
-  if (ok.length < 3) return null;
-  const lo = Math.min.apply(null, ok), hi = Math.max.apply(null, ok);
-  const m2ft = (m) => Math.round(m * 3.28084);
-  return { lowFt: m2ft(lo), highFt: m2ft(hi), reliefFt: m2ft(hi - lo), samples: ok.length };
-}
-
-async function resolveDossier(q) {
-  // --- 1. anchor on the parcel -------------------------------------------
-  let parcel = null;
-  if (q.apn) {
-    const apn10 = String(q.apn).replace(/[^0-9]/g, '');
-    const rows = await agsQuery('SDs/Parcels', 0, null, {
-      where: "APN10='" + apn10 + "'", returnGeometry: true,
-    });
-    parcel = rows[0];
-  }
-  if (!parcel && q.lat != null && q.lon != null) {
-    const rows = await agsQuery('SDs/Parcels', 0, ptGeom(q.lon, q.lat), { returnGeometry: true });
-    parcel = rows[0];
-  }
-  if (!parcel) { const e = new Error('No parcel found'); e.status = 404; throw e; }
-
-  const a = parcel.attributes;
-  const rings = (parcel.geometry && parcel.geometry.rings) || null;
-  let bbox = null, cx = q.lon, cy = q.lat;
-  if (rings) {
-    let xmin = 1e9, ymin = 1e9, xmax = -1e9, ymax = -1e9;
-    rings.forEach((r) => r.forEach((p) => {
-      if (p[0] < xmin) xmin = p[0]; if (p[0] > xmax) xmax = p[0];
-      if (p[1] < ymin) ymin = p[1]; if (p[1] > ymax) ymax = p[1];
-    }));
-    bbox = { xmin, ymin, xmax, ymax };
-    cx = (xmin + xmax) / 2; cy = (ymin + ymax) / 2;
-  }
-  const point = ptGeom(cx, cy);
-  const buckets = {}; SECTION_META.forEach(([id]) => { buckets[id] = []; });
-
-  // --- 2. identity + valuation from the assessor record -------------------
-  const apnPretty = a.APN10 ? a.APN10.replace(/^(\d{3})(\d)(\d{3})(\d{3})$/, '$1-$2-$3-$4') : (a.APN || '');
-  buckets.identity.push(['APN', apnPretty]);
-  if (a.APN10) buckets.identity.push(['APN (unformatted)', a.APN10]);
-  if (a.SITUS) buckets.identity.push(['Situs address', clean(a.SITUS)]);
-  if (a.BOOK) buckets.identity.push(['Book · page · block · parcel', [a.BOOK, a.PAGE, a.BLOCK, a.PARCEL].filter(Boolean).join(' · ')]);
-  if (a.ACREAGE) buckets.identity.push(['Acreage', parseFloat(a.ACREAGE).toFixed(2) + ' ac']);
-  if (a['SHAPE.AREA']) buckets.identity.push(['Parcel area', Math.round(a['SHAPE.AREA']).toLocaleString('en-US') + ' sq ft']);
-  if (a['SHAPE.LEN']) buckets.identity.push(['Perimeter', Math.round(a['SHAPE.LEN']).toLocaleString('en-US') + ' ft']);
-  if (a.TRA) buckets.identity.push(['Tax rate area', a.TRA]);
-  if (a.TRACT) buckets.identity.push(['Tract', clean(a.TRACT)]);
-
-  const lv = a.L_V ? Number(a.L_V) : null, iv = a.I_V ? Number(a.I_V) : null;
-  if (lv) buckets.valuation.push(['Assessed land value', money(lv)]);
-  if (iv !== null) buckets.valuation.push(['Assessed improvement value', money(iv)]);
-  if (lv) buckets.valuation.push(['Total assessed value', money((lv || 0) + (iv || 0))]);
-  if (lv && a.ACREAGE && parseFloat(a.ACREAGE) > 0) {
-    buckets.valuation.push(['Assessed land per acre', money(Math.round(lv / parseFloat(a.ACREAGE)))]);
-  }
-  if (a.SQ_FT_I) buckets.valuation.push(['Improved floor area on record', Number(a.SQ_FT_I).toLocaleString('en-US') + ' sq ft']);
-  if (a.DOC_NR) buckets.valuation.push(['Last recorded document', a.DOC_NR + (a.DOC_TYPE ? ' · type ' + a.DOC_TYPE : '')]);
-  if (a.DOC_DT && /^\d{8}$/.test(a.DOC_DT)) {
-    const d = a.DOC_DT;
-    buckets.valuation.push(['Document date', new Date(d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6, 8) + 'T12:00:00Z')
-      .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })]);
-  }
-  if (a.CL) buckets.valuation.push(['Assessor class code', a.CL + (a.QC ? ' · qual ' + a.QC : '')]);
-
-  // --- 3. fan out ---------------------------------------------------------
-  const jobs = DOSSIER_SOURCES.map(async (s) => {
-    try {
-      const g = s.dist ? Object.assign({}, point, { distance: s.dist, units: 'esriSRUnit_Meter' })
-        : (s.geom === 'poly' && rings ? polyGeom(rings) : point);
-      const fs = await agsQuery(s.svc, s.layer, g);
-      const rows = fs.length ? (s.hit(fs[0].attributes, fs.length) || []) : (s.miss ? s.miss() || [] : []);
-      rows.forEach((r) => { if (r && r[1] !== null && r[1] !== undefined && r[1] !== '') buckets[s.sec].push(r); });
-      return 1;
-    } catch (e) { return 0; }
-  });
-
-  // structures actually inside the parcel polygon
-  jobs.push((async () => {
-    try {
-      if (!rings) return 0;
-      const fs = await agsQuery('DataDownloads/CommonData', 0, polyGeom(rings));
-      if (!fs.length) {
-        buckets.structures.push(['Buildings mapped by the county', 'None']);
-        return 1;
-      }
-      buckets.structures.push(['Buildings mapped by the county', String(fs.length)]);
-      const uses = {};
-      fs.forEach((f) => {
-        const at = f.attributes;
-        const u = clean(at.building_d || at.buildingty || at.BUILDING_D || 'unclassified');
-        uses[u] = (uses[u] || 0) + 1;
-      });
-      Object.keys(uses).forEach((u) => buckets.structures.push(['— ' + titleish(u), uses[u] + (uses[u] > 1 ? ' structures' : ' structure')]));
-      const hs = fs.map((f) => f.attributes.height || f.attributes.HEIGHT).filter((h) => h != null && h > 0);
-      if (hs.length) buckets.structures.push(['Tallest mapped structure', Math.max.apply(null, hs) + ' ft']);
-      const area = fs.map((f) => f.attributes['st_area(shape)']).filter((v) => v > 0);
-      if (area.length) buckets.structures.push(['Total mapped footprint', Math.round(area.reduce((x, y) => x + y, 0)).toLocaleString('en-US') + ' sq ft']);
-      const yr = fs.map((f) => f.attributes.imagedate).filter(Boolean);
-      if (yr.length) buckets.structures.push(['Footprints traced from imagery of', yr.sort().slice(-1)[0]]);
-      return 1;
-    } catch (e) { return 0; }
-  })());
-
-  // recorded maps - the chain of prior surveys, with links to the scans
-  const records = [];
-  jobs.push((async () => {
-    try {
-      if (!bbox) return 0;
-      const fs = await agsQuery('DataDownloads/Survey', 4, envGeom(bbox));
-      const seen = {};
-      fs.forEach((f) => {
-        const at = f.attributes;
-        if (!at.recordlabel || seen[at.recordlabel]) return;
-        seen[at.recordlabel] = 1;
-        records.push({
-          label: at.recordlabel,
-          type: at.documenttype,
-          year: at.year ? String(Math.round(at.year)) : null,
-          surveyor: clean(at.surveyor) || null,
-          note: clean(at.description) || (clean(at.recordmap) && clean(at.recordmap) !== 'PM UA' ? clean(at.recordmap) : null),
-          pages: at.numberpages ? Math.round(at.numberpages) : null,
-          url: at.documentlink ? RECORDMAP_BASE + at.documentlink : null,
-        });
-      });
-      records.sort((x, y) => (Number(y.year || 0) - Number(x.year || 0)));
-      return 1;
-    } catch (e) { return 0; }
-  })());
-
-  // elevation profile across the parcel
-  let elev = null;
-  jobs.push((async () => {
-    try { if (bbox) elev = await sampleElevation(bbox); return 1; } catch (e) { return 0; }
-  })());
-
-  const done = await Promise.all(jobs);
-
-  if (elev) {
-    buckets.ground.unshift(['Elevation range', elev.lowFt.toLocaleString('en-US') + '–' + elev.highFt.toLocaleString('en-US') + ' ft'],
-      ['Relief across the parcel', elev.reliefFt + ' ft']);
-  }
-
-  // --- 4. flags - the things a buyer or a lender would want surfaced ------
-  const flags = [];
-  const flat = [].concat.apply([], SECTION_META.map(([id]) => buckets[id]));
-  const findRow = (k) => { const r = flat.find((x) => x[0] === k); return r ? String(r[1]) : ''; };
-  if (/very high|high/i.test(findRow('Fire hazard severity'))) {
-    flags.push({ level: 'watch', text: findRow('Fire hazard severity') + ' fire severity — expect defensible-space and ignition-resistant construction requirements, and check insurability early.' });
-  }
-  if (/^Zone /.test(findRow('FEMA flood zone'))) {
-    flags.push({ level: 'watch', text: findRow('FEMA flood zone') + ' — flood insurance is normally required by a lender, and habitable floors must sit above the base flood elevation.' });
-  }
-  if (/touches/.test(findRow('Mapped landslide')) || /touches/.test(findRow('Earthquake-induced landslide'))) {
-    flags.push({ level: 'watch', text: 'Mapped landslide terrain on or touching the parcel \u2014 a geotechnical report will be part of any building permit; site the structure on the flat ground and keep the toe of the slope clear.' });
-  }
-  if (/Inside a state Alquist/.test(findRow('Earthquake Fault Zone'))) {
-    flags.push({ level: 'watch', text: 'Alquist-Priolo zone — a fault investigation by a licensed geologist is required before a building permit.' });
-  }
-  if (a.SQ_FT_I && Number(a.SQ_FT_I) > 0 && /None/.test(findRow('Buildings mapped by the county'))) {
-    flags.push({ level: 'note', text: 'The assessor records ' + Number(a.SQ_FT_I).toLocaleString('en-US') + ' sq ft of improvement, but the county maps no building footprint here. Worth reconciling before a lender does.' });
-  }
-  if (records.length) {
-    flags.push({ level: 'good', text: records.length + ' recorded maps cover this parcel, back to ' + (records[records.length - 1].year || 'the earliest on file') + '. Each one is a downloadable scan.' });
-  }
-
-  const sections = SECTION_META
-    .map(([id, label]) => ({ id, label, rows: buckets[id] }))
-    .filter((s) => s.rows.length);
-
-  return {
-    apn: apnPretty,
-    apn10: a.APN10 || null,
-    situs: clean(a.SITUS) || null,
-    acreage: a.ACREAGE ? parseFloat(a.ACREAGE) : null,
-    center: [cy, cx],
-    bbox: bbox,
-    flags: flags,
-    sections: sections,
-    records: records,
-    sourcesQueried: done.length,
-    sourcesAnswered: done.reduce((n, v) => n + v, 0),
-    resolvedAt: new Date().toISOString(),
-  };
-}
-
 const SURVEY_FILES = { 'sulphur-mountain': 'sulphur-survey.json' };
 // V2 engine (docs/engine-blueprint.md): the same properties as JSON, positions already applied,
 // and the built single-engine app served at /v2 (source in v2/, output committed to public/v2)
@@ -8707,28 +8369,38 @@ app.get('/api/survey/:propertyId', (req, res) => {
 });
 
 app.get('/api/dossier', async (req, res) => {
-  const apn = req.query.apn ? String(req.query.apn) : null;
-  const lat = req.query.lat != null ? parseFloat(req.query.lat) : null;
-  const lon = req.query.lon != null ? parseFloat(req.query.lon) : null;
-  if (!apn && (lat === null || lon === null || !isFinite(lat) || !isFinite(lon))) {
-    return res.status(400).json({ error: 'Pass either apn, or lat and lon.' });
-  }
-  const key = apn ? 'apn:' + String(apn).replace(/[^0-9]/g, '') : 'pt:' + lat.toFixed(5) + ',' + lon.toFixed(5);
+  const q = dossierQuery(req);
+  if (!q) return res.status(400).json({ error: 'Pass either apn, or lat and lon.' });
+  const part = req.query.part === 'deep' ? 'deep' : req.query.part === 'all' ? 'all' : 'core';
   const fresh = req.query.refresh === '1';
-  const hit = dossierCache.get(key);
-  if (hit && !fresh && Date.now() - hit.ts < DOSSIER_TTL_MS) {
-    res.set('Cache-Control', 'public, max-age=86400');
-    return res.json(Object.assign({ cached: true }, hit.data));
-  }
   try {
-    const data = await resolveDossier({ apn, lat, lon });
-    dossierCache.set(key, { ts: Date.now(), data });
-    res.set('Cache-Control', 'public, max-age=86400');
-    res.json(Object.assign({ cached: false }, data));
+    let data;
+    if (part === 'all') {
+      const [core, deep] = await Promise.all([cachedPart(q, 'core', fresh), cachedPart(q, 'deep', fresh)]);
+      data = mergeRecord(core, deep); data.cached = core.cached && deep.cached;
+    } else data = await cachedPart(q, part, fresh);
+    if (req.query.read === '1') data.read = readFrom(data);
+    res.set('Cache-Control', data.partial ? 'no-store' : 'public, max-age=86400');
+    res.json(data);
   } catch (e) {
     console.error('dossier:', e.message);
     res.status(e.status || 502).json({ error: e.message || 'Could not resolve this parcel.' });
   }
+});
+// the anchor alone: APN or point -> parcel identity + geometry (the APN search box flies here)
+app.get('/api/parcel', async (req, res) => {
+  const q = dossierQuery(req);
+  if (!q) return res.status(400).json({ error: 'Pass either apn, or lat and lon.' });
+  try {
+    const data = await resolveParcel(q);
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.json(data);
+  } catch (e) { res.status(e.status || 502).json({ error: e.message || 'Could not resolve this parcel.' }); }
+});
+// which counties have a parcel adapter (the intake rule and the search box read this)
+app.get('/api/counties', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.json(Object.keys(COUNTY_ADAPTERS).map((fips) => { const a = COUNTY_ADAPTERS[fips]; return { fips, id: a.id, name: a.name, state: a.state, apnExample: fips === '06111' ? '037-0-012-125' : '2048-011-048', sources: a.sources.length, authority: a.authority }; }));
 });
 
 app.get('/api/project-zones', (req, res) => {

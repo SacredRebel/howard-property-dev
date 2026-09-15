@@ -269,3 +269,50 @@ button { font: inherit; color: inherit; }
 .gp-el { font-size: 13px; font-weight: 800; color: var(--gold); margin: 4px 0 8px; }
 .gp-el i { font-style: normal; font-size: 10px; font-weight: 600; color: var(--ink-3); margin-left: 4px; }
 .gp-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* —— V0.29: the County Record, the search box, research & compare —— */
+.apn-search { display: flex; align-items: center; gap: 4px; }
+.apn-search input { width: 190px; max-width: 32vw; font: 600 11.5px var(--mono); padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.05); color: var(--ink); outline: none; }
+.apn-search input:focus { border-color: var(--gold); width: 240px; }
+.apn-search input::placeholder { font-family: var(--font); font-weight: 500; color: var(--ink-3); }
+.rec-title { display: flex; align-items: center; gap: 8px; margin: 12px 0 6px; padding-top: 8px; border-top: 1px solid var(--line); font-weight: 900; font-size: 12.5px; }
+.rec { font-size: 12px; }
+.rec-head { margin: 2px 0 8px; }
+.rec-apn { font: 800 13px var(--mono); color: var(--gold); }
+.rec-situs { font-size: 11.5px; color: var(--ink); margin-top: 1px; }
+.rec-auth { font-size: 10.5px; color: var(--ink-3); margin-top: 2px; line-height: 1.4; }
+.rec-acts { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 4px; }
+.rec-sub { font-size: 10.5px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3); margin: 12px 0 6px; }
+.rec .wait { color: var(--ink-3); font-weight: 500; letter-spacing: 0; text-transform: none; }
+.rec .r.cont .k { visibility: hidden; }
+.rec .rows.mono .k, .rec .rows.mono .v { font: 500 10.5px var(--mono); }
+.rec details.rec-sec > summary { position: sticky; top: 0; background: var(--panel); z-index: 1; }
+.read { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.rd { padding: 7px 9px; border-radius: 10px; background: var(--panel-2); border: 1px solid rgba(255, 255, 255, 0.07); }
+.rd-l { font-size: 9.5px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); }
+.rd-v { font-size: 11.5px; font-weight: 700; color: var(--ink); margin: 2px 0; line-height: 1.35; }
+.rd-n { font-size: 10.5px; color: var(--ink-2); line-height: 1.4; }
+.rd-bar { height: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); margin: 4px 0 3px; overflow: hidden; }
+.rd-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--green), var(--gold)); }
+.portals { display: flex; flex-direction: column; gap: 4px; }
+.pg { margin: 4px 0 2px; }
+.pg-l { font-size: 9.5px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3); margin: 6px 0 3px; }
+.pi { padding: 5px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.pl { font: 700 11.5px var(--font); color: var(--gold); background: none; border: none; padding: 0; cursor: pointer; text-decoration: none; text-align: left; }
+.pl:hover { text-decoration: underline; }
+.pf { display: inline; margin: 0; }
+.pn { font-size: 10.5px; color: var(--ink-2); line-height: 1.4; margin-top: 1px; }
+.rs-list { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+.rs { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 9px; border-radius: 10px; background: var(--panel-2); border: 1px solid rgba(255, 255, 255, 0.07); }
+.rs-t b { display: block; font-size: 11.5px; }
+.rs-t i { display: block; font: 500 10px var(--mono); color: var(--ink-3); font-style: normal; }
+.rs-a { display: flex; gap: 4px; flex-shrink: 0; }
+.cmp-wrap { overflow-x: auto; margin: 6px 0; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); }
+.cmp { border-collapse: collapse; font-size: 10.5px; min-width: 100%; }
+.cmp th, .cmp td { padding: 6px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); vertical-align: top; text-align: left; min-width: 120px; }
+.cmp thead th { position: sticky; top: 0; background: var(--panel-2); font-size: 10.5px; }
+.cmp thead th b { display: block; } .cmp thead th i { display: block; font: 500 9.5px var(--mono); color: var(--ink-3); font-style: normal; }
+.cmp tbody th { position: sticky; left: 0; background: var(--panel-2); color: var(--ink-3); font-weight: 700; min-width: 96px; }
+.cmp tr.dim th { color: var(--gold); }
+.cmp .bad { color: var(--red); }
+@media (max-width: 760px) { .apn-search input { width: 120px; } .apn-search input:focus { width: 160px; } .crumb { display: none; } .read { grid-template-columns: 1fr; } }

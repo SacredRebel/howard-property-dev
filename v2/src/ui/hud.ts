@@ -10,6 +10,7 @@ import { legendFor } from '../layers/legend';
 import type { PropertyLayer, Property, Zone, LotPick } from '../data/properties';
 import { galleryFor, galleryHTML, wireGallery, isOpen as lightboxOpen } from './gallery';
 import { Editor } from './editor';
+import { RecordStore, renderRecord, research, compareHTML, type Target, type RecordData, type ResearchItem, type CompareCol } from './record';
 
 interface RichProperty extends Property { panel?: { title: string; html: string }; visionPanel?: { title: string; html: string }; cta?: { heading?: string; paragraph?: string; contacts?: { name: string; email: string }[]; buttons?: { label: string; url: string }[] }; }
 const stripClassicGallery = (html: string) => html.replace(/<div class="image-gallery-section"[\s\S]*?<\/div><\/div><\/div>/, '');
@@ -27,11 +28,13 @@ export class Hud {
   private onMode: (m: 'today' | 'vision') => void;
   private peek = new Set<string>();
   private legendSig = '';
-  private selected: { kind: 'property' | 'zone' | 'lot' | 'ground'; payload: unknown } | null = null;
+  private selected: { kind: 'property' | 'zone' | 'lot' | 'ground' | 'search'; payload: unknown } | null = null;
   private groundPopup: maplibregl.Popup | null = null;
   private dockOpen = window.innerWidth > 760;
   private inspectorOpen = window.innerWidth > 1100;
-  private dossierCache = new Map<string, Promise<unknown>>();
+  private store = new RecordStore();
+  private recordToken: { cancel: () => void } | null = null;
+  private compareRecs = new Map<string, RecordData | null>();
   editor!: Editor;
   private lowFps = 0;
   private galleryToken = 0;
@@ -51,6 +54,7 @@ export class Hud {
     const t = el(`<header class="hud-top">
       <div class="brand"><span class="brand-mark">◈</span><span class="brand-name">OJAI ATLAS</span><span class="brand-sub">v2 · one engine</span></div>
       <div class="crumb" id="crumb">Ojai Valley · 6 properties</div>
+      <form class="apn-search" id="apn-form" autocomplete="off"><input id="apn-in" type="search" placeholder="APN or lat, lng — any parcel" title="type an assessor parcel number (Ventura or Los Angeles County) or coordinates anywhere in the US, then Enter" spellcheck="false"><button type="submit" class="icon-btn" title="look up the county record">⌕</button></form>
       <div class="top-right">
         <div class="year-pill" id="year-pill" title="base imagery"><b id="year-big">today</b><span id="year-small">Esri satellite</span></div>
         <button class="mode-pill" id="mode-pill" data-mode="${this.mode}"><span class="mode-today">TODAY</span><span class="mode-vision">VISION</span></button>
@@ -81,9 +85,10 @@ export class Hud {
   // ---- right inspector -------------------------------------------------------
   private buildInspector() {
     return el(`<aside class="inspector" id="inspector">
-      <div class="insp-tabs"><button data-tab="legend" class="on">What you see</button><button data-tab="parcel">Parcel</button><button class="icon-btn" id="insp-close" title="close (I)">✕</button></div>
+      <div class="insp-tabs"><button data-tab="legend" class="on">What you see</button><button data-tab="parcel">Parcel</button><button data-tab="research">Research</button><button class="icon-btn" id="insp-close" title="close (I)">✕</button></div>
       <div class="insp-body" id="insp-legend"></div>
       <div class="insp-body" id="insp-parcel" hidden></div>
+      <div class="insp-body" id="insp-research" hidden></div>
     </aside>`);
   }
 
@@ -141,7 +146,7 @@ export class Hud {
     // inspector
     this.q('#inspector').addEventListener('click', e => {
       const t = e.target as HTMLElement;
-      const tab = t.closest('[data-tab]') as HTMLElement | null; if (tab) { this.setTab(tab.dataset.tab as 'legend' | 'parcel'); return; }
+      const tab = t.closest('[data-tab]') as HTMLElement | null; if (tab) { this.setTab(tab.dataset.tab as 'legend' | 'parcel' | 'research'); return; }
       if (t.closest('#insp-close')) { this.inspectorOpen = false; this.props.selectLot(null); this.syncPanels(); return; }
       const x = t.closest('.lg-x') as HTMLElement | null; if (x) { this.peek.delete(x.dataset.x!); this.renderLegend(true); return; }
       const more = t.closest('.lg-more') as HTMLElement | null; if (more) { const blk = more.closest('.lgb')!; blk.classList.toggle('all'); more.textContent = blk.classList.contains('all') ? 'show fewer' : more.dataset.all!; return; }
@@ -150,7 +155,10 @@ export class Hud {
       const dive = t.closest('[data-dive]') as HTMLElement | null; if (dive) { const p = this.props.props.find(x => x.id === dive.dataset.dive); if (p) this.enterVision(p); return; }
       const lot = t.closest('[data-lot]') as HTMLElement | null; if (lot) { const [pid, lid] = lot.dataset.lot!.split('/'); this.props.flyToLot(pid, lid); return; }
       const copy = t.closest('[data-copy]') as HTMLElement | null; if (copy) { try { navigator.clipboard?.writeText(copy.dataset.copy!); this.say('Copied ' + copy.dataset.copy); } catch { /* fine */ } return; }
+      const rs = t.closest('[data-rs]') as HTMLElement | null; if (rs) { this.researchAction(rs.dataset.rs!, rs.dataset.apn || '', rs.dataset.pid || ''); return; }
     });
+    // the APN / coordinate search
+    this.q('#apn-form').addEventListener('submit', e => { e.preventDefault(); const v = this.q<HTMLInputElement>('#apn-in').value.trim(); if (v) this.lookup(v); });
     this.q('#inspector').addEventListener('input', e => {
       const t = e.target as HTMLInputElement;
       if (t.classList.contains('op-in')) eng.setOpacity(t.dataset.op!, Number(t.value) / 100);
@@ -247,7 +255,7 @@ export class Hud {
   }
   help() {
     const t = this.q('#toast');
-    t.innerHTML = `<b>Hotkeys</b> — W A S D pan · Q E rotate · R F tilt · + − zoom · T 2D/3D · X terrain · N north · L layers · I inspector · P position editor · 1–7 open a layer group · [ ] step the aerial year · H historic topo · Space Today/Vision · G open in Google Earth · Esc close. <br>Mouse: drag to pan, right-drag / Ctrl-drag / <b>middle-drag</b> to orbit (drag right = turn right), wheel to zoom, click open ground for elevation + the county dossier of any parcel. Touch: two fingers to rotate and tilt.`;
+    t.innerHTML = `<b>Hotkeys</b> — W A S D pan · Q E rotate · R F tilt · + − zoom · T 2D/3D · X terrain · N north · L layers · I inspector · P position editor · 1–7 open a layer group · [ ] step the aerial year · H historic topo · Space Today/Vision · G open in Google Earth · Esc close. <br>Mouse: drag to pan, right-drag / Ctrl-drag / <b>middle-drag</b> to orbit (drag right = turn right), wheel to zoom, click open ground for elevation + the county record of any parcel; type an APN or coordinates in the top bar to pull any parcel in the US. Touch: two fingers to rotate and tilt.`;
     t.hidden = false; window.clearTimeout((t as unknown as { _t: number })._t); (t as unknown as { _t: number })._t = window.setTimeout(() => { t.hidden = true; }, 9000);
   }
 
@@ -260,7 +268,7 @@ export class Hud {
   // ---- sync ------------------------------------------------------------------
   private aerialLabels(i: number) { const f = FLIGHTS[i]; this.q('#tl-aerial-year').textContent = String(f.year); this.q('#tl-aerial-note').textContent = f.when + (f.note ? ' · ' + f.note : ''); }
   private histLabels(y: number) { this.q('#tl-hist-year').textContent = String(y); this.q('#tl-hist-note').textContent = HIST_NOTES[y] || ''; }
-  private setTab(t: 'legend' | 'parcel') { for (const b of this.root.querySelectorAll<HTMLElement>('.insp-tabs [data-tab]')) b.classList.toggle('on', b.dataset.tab === t); this.q('#insp-legend').hidden = t !== 'legend'; this.q('#insp-parcel').hidden = t !== 'parcel'; }
+  private setTab(t: 'legend' | 'parcel' | 'research') { for (const b of this.root.querySelectorAll<HTMLElement>('.insp-tabs [data-tab]')) b.classList.toggle('on', b.dataset.tab === t); this.q('#insp-legend').hidden = t !== 'legend'; this.q('#insp-parcel').hidden = t !== 'parcel'; this.q('#insp-research').hidden = t !== 'research'; if (t === 'research') this.renderResearch(); }
   private lastPanel: 'dock' | 'insp' = 'dock';
   private syncPanels() {
     // a phone shows one panel at a time: the one that was opened last wins
@@ -364,9 +372,9 @@ export class Hud {
           + (p.cta.contacts || []).map(c => `<a class="doc" href="mailto:${esc(c.email)}"><span><b>${esc(c.name)}</b><i>${esc(c.email)}</i></span><span class="o">write ↗</span></a>`).join('')
           + (p.cta.buttons || []).map(b => `<a class="mini gold" href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.label)}</a>`).join(' ') + '</div></details>';
       }
-      h += `<details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
+      h += this.recordShell(p.lots && p.lots.length > 1 ? `This property is ${p.lots.length} county parcels — click any lot for its own record. Shown here: the parcel under the centre pin.` : '');
       box.innerHTML = h;
-      this.loadDossier(p);
+      this.showRecord(p.apn ? { apn: p.apn, county: p.county } : { lat: p.center[0], lng: p.center[1] });
       this.fillGallery(box, p.id, 'property', token);
     } else if (kind === 'zone') {
       const { property: p, zone: z } = payload as { property: Property; zone: Zone };
@@ -389,18 +397,24 @@ export class Hud {
       if (l.name && l.name !== title) h += `<p class="desc">${esc(l.name)}</p>`;
       h += '<div class="rows">' + rows.map(r => `<div class="r"><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('') + '</div>';
       h += `<div class="acts"><button class="mini" data-lot="${esc(l.pid)}/${esc(l.lid)}">fly to this lot</button>${p ? `<button class="mini" data-fly="${p.id}">whole ranch</button>` : ''}<button class="mini" data-copy="${esc(l.apn)}">copy APN</button></div>`;
-      h += `<p class="note-p">One of ${p?.lots?.length || '—'} county parcels drawn from the assessor fabric. The dossier below is resolved for this parcel alone.</p>`;
-      h += `<details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
+      h += this.recordShell(`One of ${p?.lots?.length || '—'} county parcels drawn from the assessor fabric. The record below is this parcel alone.`);
       box.innerHTML = h;
-      this.loadDossier({ apn: l.apn } as Property);
+      this.showRecord({ apn: l.apn, county: p?.county });
+    } else if (kind === 'search') {
+      const c = payload as { apn: string | null; situs: string | null; acreage: number | null; center: [number, number]; county?: { name: string; stateName?: string | null; fips?: string; adapter?: string | null } | null; label?: string };
+      const saved = c.apn ? research.has(c.apn) : false;
+      box.innerHTML = `<div class="card">${strip}<div class="card-head"><b>${esc(c.situs || c.apn || 'Parcel')}</b><span class="apn">${c.apn ? 'APN ' + esc(c.apn) + ' · ' : ''}${c.county ? esc(c.county.name) + (c.county.stateName ? ', ' + esc(c.county.stateName) : '') : 'outside any mapped county'}${c.acreage ? ' · ' + c.acreage.toFixed(2) + ' ac' : ''}</span></div>
+        <div class="acts"><button class="mini" data-rs="fly" data-apn="${esc(c.apn || '')}">fly here</button>${c.apn ? `<button class="mini gold" data-rs="${saved ? 'remove' : 'save'}" data-apn="${esc(c.apn)}">${saved ? '★ remove from research' : '☆ save to research'}</button><button class="mini" data-copy="${esc(c.apn)}">copy APN</button>` : ''}<button class="mini" data-rs="clear">clear outline</button></div>
+        <p class="note-p">${c.county?.adapter ? 'Not one of our properties — a research candidate. The full county record follows; save it to compare with the others.' : 'No parcel adapter for this county yet, so the parcel line is not drawn; the state and federal record still resolves for the point (docs/property-intake.md explains how to add the county).'}</p>
+        ${this.recordShell('')}`;
+      this.showRecord(c.apn ? { apn: c.apn, county: c.county?.fips } : { lat: c.center[0], lng: c.center[1] });
     } else {
       const g = payload as { lat: number; lng: number; elev?: string };
       box.innerHTML = `<div class="card">${strip}<div class="card-head"><b>Ground at ${g.lat.toFixed(5)}, ${g.lng.toFixed(5)}</b><span class="apn">any parcel</span></div>
         <div class="rows"><div class="r"><span class="k">Elevation</span><span class="v" id="gr-elev">${esc(g.elev || 'measuring…')}</span></div></div>
         <div class="acts"><button class="mini" data-copy="${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}">copy coordinates</button><a class="mini" href="https://earth.google.com/web/@${g.lat},${g.lng},0a,1200d,35y,0h,45t,0r" target="_blank" rel="noopener">Google Earth ↗</a></div>
-        <p class="note-p">The county dossier for whatever parcel lies under this point — zoning, plan, hazards, soils, water, recorded maps — resolved live from public sources.</p>
-        <details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
-      this.loadDossier({ center: [g.lat, g.lng] } as Property);
+        ${this.recordShell('The county record for whatever parcel lies under this point — anywhere in the United States: the county’s own record where an adapter exists, the state and federal record everywhere.')}`;
+      this.showRecord({ lat: g.lat, lng: g.lng });
     }
   }
 
@@ -412,7 +426,7 @@ export class Hud {
     if (!this.groundPopup) this.groundPopup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, className: 'ground', maxWidth: '300px', offset: 8 });
     const pop = this.groundPopup;
     pop.setLngLat(ll).setHTML(`<div class="gp"><div class="gp-ll">${lat.toFixed(5)}, ${lng.toFixed(5)}</div><div class="gp-el" id="gp-el">${est != null ? fmt(est, '≈ terrain') : 'measuring…'}</div>
-      <div class="gp-acts"><button class="mini gold" id="gp-ds">🗂 county dossier here</button><button class="mini" id="gp-cp">copy</button></div></div>`).addTo(m);
+      <div class="gp-acts"><button class="mini gold" id="gp-ds">🗂 county record here</button><button class="mini" id="gp-cp">copy</button></div></div>`).addTo(m);
     const el = pop.getElement();
     el.querySelector('#gp-ds')?.addEventListener('click', () => { this.selected = { kind: 'ground', payload: { lat, lng, elev: (el.querySelector('#gp-el')?.textContent || '').trim() } }; this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); });
     el.querySelector('#gp-cp')?.addEventListener('click', () => { try { navigator.clipboard?.writeText(`${lat.toFixed(6)}, ${lng.toFixed(6)}`); this.say('Coordinates copied.'); } catch { /* fine */ } });
@@ -432,25 +446,74 @@ export class Hud {
     slot.innerHTML = galleryHTML(g, this.mode === 'vision' ? 'vision' : 'current');
     wireGallery(slot, g);
   }
-  private async loadDossier(p: Property) {
-    const key = p.apn ? 'apn=' + encodeURIComponent(p.apn) : `lat=${p.center[0]}&lon=${p.center[1]}`;
-    let pr = this.dossierCache.get(key);
-    if (!pr) { pr = fetch('/api/dossier?' + key).then(r => r.json()); this.dossierCache.set(key, pr); }
-    let d: { apn?: string; situs?: string; acreage?: number; flags?: { level: string; text: string }[]; sections?: { label: string; rows: [string, string][] }[]; records?: { label: string; url?: string; year?: string; surveyor?: string; note?: string; pages?: number }[]; sourcesAnswered?: number; resolvedAt?: string; error?: string };
-    try { d = await pr as typeof d; } catch { d = { error: 'unreachable' }; }
-    const body = this.root.querySelector('#ds-body'); if (!body) return;
-    if (!d || d.error) { body.innerHTML = `<div class="lg">The county resolver did not answer (${esc(d?.error || 'no data')}). Try again in a moment.</div>`; return; }
-    let h = `<div class="ds-head"><span class="ds-apn">${esc(d.apn)}</span>${d.situs ? `<span class="ds-situs">${esc(d.situs)}</span>` : ''}${d.acreage ? `<span class="ds-situs">${d.acreage.toFixed(2)} ac</span>` : ''}</div>`;
-    for (const f of d.flags || []) h += `<div class="ds-flag ${esc(f.level)}">${esc(f.text)}</div>`;
-    (d.sections || []).forEach((s, i) => { h += `<details class="fold sub"${i < 2 ? ' open' : ''}><summary>${esc(s.label)}<span class="cnt">${s.rows.length}</span></summary><div class="rows">${s.rows.map(r => `<div class="r"><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('')}</div></details>`; });
-    if (d.records?.length) {
-      h += `<details class="fold sub"><summary>Recorded maps &amp; surveys<span class="cnt">${d.records.length}</span></summary><div class="rows"><p class="note-p">Every map ever filed over this land — the same documents a surveyor retraces. Each opens as the county’s own scan.</p>`;
-      for (const r of d.records) { const meta = [r.year, r.surveyor, r.note, r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null].filter(Boolean).join(' · '); h += r.url ? `<a class="doc" href="${esc(r.url)}" target="_blank" rel="noopener"><span><b>${esc(r.label)}</b><i>${esc(meta)}</i></span><span class="o">open ↗</span></a>` : `<div class="r"><span class="k">${esc(r.label)}</span><span class="v">${esc(meta)}</span></div>`; }
-      h += '</div></details>';
-    }
-    h += `<div class="ds-foot">Resolved from ${d.sourcesAnswered || 0} public sources on ${d.resolvedAt ? new Date(d.resolvedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}. Assessor figures are not an appraisal; recorded documents, not GIS, are the authority on boundaries.</div>`;
-    body.innerHTML = h;
-    const cnt = this.root.querySelector('#ds-cnt'); if (cnt) cnt.textContent = String((d.flags || []).length ? (d.flags || []).length + ' flags' : '');
+  // ---- the county record --------------------------------------------------------------
+  private recordShell(note: string) {
+    return `${note ? `<p class="note-p">${esc(note)}</p>` : ''}<div class="rec-title">🗂 County record<span class="cnt">every public source</span></div><div class="ds" id="rec-body"></div></div>`;
+  }
+  private showRecord(t: Target) {
+    this.recordToken?.cancel();
+    const body = this.root.querySelector('#rec-body') as HTMLElement | null; if (!body) return;
+    this.recordToken = renderRecord(body, t, this.store, {
+      saved: t.apn ? research.has(t.apn) : false,
+      onSave: rec => { const it = research.fromRecord(rec); if (it) { research.add(it); this.say('Saved to the research list — open the Research tab to compare.'); } else this.say('This point has no parcel to save.'); }
+    });
+  }
+  // APN or "lat, lng" -> the county's parcel -> outline + fly + card
+  async lookup(v: string) {
+    const ll = /^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/.exec(v);
+    const q = ll ? `lat=${ll[1]}&lon=${ll[2]}` : 'apn=' + encodeURIComponent(v);
+    this.say('Looking up ' + (ll ? 'the parcel at ' + ll[1] + ', ' + ll[2] : 'APN ' + v) + '…');
+    try {
+      const r = await fetch('/api/parcel?' + q); const j = await r.json() as { error?: string; apn: string | null; situs: string | null; acreage: number | null; center: [number, number]; bbox: { xmin: number; ymin: number; xmax: number; ymax: number } | null; geometry: { rings: [number, number][][] } | null; county: { name: string; stateName?: string | null; fips: string; adapter: string | null } | null };
+      if (!r.ok || j.error) { this.say(j.error || 'No parcel found.'); return; }
+      this.openCandidate(j);
+    } catch { this.say('The parcel resolver did not answer.'); }
+  }
+  private openCandidate(j: { apn: string | null; situs: string | null; acreage: number | null; center: [number, number]; bbox?: { xmin: number; ymin: number; xmax: number; ymax: number } | null; geometry?: { rings: [number, number][][] } | null; county?: { name: string; stateName?: string | null; fips: string; adapter: string | null } | null; rings?: [number, number][][] | null }) {
+    const rings = j.geometry?.rings || j.rings || null;
+    this.props.selectLot(null); this.groundPopup?.remove();
+    this.props.showCandidate(rings, j.apn || '');
+    if (j.bbox) this.props.flyToBox(j.bbox); else this.eng.map.flyTo({ center: [j.center[1], j.center[0]], zoom: Math.max(this.eng.map.getZoom(), 15), essential: true });
+    this.selected = { kind: 'search', payload: { ...j, county: j.county || null } };
+    this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels();
+  }
+  // ---- the research tab ---------------------------------------------------------------
+  private researchCols(): CompareCol[] {
+    const cols: CompareCol[] = this.props.props.map(p => ({ label: p.shortLabel || p.name, sub: p.apn || 'centre parcel', target: p.apn ? { apn: p.apn, county: p.county } : { lat: p.center[0], lng: p.center[1] } }));
+    for (const it of research.list()) cols.push({ label: it.situs || it.apn, sub: it.apn, target: { apn: it.apn, county: it.county } });
+    return cols;
+  }
+  private renderResearch() {
+    const box = this.q('#insp-research');
+    const list = research.list();
+    let h = `<div class="card"><div class="card-head"><b>Research</b><span class="apn">any parcel, anywhere — compared on the same seven questions</span></div>
+      <p class="note-p">Type an APN or coordinates in the search box at the top to pull any parcel’s county record; save the ones you are looking at here. Our own properties are always in the comparison.</p>
+      <div class="rs-list">${list.length ? list.map(it => `<div class="rs"><div class="rs-t"><b>${esc(it.situs || it.apn)}</b><i>${esc(it.apn)}${it.acreage ? ' · ' + it.acreage.toFixed(2) + ' ac' : ''}${it.county ? ' · ' + esc(it.county) : ''}</i></div><div class="rs-a"><button class="mini" data-rs="fly" data-apn="${esc(it.apn)}">fly</button><button class="mini" data-rs="open" data-apn="${esc(it.apn)}">record</button><button class="mini" data-rs="remove" data-apn="${esc(it.apn)}" title="remove">✕</button></div></div>`).join('') : '<div class="empty">Nothing saved yet. Look a parcel up, then “☆ save to research”.</div>'}</div>
+      <div class="acts"><button class="mini gold" data-rs="compare">compare all (${this.props.props.length + list.length})</button>${list.length ? `<button class="mini" data-rs="export">export list</button><button class="mini" data-rs="clearlist">clear list</button>` : ''}</div>
+      <div id="cmp-body"></div></div>`;
+    box.innerHTML = h;
+    if (this.compareRecs.size) this.renderCompare(false);
+  }
+  private async renderCompare(fetchAll: boolean) {
+    const cols = this.researchCols();
+    const body = this.root.querySelector('#cmp-body') as HTMLElement | null; if (!body) return;
+    const keyOf = (c: CompareCol) => JSON.stringify(c.target);
+    const draw = () => { body.innerHTML = `<div class="rec-sub">The comparison${[...this.compareRecs.values()].some(v => v === null) ? ' <span class="wait">— records still resolving (about ten seconds each the first time)</span>' : ''}</div>` + compareHTML(cols, cols.map(c => this.compareRecs.has(keyOf(c)) ? this.compareRecs.get(keyOf(c))! : null)) + `<div class="ds-foot">Scores are 0–100 reads of the public record (buildable share, lot-split headroom, hazard count, water and access) — comparable, not opinions. Blank score = the data does not support a number.</div>`; };
+    if (fetchAll) { for (const c of cols) if (!this.compareRecs.get(keyOf(c))) this.compareRecs.set(keyOf(c), null); }
+    draw();
+    if (!fetchAll) return;
+    await Promise.all(cols.map(async c => { if (this.compareRecs.get(keyOf(c))) return; const rec = await this.store.full(c.target); this.compareRecs.set(keyOf(c), rec); draw(); }));
+  }
+  private researchAction(a: string, apn: string, _pid: string) {
+    const it = research.list().find(x => x.apn === apn);
+    if (a === 'fly') { if (it) this.openCandidate({ apn: it.apn, situs: it.situs || null, acreage: it.acreage ?? null, center: it.center, bbox: it.bbox || null, rings: it.rings || null, county: it.county ? { name: it.county, fips: it.county, adapter: 'saved' } : null }); else if (this.selected?.kind === 'search') { const c = this.selected.payload as { bbox?: { xmin: number; ymin: number; xmax: number; ymax: number } | null; center: [number, number] }; if (c.bbox) this.props.flyToBox(c.bbox); else this.eng.map.flyTo({ center: [c.center[1], c.center[0]], zoom: 16 }); } return; }
+    if (a === 'open') { if (it) this.openCandidate({ apn: it.apn, situs: it.situs || null, acreage: it.acreage ?? null, center: it.center, bbox: it.bbox || null, rings: it.rings || null, county: it.county ? { name: it.county, fips: it.county, adapter: 'saved' } : null }); return; }
+    if (a === 'remove') { research.remove(apn); this.say('Removed from the research list.'); if (this.selected?.kind === 'search') this.renderParcel(); this.renderResearch(); return; }
+    if (a === 'save') { const c = this.selected?.payload as { apn: string | null; situs: string | null; acreage: number | null; center: [number, number]; bbox?: ResearchItem['bbox']; geometry?: { rings: [number, number][][] } | null; county?: { fips: string } | null } | undefined; if (c && c.apn) { research.add({ apn: c.apn, county: c.county?.fips, situs: c.situs, acreage: c.acreage, center: c.center, bbox: c.bbox || null, rings: c.geometry?.rings || null, savedAt: new Date().toISOString() }); this.say('Saved to the research list.'); this.renderParcel(); } return; }
+    if (a === 'clear') { this.props.clearCandidate(); return; }
+    if (a === 'compare') { this.renderCompare(true); return; }
+    if (a === 'export') { const blob = new Blob([JSON.stringify(research.list(), null, 2)], { type: 'application/json' }); const u = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = u; link.download = 'research-list.json'; link.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); return; }
+    if (a === 'clearlist') { research.save([]); this.compareRecs.clear(); this.renderResearch(); return; }
   }
   setCrumb(text: string) { this.q('#crumb').textContent = text; }
 }

@@ -662,6 +662,7 @@ const BMR_LOTS = [
 
 export const BMR_PROPERTY = {
   id: 'black-mountain-ranch',
+  county: '06111',              // FIPS: Ventura County, CA — 63 parcels, each lot carries its own APN
   name: 'Black Mountain Ranch',
   shortLabel: '⛰️ Black Mtn',
   labelChip: '⛰️ Black Mountain Ranch',

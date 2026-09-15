@@ -178,6 +178,8 @@ const VISION_PANEL_HTML =
 
 export const CHERS_PROPERTY = {
   id: 'chers-property',
+  apn: '034-0-220-135',           // Ventura County assessor parcel — the county record anchors here (docs/property-intake.md)
+  county: '06111',              // FIPS: Ventura County, CA
   name: "Cher's Property",
   shortLabel: "🌹 Cher's",
   labelChip: "🌹 Cher's Property",

@@ -149,6 +149,8 @@ const VISION_PANEL_HTML =
 
 export const ROSE_VALLEY_PROPERTY = {
   id: 'rose-valley',
+  apn: '015-0-010-120',           // Ventura County assessor parcel — the county record anchors here (docs/property-intake.md)
+  county: '06111',              // FIPS: Ventura County, CA
   name: 'Rose Valley Property',
   shortLabel: '🌄 Rose Valley',
   labelChip: '🌄 Rose Valley Property',

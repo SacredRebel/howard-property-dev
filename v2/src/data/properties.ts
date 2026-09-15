@@ -15,7 +15,7 @@ export interface Lot { id: string; apn: string; name: string; acreage: string; r
 export interface StatusBlock { badge?: string; rows?: [string, string][]; note?: string; }
 export interface Property {
   id: string; name: string; shortLabel: string; labelChip?: string; visionLabelChip?: string;
-  center: [number, number]; zoom: number; apn?: string;
+  center: [number, number]; zoom: number; apn?: string; county?: string;
   boundary: Segment[]; zones: Zone[]; lots?: Lot[];
   status?: { today?: StatusBlock; vision?: StatusBlock };
   docs?: { label: string; file: string }[];
@@ -158,6 +158,10 @@ export class PropertyLayer {
     // territories: the coloured ground each zone claims (polygon where surveyed, 15 m circle otherwise)
     m.addLayer({ id: 'terr-fill', type: 'fill', source: 'terr', minzoom: 10, paint: { 'fill-color': ['get', 'color'], 'fill-opacity': revealOpacity(0.28), 'fill-opacity-transition': { duration: 350, delay: 0 } } }, PROP_ANCHOR);
     m.addLayer({ id: 'terr-line', type: 'line', source: 'terr', minzoom: 10, paint: { 'line-color': ['get', 'color'], 'line-width': 1.6, 'line-opacity': revealOpacity(0.85), 'line-opacity-transition': { duration: 350, delay: 0 } } }, PROP_ANCHOR);
+    // a searched / clicked parcel that is not one of ours: cyan dashed outline (the research candidate)
+    m.addSource('cand', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    m.addLayer({ id: 'cand-fill', type: 'fill', source: 'cand', paint: { 'fill-color': '#7ff0ff', 'fill-opacity': 0.08 } }, PROP_ANCHOR);
+    m.addLayer({ id: 'cand-line', type: 'line', source: 'cand', layout: { 'line-join': 'round' }, paint: { 'line-color': '#7ff0ff', 'line-width': 2.4, 'line-dasharray': [2, 1.2], 'line-opacity': 0.95 } }, PROP_ANCHOR);
     m.addLayer({ id: 'zones', type: 'symbol', source: 'zones', minzoom: 9, layout: {
       'icon-image': ['get', 'icon'], 'icon-size': ['interpolate', ['linear'], ['zoom'], 12, 0.45, 16, 0.8, 19, 1.0], 'icon-allow-overlap': true, 'icon-ignore-placement': true,
       'text-field': ['get', 'name'], 'text-font': ['Open Sans Semibold'], 'text-size': ['interpolate', ['linear'], ['zoom'], 12.5, 4, 14.5, 10.5, 18, 13], 'text-offset': [0, 1.9], 'text-anchor': 'top', 'text-optional': true
@@ -177,6 +181,21 @@ export class PropertyLayer {
   }
 
   // true when the map is over any of our own features (the ground readout stays out of the way then)
+  // the research candidate: rings in [lat, lng] order (as the county returns them via the record) or [lng, lat] GeoJSON
+  showCandidate(rings: [number, number][][] | null, label = '') {
+    const src = this.eng.map.getSource('cand') as maplibregl.GeoJSONSource | undefined; if (!src) return;
+    const feats: GeoJSON.Feature[] = rings && rings.length ? [{ type: 'Feature', properties: { label }, geometry: { type: 'Polygon', coordinates: rings.map(r => r.map(q => [q[0], q[1]] as [number, number])) } }] : [];
+    src.setData({ type: 'FeatureCollection', features: feats });
+  }
+  clearCandidate() { this.showCandidate(null); }
+  // fly to a lon/lat bbox {xmin,ymin,xmax,ymax} the way flyToLot does (works with terrain and pitch)
+  flyToBox(b: { xmin: number; ymin: number; xmax: number; ymax: number }) {
+    const m = this.eng.map;
+    const bounds = new maplibregl.LngLatBounds([b.xmin, b.ymin], [b.xmax, b.ymax]);
+    const cam = m.cameraForBounds(bounds, { padding: { top: 90, bottom: 150, left: 40, right: 40 }, maxZoom: 17 });
+    if (!cam) return;
+    m.flyTo({ center: cam.center as maplibregl.LngLatLike, zoom: Math.min(cam.zoom ?? 15, 17), pitch: this.eng.terrain ? Math.max(m.getPitch(), 40) : m.getPitch(), curve: 1.4, speed: 1.1, essential: true });
+  }
   hitsOwn(point: maplibregl.Point): boolean {
     const m = this.eng.map, z = m.getZoom();
     return m.queryRenderedFeatures(point, { layers: ['zones', 'terr-fill', 'prop-fill', 'lot-fill'].filter(l => !!m.getLayer(l)) }).some(f => f.properties.minz == null || z >= Number(f.properties.minz));
