@@ -6,7 +6,7 @@ import compression from 'compression';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { IMAGE_URLS } from './image-urls.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -82,8 +82,27 @@ const zoneColors = {
   wellness: '#00838F'           // Teal - represents healing waters and tranquility
 };
 
-// Main route - serves the complete interactive map
-app.get('/', (req, res) => {
+// The single-engine atlas (V2, built from v2/ into public/v2) is the front door since V0.27.
+// The classic Leaflet page stays at /classic. Both read the same PROPERTIES and the same API.
+const V2_INDEX = join(__dirname, 'public', 'v2', 'index.html');
+const V2_SW = join(__dirname, 'public', 'v2', 'sw.js');
+function serveV2(req, res) {
+  if (!existsSync(V2_INDEX)) return serveClassic(req, res);
+  res.set('Cache-Control', 'no-cache');
+  res.sendFile(V2_INDEX);
+}
+app.get('/', serveV2);
+app.get('/sw.js', (req, res) => {
+  if (!existsSync(V2_SW)) return res.status(404).end();
+  res.set('Service-Worker-Allowed', '/');
+  res.set('Cache-Control', 'no-cache');
+  res.type('application/javascript');
+  res.sendFile(V2_SW);
+});
+
+// Classic route - serves the complete Leaflet map (moved from / to /classic in V0.27)
+app.get(['/classic', '/classic/'], serveClassic);
+function serveClassic(req, res) {
   try {
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -8238,7 +8257,7 @@ app.get('/', (req, res) => {
     console.error('❌ Error serving interactive map:', error);
     res.status(500).send('Server Error: ' + error.message);
   }
-});
+}
 
 // Helper function to parse budget strings (handles K suffix, ranges, and phases)
 function parseBudget(budgetStr) {

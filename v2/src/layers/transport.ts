@@ -40,7 +40,7 @@ export function rasterSource(def: RasterDef, opts: RasterOpts = {}): RasterSourc
   const transparent = opts.transparent !== false;
   return {
     type: 'raster', tileSize: px, attribution,
-    maxzoom: opts.maxZoom ?? (def.root ? 19 : 21),
+    maxzoom: opts.maxZoom ?? (def.root ? 19 : 20),
     tiles: [exportBase(def) + '?bbox={bbox-epsg-3857}' + exportTail(def, transparent, px)]
   };
 }

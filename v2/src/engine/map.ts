@@ -42,6 +42,8 @@ export class Engine {
   lastFlight = '2024';
   terrain = true;
   readonly active = new Set<string>();
+  tilesInFlight = 0;
+  quality: 'low' | 'medium' | 'high' = 'medium';
   readonly opacity = new Map<string, number>();
   private present = new Map<string, { z: number; layers: string[]; sources: string[] }>();
   private baseTimer: number | null = null;
@@ -54,7 +56,7 @@ export class Engine {
   constructor(container: HTMLElement, opts: { center: LngLatLike; zoom: number; bearing: number; pitch: number; pixelRatio?: number }) {
     const style: StyleSpecification = {
       version: 8,
-      glyphs: new URL('fonts/{fontstack}/{range}.pbf', document.baseURI.replace(/#.*$/, '')).href.replace(/%7B/g, '{').replace(/%7D/g, '}'),   // self-hosted under /v2/fonts
+      glyphs: location.origin + '/v2/fonts/{fontstack}/{range}.pbf',   // self-hosted, works from / and /v2/
       sources: {
         'base-esri': { type: 'raster', tileSize: 256, ...BASE_DIRECT.esri },
         dem: { type: 'raster-dem', tiles: [DEM_TILES], tileSize: 256, encoding: 'terrarium', maxzoom: 14, attribution: 'Terrain: Mapzen / AWS' }
@@ -80,8 +82,8 @@ export class Engine {
     this.map.on('load', () => this.onLoad());
     this.map.on('zoomend', () => this.projectionFor(this.map.getZoom()));
     this.map.on('move', () => this.events.emit('view', { zoom: this.map.getZoom(), pitch: this.map.getPitch(), bearing: this.map.getBearing() }));
-    this.map.on('dataloading', () => this.events.emit('loading', true));
-    this.map.on('idle', () => this.events.emit('loading', false));
+    this.map.on('dataloading', () => { this.events.emit('loading', true); });
+    this.map.on('idle', () => { this.tilesInFlight = 0; this.events.emit('loading', false); });
     this.startFps();
   }
 
@@ -265,10 +267,21 @@ export class Engine {
     };
     requestAnimationFrame(tick);
   }
+  // tiles still loading right now, counted from the source caches (aborted requests never drift it)
+  tilesLoading(): number {
+    try {
+      const caches = (this.map as unknown as { style: { sourceCaches: Record<string, { _tiles: Record<string, { state: string }> }> } }).style.sourceCaches;
+      let n = 0;
+      for (const sc of Object.values(caches)) for (const t of Object.values(sc._tiles)) if (t.state === 'loading' || t.state === 'reloading') n++;
+      this.tilesInFlight = n;
+      return n;
+    } catch { return this.tilesInFlight; }
+  }
   setQuality(q: 'low' | 'medium' | 'high') {
+    this.quality = q;
     const pr = q === 'low' ? 1 : q === 'medium' ? Math.min(window.devicePixelRatio || 1, 1.5) : (window.devicePixelRatio || 1);
     try { (this.map as unknown as { setPixelRatio: (n: number) => void }).setPixelRatio(pr); } catch { /* n/a */ }
-    if (q === 'low' && this.terrain) this.setTerrain(false);
+    try { localStorage.setItem('atlasQuality', q); } catch { /* fine */ }
   }
   overlaysSorted(): OverlayDef[] { return OVERLAYS.filter(o => this.active.has(o.id)); }
 }

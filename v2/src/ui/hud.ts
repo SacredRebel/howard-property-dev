@@ -7,7 +7,11 @@ import { BASE_LABELS, ml } from '../engine/map';
 import { GROUPS, OVERLAYS, FLIGHTS, HIST_YEARS, HIST_NOTES, overlayById, histYear, type OverlayDef } from '../layers/registry';
 import { legendFor } from '../layers/legend';
 import type { PropertyLayer, Property, Zone } from '../data/properties';
+import { galleryFor, galleryHTML, wireGallery, isOpen as lightboxOpen } from './gallery';
+import { Editor } from './editor';
 
+interface RichProperty extends Property { panel?: { title: string; html: string }; visionPanel?: { title: string; html: string }; cta?: { heading?: string; paragraph?: string; contacts?: { name: string; email: string }[]; buttons?: { label: string; url: string }[] }; }
+const stripClassicGallery = (html: string) => html.replace(/<div class="image-gallery-section"[\s\S]*?<\/div><\/div><\/div>/, '');
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 const el = (html: string) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild as HTMLElement; };
 
@@ -25,12 +29,16 @@ export class Hud {
   private dockOpen = window.innerWidth > 760;
   private inspectorOpen = window.innerWidth > 1100;
   private dossierCache = new Map<string, Promise<unknown>>();
+  editor!: Editor;
+  private lowFps = 0;
+  private galleryToken = 0;
 
   constructor(container: HTMLElement, o: HudOpts) {
     this.eng = o.eng; this.props = o.props; this.mode = o.mode; this.onMode = o.onMode;
     this.root = el('<div class="hud"></div>');
     container.appendChild(this.root);
     this.root.append(this.buildTop(), this.buildDock(), this.buildInspector(), this.buildTimeline(), this.buildControls(), el('<div class="toast" id="toast" hidden></div>'));
+    this.editor = new Editor(this.root, this.eng, this.props, m => this.say(m));
     this.wire();
     this.syncAll();
   }
@@ -104,8 +112,9 @@ export class Hud {
       <button class="ctl on" id="ctl-terrain" title="terrain on/off (X)">⛰</button>
       <button class="ctl" id="ctl-layers" title="layers (L)">☰</button>
       <button class="ctl" id="ctl-insp" title="inspector (I)">ⓘ</button>
+      <button class="ctl" id="ctl-edit" title="position editor (P)">⚙</button>
       <select class="ctl sel" id="ctl-quality" title="render quality"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select>
-      <span class="fps" id="fps" title="frames per second">— fps</span>
+      <span class="fps" id="fps" title="frames per second · tiles still loading">— fps</span>
       <span class="busy" id="busy" title="tiles loading"></span>
     </div>`);
   }
@@ -118,7 +127,7 @@ export class Hud {
     this.q('#dock').addEventListener('click', e => {
       const t = e.target as HTMLElement;
       const info = t.closest('.info') as HTMLElement | null;
-      if (info) { e.preventDefault(); const id = info.dataset.info!; this.peek.has(id) ? this.peek.delete(id) : this.peek.add(id); this.inspectorOpen = true; this.setTab('legend'); this.syncAll(); this.scrollLegendTo(id); return; }
+      if (info) { e.preventDefault(); const id = info.dataset.info!; this.peek.has(id) ? this.peek.delete(id) : this.peek.add(id); this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('legend'); this.syncAll(); this.scrollLegendTo(id); return; }
       const base = t.closest('.row.radio') as HTMLElement | null;
       if (base) { const b = base.dataset.base!; eng.setBase(b === 'flight' ? eng.lastFlight : b); return; }
       const row = t.closest('.row[data-id]') as HTMLElement | null;
@@ -135,6 +144,7 @@ export class Hud {
       const more = t.closest('.lg-more') as HTMLElement | null; if (more) { const blk = more.closest('.lgb')!; blk.classList.toggle('all'); more.textContent = blk.classList.contains('all') ? 'show fewer' : more.dataset.all!; return; }
       const fly = t.closest('[data-fly]') as HTMLElement | null; if (fly) { const p = this.props.props.find(x => x.id === fly.dataset.fly); if (p) this.props.flyTo(p); return; }
       const off = t.closest('[data-off]') as HTMLElement | null; if (off) { eng.setOverlay(off.dataset.off!, false); return; }
+      const dive = t.closest('[data-dive]') as HTMLElement | null; if (dive) { const p = this.props.props.find(x => x.id === dive.dataset.dive); if (p) this.enterVision(p); return; }
     });
     this.q('#inspector').addEventListener('input', e => {
       const t = e.target as HTMLInputElement;
@@ -153,8 +163,9 @@ export class Hud {
     this.q('#ctl-north').addEventListener('click', () => map.easeTo({ bearing: 0, pitch: map.getPitch() > 0 && map.getPitch() < 5 ? 0 : map.getPitch(), duration: 600 }));
     this.q('#ctl-3d').addEventListener('click', () => eng.set3D(map.getPitch() < 5));
     this.q('#ctl-terrain').addEventListener('click', () => eng.setTerrain(!eng.terrain));
-    this.q('#ctl-layers').addEventListener('click', () => { this.dockOpen = !this.dockOpen; this.syncPanels(); });
-    this.q('#ctl-insp').addEventListener('click', () => { this.inspectorOpen = !this.inspectorOpen; this.syncPanels(); });
+    this.q('#ctl-layers').addEventListener('click', () => { this.dockOpen = !this.dockOpen; this.lastPanel = 'dock'; this.syncPanels(); });
+    this.q('#ctl-insp').addEventListener('click', () => { this.inspectorOpen = !this.inspectorOpen; this.lastPanel = 'insp'; this.syncPanels(); });
+    this.q('#ctl-edit').addEventListener('click', () => this.editor.toggle());
     this.q<HTMLSelectElement>('#ctl-quality').addEventListener('change', e => eng.setQuality((e.target as HTMLSelectElement).value as 'low' | 'medium' | 'high'));
     this.q('#mode-pill').addEventListener('click', () => { this.mode = this.mode === 'today' ? 'vision' : 'today'; this.onMode(this.mode); this.syncAll(); });
     this.q('#btn-help').addEventListener('click', () => this.help());
@@ -163,11 +174,23 @@ export class Hud {
     eng.events.on('overlays', () => this.syncAll());
     eng.events.on('histYear', () => this.syncAll());
     eng.events.on('terrain', on => this.q('#ctl-terrain').classList.toggle('on', on));
-    eng.events.on('view', v => { this.q('#compass').style.transform = `rotate(${-v.bearing}deg)`; this.q('#ctl-3d').classList.toggle('on', v.pitch > 5); this.zoomHints(v.zoom); });
-    eng.events.on('loading', b => this.q('#busy').classList.toggle('on', b));
-    eng.events.on('fps', f => { const e = this.q('#fps'); e.textContent = f + ' fps'; e.classList.toggle('bad', f < 30); });
+    // every frame: only the cheap things (compass, 3D button); the row hints only when a zoom settles
+    const compass = this.q('#compass'), btn3d = this.q('#ctl-3d');
+    let lastPitchOn = false;
+    eng.events.on('view', v => { compass.style.transform = `rotate(${-v.bearing}deg)`; const on = v.pitch > 5; if (on !== lastPitchOn) { lastPitchOn = on; btn3d.classList.toggle('on', on); } });
+    eng.map.on('zoomend', () => this.zoomHints(eng.map.getZoom()));
+    const busy = this.q('#busy'); let busyOn = false;
+    eng.events.on('loading', b => { if (b !== busyOn) { busyOn = b; busy.classList.toggle('on', b); } });
+    const fpsEl = this.q('#fps');
+    eng.events.on('fps', f => {
+      const t = eng.tilesLoading();
+      fpsEl.textContent = f + ' fps' + (t ? ' · ' + t + ' tiles' : ''); fpsEl.classList.toggle('bad', f < 30);
+      // adaptive quality: five straight seconds under 28 fps while moving steps the render scale down once
+      if (f < 28 && eng.quality !== 'low' && eng.map.isMoving()) { if (++this.lowFps >= 5) { this.lowFps = 0; const q = eng.quality === 'high' ? 'medium' : 'low'; eng.setQuality(q); (this.q('#ctl-quality') as HTMLSelectElement).value = q; this.say(`Render quality lowered to ${q} for smoother movement — change it back in the corner control any time.`); } }
+      else this.lowFps = 0;
+    });
     // selection from the map
-    this.props.onSelect = (kind, payload) => { this.selected = { kind, payload }; this.inspectorOpen = true; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); };
+    this.props.onSelect = (kind, payload) => { this.selected = { kind, payload }; this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); };
     // hotkeys
     window.addEventListener('keydown', e => this.key(e));
   }
@@ -175,6 +198,8 @@ export class Hud {
   private key(e: KeyboardEvent) {
     const tgt = e.target as HTMLElement;
     if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA' || tgt.tagName === 'SELECT')) return;
+    if (lightboxOpen()) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     const map = this.eng.map, step = 120;
     const k = e.key.toLowerCase();
     const pan = (x: number, y: number) => map.panBy([x, y], { duration: 200 });
@@ -188,9 +213,10 @@ export class Hud {
       case 't': this.eng.set3D(map.getPitch() < 5); break;
       case 'n': map.easeTo({ bearing: 0, duration: 500 }); break;
       case 'x': this.eng.setTerrain(!this.eng.terrain); break;
-      case 'l': this.dockOpen = !this.dockOpen; this.syncPanels(); break;
-      case 'i': this.inspectorOpen = !this.inspectorOpen; this.syncPanels(); break;
+      case 'l': this.dockOpen = !this.dockOpen; this.lastPanel = 'dock'; this.syncPanels(); break;
+      case 'i': this.inspectorOpen = !this.inspectorOpen; this.lastPanel = 'insp'; this.syncPanels(); break;
       case 'h': this.eng.toggleOverlay('histtopo'); break;
+      case 'p': this.editor.toggle(); break;
       case 'g': { const c = map.getCenter(); window.open(`https://earth.google.com/web/@${c.lat},${c.lng},0a,${Math.round(40075016 / Math.pow(2, map.getZoom()) * 0.6)}d,35y,${Math.round(map.getBearing())}h,${Math.round(map.getPitch())}t,0r`, '_blank'); break; }
       case '?': this.help(); break;
       case ' ': e.preventDefault(); this.mode = this.mode === 'today' ? 'vision' : 'today'; this.onMode(this.mode); this.syncAll(); break;
@@ -198,13 +224,23 @@ export class Hud {
       case '[': { const i = Math.max(0, this.eng.flightIndex(this.eng.lastFlight) - 1); this.eng.setFlight(i, true); break; }
       case ']': { const i = Math.min(FLIGHTS.length - 1, this.eng.flightIndex(this.eng.lastFlight) + 1); this.eng.setFlight(i, true); break; }
       default:
-        if (/^[1-7]$/.test(k)) { const g = GROUPS[Number(k) - 1]; const d = this.q(`details[data-sec="${g.id}"]`) as HTMLDetailsElement; this.dockOpen = true; this.syncPanels(); d.open = !d.open; if (d.open) d.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+        if (/^[1-7]$/.test(k)) { const g = GROUPS[Number(k) - 1]; const d = this.q(`details[data-sec="${g.id}"]`) as HTMLDetailsElement; this.dockOpen = true; this.lastPanel = 'dock'; this.syncPanels(); d.open = !d.open; if (d.open) d.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
     }
   }
 
+  say(msg: string) {
+    const t = this.q('#toast'); t.textContent = msg; t.hidden = false;
+    window.clearTimeout((t as unknown as { _t: number })._t); (t as unknown as { _t: number })._t = window.setTimeout(() => { t.hidden = true; }, 6000);
+  }
+  enterVision(p: Property) {
+    if (this.mode !== 'vision') { this.mode = 'vision'; this.onMode('vision'); this.syncAll(); }
+    this.inspectorOpen = false; this.syncPanels();
+    this.say(`🌀 Entering the Vision — ${p.shortLabel || p.name}`);
+    this.props.dive(p, () => { this.selected = { kind: 'property', payload: p }; this.inspectorOpen = true; this.lastPanel = 'insp'; this.setTab('parcel'); this.renderParcel(); this.syncPanels(); });
+  }
   help() {
     const t = this.q('#toast');
-    t.innerHTML = `<b>Hotkeys</b> — W A S D pan · Q E rotate · R F tilt · + − zoom · T 2D/3D · X terrain · N north · L layers · I inspector · 1–7 open a layer group · [ ] step the aerial year · H historic topo · Space Today/Vision · G open in Google Earth · Esc close. <br>Mouse: drag to pan, right-drag or Ctrl-drag to rotate and tilt, wheel to zoom.`;
+    t.innerHTML = `<b>Hotkeys</b> — W A S D pan · Q E rotate · R F tilt · + − zoom · T 2D/3D · X terrain · N north · L layers · I inspector · P position editor · 1–7 open a layer group · [ ] step the aerial year · H historic topo · Space Today/Vision · G open in Google Earth · Esc close. <br>Mouse: drag to pan, right-drag or Ctrl-drag to rotate and tilt, wheel to zoom.`;
     t.hidden = false; window.clearTimeout((t as unknown as { _t: number })._t); (t as unknown as { _t: number })._t = window.setTimeout(() => { t.hidden = true; }, 9000);
   }
 
@@ -218,7 +254,10 @@ export class Hud {
   private aerialLabels(i: number) { const f = FLIGHTS[i]; this.q('#tl-aerial-year').textContent = String(f.year); this.q('#tl-aerial-note').textContent = f.when + (f.note ? ' · ' + f.note : ''); }
   private histLabels(y: number) { this.q('#tl-hist-year').textContent = String(y); this.q('#tl-hist-note').textContent = HIST_NOTES[y] || ''; }
   private setTab(t: 'legend' | 'parcel') { for (const b of this.root.querySelectorAll<HTMLElement>('.insp-tabs [data-tab]')) b.classList.toggle('on', b.dataset.tab === t); this.q('#insp-legend').hidden = t !== 'legend'; this.q('#insp-parcel').hidden = t !== 'parcel'; }
+  private lastPanel: 'dock' | 'insp' = 'dock';
   private syncPanels() {
+    // a phone shows one panel at a time: the one that was opened last wins
+    if (this.dockOpen && this.inspectorOpen && window.innerWidth <= 760) { if (this.lastPanel === 'insp') this.dockOpen = false; else this.inspectorOpen = false; }
     this.q('#dock').classList.toggle('open', this.dockOpen); this.q('#ctl-layers').classList.toggle('on', this.dockOpen);
     this.q('#inspector').classList.toggle('open', this.inspectorOpen); this.q('#ctl-insp').classList.toggle('on', this.inspectorOpen);
     this.root.classList.toggle('dock-open', this.dockOpen); this.root.classList.toggle('insp-open', this.inspectorOpen);
@@ -299,33 +338,51 @@ export class Hud {
     const box = this.q('#insp-parcel');
     if (!this.selected) { box.innerHTML = '<div class="empty">Click a property, a zone or a ranch lot to inspect it.</div>'; return; }
     const { kind, payload } = this.selected;
+    const strip = `<div class="strip ${this.mode}">${this.mode === 'vision' ? 'VISION · the proposal' : 'TODAY · as it stands'}</div>`;
+    const token = ++this.galleryToken;
     if (kind === 'property') {
-      const p = payload as Property, st = (this.mode === 'vision' ? p.status?.vision : p.status?.today) || p.status?.today;
-      let h = `<div class="card"><div class="card-head"><b>${esc(p.name)}</b>${p.apn ? `<span class="apn">APN ${esc(p.apn)}</span>` : ''}</div>`;
+      const p = payload as RichProperty, st = (this.mode === 'vision' ? p.status?.vision : p.status?.today) || p.status?.today;
+      const panel = this.mode === 'vision' ? (p.visionPanel || p.panel) : p.panel;
+      let h = `<div class="card">${strip}<div class="card-head"><b>${esc(p.name)}</b>${p.apn ? `<span class="apn">APN ${esc(p.apn)}</span>` : ''}</div><div class="gal-slot"></div>`;
       if (st?.badge) h += `<div class="badge">${esc(st.badge)}</div>`;
       if (st?.rows?.length) h += '<div class="rows">' + st.rows.map(r => `<div class="r"><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('') + '</div>';
       if (st?.note) h += `<div class="note-p">${esc(st.note)}</div>`;
-      h += `<div class="acts"><button class="mini" data-fly="${p.id}">fly here</button><a class="mini" href="/?p=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">classic page ↗</a></div>`;
+      h += `<div class="acts"><button class="mini" data-fly="${p.id}">fly here</button><button class="mini violet" data-dive="${p.id}">🌀 Enter the Vision</button><a class="mini" href="/classic" target="_blank" rel="noopener">classic page ↗</a></div>`;
       if (p.docs?.length) h += '<div class="docs">' + p.docs.map(d => `<a href="https://raw.githubusercontent.com/SacredRebel/howard-property-dev/main/${esc(d.file)}" target="_blank" rel="noopener">📄 ${esc(d.label)}</a>`).join('') + '</div>';
+      if (panel?.html) h += `<details class="fold"><summary>${esc(panel.title || 'Full details')}<span class="cnt">details</span></summary><div class="classic">${stripClassicGallery(panel.html)}</div></details>`;
+      if (p.cta) {
+        h += `<details class="fold" open><summary>${esc(p.cta.heading || 'Get in touch')}</summary><div class="cta">${p.cta.paragraph ? `<p class="desc">${esc(p.cta.paragraph)}</p>` : ''}`
+          + (p.cta.contacts || []).map(c => `<a class="doc" href="mailto:${esc(c.email)}"><span><b>${esc(c.name)}</b><i>${esc(c.email)}</i></span><span class="o">write ↗</span></a>`).join('')
+          + (p.cta.buttons || []).map(b => `<a class="mini gold" href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.label)}</a>`).join(' ') + '</div></details>';
+      }
       h += `<details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
       box.innerHTML = h;
       this.loadDossier(p);
+      this.fillGallery(box, p.id, 'property', token);
     } else if (kind === 'zone') {
       const { property: p, zone: z } = payload as { property: Property; zone: Zone };
-      let h = `<div class="card"><div class="card-head"><b>${esc(z.emoji || '')} ${esc(z.name)}</b><span class="apn">${esc(p.shortLabel || p.name)}</span></div>`;
+      let h = `<div class="card">${strip}<div class="card-head"><b>${esc(z.emoji || '')} ${esc(z.name)}</b><span class="apn">${esc(p.shortLabel || p.name)}</span></div><div class="gal-slot"></div>`;
       if (z.description) h += `<p class="desc">${esc(z.description)}</p>`;
       const rows: [string, string][] = [];
       if (z.type) rows.push(['Type', z.type]); if (z.budget) rows.push(['Budget', z.budget]); if (z.timeline) rows.push(['Timeline', z.timeline]); if (z.monthlyRevenue) rows.push(['Revenue', z.monthlyRevenue]); if (z.roi) rows.push(['ROI', z.roi]);
       if (rows.length) h += '<div class="rows">' + rows.map(r => `<div class="r"><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('') + '</div>';
-      if (z.features?.length) h += '<ul class="feats">' + z.features.slice(0, 8).map(f => `<li>${esc(f)}</li>`).join('') + '</ul>';
-      h += `<div class="acts"><button class="mini" data-fly="${p.id}">property</button></div></div>`;
+      if (z.features?.length) h += '<ul class="feats">' + z.features.map(f => `<li>${esc(f)}</li>`).join('') + '</ul>';
+      h += `<div class="acts"><button class="mini" data-fly="${p.id}">property</button><button class="mini violet" data-dive="${p.id}">🌀 Enter the Vision</button></div></div>`;
       box.innerHTML = h;
+      this.fillGallery(box, p.id, z.id, token);
     } else {
       const l = payload as { apn: string; name: string; acreage: string; pid: string };
-      box.innerHTML = `<div class="card"><div class="card-head"><b>${esc(l.name)}</b><span class="apn">APN ${esc(l.apn)}</span></div><div class="rows"><div class="r"><span class="k">Acreage</span><span class="v">${esc(l.acreage)} ac</span></div></div>
+      box.innerHTML = `<div class="card">${strip}<div class="card-head"><b>${esc(l.name)}</b><span class="apn">APN ${esc(l.apn)}</span></div><div class="rows"><div class="r"><span class="k">Acreage</span><span class="v">${esc(l.acreage)} ac</span></div></div>
         <details class="fold" open><summary>County dossier<span class="cnt" id="ds-cnt"></span></summary><div class="ds" id="ds-body"><div class="lg wait">resolving from public sources…</div></div></details></div>`;
       this.loadDossier({ apn: l.apn } as Property);
     }
+  }
+  private async fillGallery(box: HTMLElement, pid: string, zid: string, token: number) {
+    const g = await galleryFor(pid, zid, this.mode);
+    if (token !== this.galleryToken) return;   // the card changed meanwhile
+    const slot = box.querySelector('.gal-slot') as HTMLElement | null; if (!slot) return;
+    slot.innerHTML = galleryHTML(g, this.mode === 'vision' ? 'vision' : 'current');
+    wireGallery(slot, g);
   }
   private async loadDossier(p: Property) {
     const key = p.apn ? 'apn=' + encodeURIComponent(p.apn) : `lat=${p.center[0]}&lon=${p.center[1]}`;

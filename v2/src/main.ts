@@ -12,9 +12,15 @@ const mapEl = document.createElement('div'); mapEl.id = 'map'; app.appendChild(m
 
 const eng = new Engine(mapEl, { center: [state.lng, state.lat], zoom: state.zoom, bearing: state.bearing, pitch: state.pitch });
 eng.terrain = state.terrain;
+// tile cache: immutable aerials / historic topo / DEM tiles come back instantly on the next visit
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(e => console.info('[atlas] sw', e)); });
+}
 const props = new PropertyLayer(eng);
 let mode = state.mode;
 const hud = new Hud(app, { eng, props, mode, onMode: m => { mode = m; props.applyMode(m); persist(); } });
+// remembered render quality (low / medium / high) - applied before the first real frame
+try { const q = localStorage.getItem('atlasQuality'); if (q === 'low' || q === 'medium' || q === 'high') { eng.setQuality(q); const sel = document.getElementById('ctl-quality') as HTMLSelectElement | null; if (sel) sel.value = q; } } catch { /* private mode */ }
 
 function persist() {
   const c = eng.map.getCenter();

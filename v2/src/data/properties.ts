@@ -62,9 +62,23 @@ export class PropertyLayer {
     return b;
   }
 
+  private editing: string | null = null;
+  private zoneFeatures(): GeoJSON.Feature[] {
+    const m = this.eng.map, zones: GeoJSON.Feature[] = [];
+    for (const p of this.props) for (const z of p.zones || []) {
+      const emoji = z.emoji || z.icon || '📍', color = z.color || ZONE_COLORS[z.type || ''] || ZONE_COLORS.default;
+      const key = 'z-' + emoji + '-' + color.replace('#', '');
+      if (!this.icons.has(key)) { try { m.addImage(key, badge(emoji, color), { pixelRatio: 2 }); this.icons.add(key); } catch { /* dup */ } }
+      zones.push({ type: 'Feature', properties: { pid: p.id, zid: z.id, name: z.name, icon: key, mode: z.mode || 'both' }, geometry: { type: 'Point', coordinates: [z.position[1], z.position[0]] } });
+    }
+    return zones;
+  }
+  refreshZones() { const src = this.eng.map.getSource('zones') as maplibregl.GeoJSONSource | undefined; if (src) src.setData({ type: 'FeatureCollection', features: this.zoneFeatures() }); }
+  setEditing(pid: string | null) { this.editing = pid; this.applyMode(this.mode); }
+
   build() {
     const m = this.eng.map;
-    const bounds: GeoJSON.Feature[] = [], lots: GeoJSON.Feature[] = [], zones: GeoJSON.Feature[] = [];
+    const bounds: GeoJSON.Feature[] = [], lots: GeoJSON.Feature[] = [];
     for (const p of this.props) {
       const ring = stitch(p);
       if (ring.length > 3) bounds.push({ type: 'Feature', properties: { pid: p.id, name: p.name }, geometry: { type: 'Polygon', coordinates: [ring] } });
@@ -72,13 +86,8 @@ export class PropertyLayer {
         const rr = r.map(q => [q[1], q[0]] as [number, number]); if (rr.length && (rr[0][0] !== rr[rr.length - 1][0] || rr[0][1] !== rr[rr.length - 1][1])) rr.push([...rr[0]] as [number, number]);
         lots.push({ type: 'Feature', properties: { pid: p.id, lid: lot.id, apn: lot.apn, name: lot.name, acreage: lot.acreage }, geometry: { type: 'Polygon', coordinates: [rr] } });
       }
-      for (const z of p.zones || []) {
-        const emoji = z.emoji || z.icon || '📍', color = z.color || ZONE_COLORS[z.type || ''] || ZONE_COLORS.default;
-        const key = 'z-' + emoji + '-' + color.replace('#', '');
-        if (!this.icons.has(key)) { try { m.addImage(key, badge(emoji, color), { pixelRatio: 2 }); this.icons.add(key); } catch { /* dup */ } }
-        zones.push({ type: 'Feature', properties: { pid: p.id, zid: z.id, name: z.name, icon: key, mode: z.mode || 'both' }, geometry: { type: 'Point', coordinates: [z.position[1], z.position[0]] } });
-      }
     }
+    const zones = this.zoneFeatures();
     m.addSource('props', { type: 'geojson', data: { type: 'FeatureCollection', features: bounds } });
     m.addSource('lots', { type: 'geojson', data: { type: 'FeatureCollection', features: lots } });
     m.addSource('zones', { type: 'geojson', data: { type: 'FeatureCollection', features: zones } });
@@ -103,7 +112,7 @@ export class PropertyLayer {
   applyMode(mode: 'today' | 'vision') {
     this.mode = mode;
     const m = this.eng.map;
-    const modeFilter: maplibregl.FilterSpecification = ['any', ['==', ['get', 'mode'], 'both'], ['==', ['get', 'mode'], mode === 'today' ? 'current' : 'vision']];
+    const modeFilter: maplibregl.FilterSpecification = ['all', ['any', ['==', ['get', 'mode'], 'both'], ['==', ['get', 'mode'], mode === 'today' ? 'current' : 'vision']], ['!=', ['get', 'pid'], this.editing || '']];
     if (m.getLayer('zones')) m.setFilter('zones', modeFilter);
     for (const mk of this.markers) { const el = mk.getElement(); const p = this.props.find(x => x.id === el.dataset.pid); if (p) el.textContent = (mode === 'vision' && p.visionLabelChip) || p.labelChip || p.shortLabel || p.name; }
   }
@@ -121,11 +130,21 @@ export class PropertyLayer {
     }
   }
 
+  // a cinematic approach: parabolic flight, settling into a gentle tilt when terrain is on
   flyTo(p: Property) {
-    const ring = stitch(p);
+    const m = this.eng.map, ring = stitch(p);
+    const pitch = this.eng.terrain ? Math.max(m.getPitch(), 48) : m.getPitch();
     if (ring.length > 3) {
       const b = new maplibregl.LngLatBounds(); for (const q of ring) b.extend(q);
-      this.eng.map.fitBounds(b, { padding: { top: 90, bottom: 140, left: 340, right: 360 }, duration: 1800, pitch: this.eng.map.getPitch(), maxZoom: p.zoom });
-    } else this.eng.map.flyTo({ center: [p.center[1], p.center[0]], zoom: p.zoom, duration: 1800 });
+      const cam = m.cameraForBounds(b, { padding: { top: 90, bottom: 150, left: 40, right: 40 }, maxZoom: p.zoom - 1 });
+      m.flyTo({ center: cam?.center ?? [p.center[1], p.center[0]], zoom: Math.min(cam?.zoom ?? p.zoom - 1, p.zoom - 1), pitch, bearing: m.getBearing(), curve: 1.55, speed: 0.9, essential: true });
+    } else m.flyTo({ center: [p.center[1], p.center[0]], zoom: p.zoom - 1, pitch, curve: 1.55, speed: 0.9, essential: true });
+  }
+  // the portal: a 4 s dive from high above into the Vision of a property
+  dive(p: Property, onArrive?: () => void) {
+    const m = this.eng.map;
+    if (!this.eng.terrain) this.eng.setTerrain(true);
+    m.flyTo({ center: [p.center[1], p.center[0]], zoom: Math.max((p.zoom || 15.5) - 1.2, 12.8), pitch: 62, bearing: -24, duration: 4200, curve: 1.7, essential: true });
+    if (onArrive) m.once('moveend', onArrive);
   }
 }
