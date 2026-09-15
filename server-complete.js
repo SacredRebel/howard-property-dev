@@ -2703,6 +2703,13 @@ app.get('/', (req, res) => {
     #layers-panel .lp-note { display: block; font-size: 10.5px; color: rgba(238, 242, 236, 0.5); margin-top: 1px; }
     #layers-panel .lp-op { display: flex; align-items: center; gap: 9px; padding: 9px 9px 2px; font-size: 11px; color: rgba(238, 242, 236, 0.65); }
     #layers-panel .lp-op input { flex: 1; accent-color: #7cb35f; }
+    #layers-panel .lp-years { padding: 4px 10px 10px 30px; opacity: 0.55; transition: opacity 0.2s; }
+    #layers-panel .lp-years.live { opacity: 1; }
+    #layers-panel .lp-year-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+    #layers-panel .lp-year-head b { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #f3f6ee; font-variant-numeric: tabular-nums; }
+    #layers-panel .lp-year-head span { font-size: 11px; color: rgba(238, 242, 236, 0.7); }
+    #layers-panel .lp-years input[type=range] { width: 100%; accent-color: #e0b64a; cursor: ew-resize; }
+    #layers-panel .lp-year-ticks { display: flex; justify-content: space-between; font-size: 9.5px; color: rgba(238, 242, 236, 0.45); letter-spacing: 0.4px; margin-top: 1px; }
     #layers-panel .lp-legend { padding: 2px 2px 6px; }
     #layers-panel .lp-lg {
       display: flex; align-items: flex-start; gap: 9px;
@@ -3239,21 +3246,44 @@ app.get('/', (req, res) => {
     // ---- the catalog ----------------------------------------------------
     var VC_BASES = [
       { id: 'esri',  label: '🛰️ Satellite (Esri)',   note: 'global, always current', ready: satelliteLayer },
-      { id: '2025',  label: 'County 2025',            note: '3 in · flown for developed areas', kind: 'xyz',    svc: 'SDs/2025UrbanAerial' },
-      { id: '2024',  label: 'County 2024',            note: 'countywide',            kind: 'xyz',    svc: 'SDs/2024CountyWideAerial' },
-      { id: '2023',  label: 'County 2023',            note: 'countywide',            kind: 'xyz',    svc: 'SDs/2023CountyWideAerial' },
-      { id: '2022',  label: 'County 2022',            note: 'full county',           kind: 'export', svc: 'SDs/2022FullCountyAerial' },
-      { id: '2021',  label: 'County 2021',            note: '3 in Vexcel — sharpest', kind: 'export', svc: 'SDs/2021Vexcel3Inch' },
-      { id: '2019',  label: 'County 2019',            note: '',                      kind: 'export', svc: 'SDs/2019DecAerial' },
-      { id: '2018f', label: 'County 2018',            note: 'flown right after the Thomas Fire', kind: 'export', svc: 'SDs/2018NovDecPostFireAerial' },
-      { id: '2017',  label: 'County 2017',            note: 'before the Thomas Fire', kind: 'export', svc: 'SDs/2017OctAerial' },
-      { id: '2015',  label: 'County 2015',            note: '',                      kind: 'export', svc: 'SDs/2015DecAerial' },
-      { id: '2010',  label: 'County 2010',            note: '',                      kind: 'export', svc: 'SDs/2010DecAerial' },
-      { id: '2005',  label: 'County 2005',            note: '',                      kind: 'export', svc: 'SDs/2005SepAerial' },
-      { id: '1945',  label: 'County 1945',            note: 'the oldest flight on file', kind: 'export', svc: 'SDs/1945Aerial' },
       { id: 'gsat',  label: '🛰️ Satellite (Google)',  note: '',                      ready: googleSatLayer },
-      { id: 'osm',   label: '🗺️ Street map',          note: '',                      ready: osmLayer }
+      { id: 'osm',   label: '🗺️ Street map',          note: '',                      ready: osmLayer },
+      // every county flight on file, oldest first - driven by the year slider
+      { id: '1945',   year: 1945, when: '1945',     note: 'the oldest flight on file', kind: 'export', svc: 'SDs/1945Aerial' },
+      { id: '2000',   year: 2000, when: 'Apr 2000', note: '', kind: 'export', svc: 'SDs/2000AprAerial' },
+      { id: '2001',   year: 2001, when: 'Dec 2001', note: '', kind: 'export', svc: 'SDs/2001DecAerial' },
+      { id: '2002',   year: 2002, when: 'Oct 2002', note: '', kind: 'export', svc: 'SDs/2002OctAerial' },
+      { id: '2003',   year: 2003, when: 'Jan 2003', note: '', kind: 'export', svc: 'SDs/2003JanAerial' },
+      { id: '2004',   year: 2004, when: 'Sep 2004', note: '', kind: 'export', svc: 'SDs/2004SepAerial' },
+      { id: '2005',   year: 2005, when: 'Sep 2005', note: '', kind: 'export', svc: 'SDs/2005SepAerial' },
+      { id: '2006',   year: 2006, when: 'Jun 2006', note: '', kind: 'export', svc: 'SDs/2006JunAerial' },
+      { id: '2007',   year: 2007, when: 'Jul 2007', note: '', kind: 'export', svc: 'SDs/2007JulAerial' },
+      { id: '2008',   year: 2008, when: 'Apr 2008', note: '', kind: 'export', svc: 'SDs/2008AprAerial' },
+      { id: '2009',   year: 2009, when: 'Apr 2009', note: '', kind: 'export', svc: 'SDs/2009AprAerial' },
+      { id: '2010',   year: 2010, when: 'Dec 2010', note: '', kind: 'export', svc: 'SDs/2010DecAerial' },
+      { id: '2011',   year: 2011, when: 'Dec 2011', note: '', kind: 'export', svc: 'SDs/2011DecAerial' },
+      { id: '2012',   year: 2012, when: 'Dec 2012', note: '', kind: 'export', svc: 'SDs/2012DecAerial' },
+      { id: '2014',   year: 2014, when: 'Feb 2014', note: '', kind: 'export', svc: 'SDs/2014FebAerial' },
+      { id: '2015',   year: 2015, when: 'Dec 2015', note: '', kind: 'export', svc: 'SDs/2015DecAerial' },
+      { id: '2016m',  year: 2016, when: 'Mar 2016', note: '', kind: 'export', svc: 'SDs/2016MarAerial' },
+      { id: '2016',   year: 2016, when: 'Dec 2016', note: '', kind: 'export', svc: 'SDs/2016DecAerial' },
+      { id: '2017',   year: 2017, when: 'Oct 2017', note: 'weeks before the Thomas Fire', kind: 'export', svc: 'SDs/2017OctAerial' },
+      { id: '2018',   year: 2018, when: 'Oct 2018', note: '', kind: 'export', svc: 'SDs/2018OctAerial' },
+      { id: '2018f',  year: 2018, when: 'Nov 2018', note: 'post-Thomas-Fire flight — burn area only', kind: 'export', svc: 'SDs/2018NovDecPostFireAerial' },
+      { id: '2019v',  year: 2019, when: 'Apr 2019', note: 'Vexcel', kind: 'export', svc: 'SDs/2019MarAprVexcelAerial' },
+      { id: '2019',   year: 2019, when: 'Dec 2019', note: '', kind: 'export', svc: 'SDs/2019DecAerial' },
+      { id: '2020',   year: 2020, when: '2020',     note: '3 in Vexcel', kind: 'export', svc: 'SDs/2020Vexcel3Inch2' },
+      { id: '2021',   year: 2021, when: '2021',     note: '3 in Vexcel — sharpest', kind: 'export', svc: 'SDs/2021Vexcel3Inch' },
+      { id: '2022v',  year: 2022, when: '2022',     note: '3 in Vexcel', kind: 'export', svc: 'SDs/2022Vexcel3Inch' },
+      { id: '2022',   year: 2022, when: '2022',     note: 'full county', kind: 'export', svc: 'SDs/2022FullCountyAerial' },
+      { id: '2023u',  year: 2023, when: '2023',     note: 'urban · developed areas only', kind: 'xyz', svc: 'SDs/2023UrbanAerial' },
+      { id: '2023',   year: 2023, when: '2023',     note: 'countywide', kind: 'xyz', svc: 'SDs/2023CountyWideAerial' },
+      { id: '2024u',  year: 2024, when: '2024',     note: 'urban · developed areas only', kind: 'xyz', svc: 'SDs/2024UrbanAerial' },
+      { id: '2024',   year: 2024, when: '2024',     note: 'countywide', kind: 'xyz', svc: 'SDs/2024CountyWideAerial' },
+      { id: '2025',   year: 2025, when: '2025',     note: '3 in · developed areas', kind: 'xyz', svc: 'SDs/2025UrbanAerial' }
     ];
+    var VC_FLIGHTS = VC_BASES.filter(function (b) { return b.year; });
+    var vcLastFlight = '2024';
 
     var VC_OVERLAYS = [
       { id: 'topo',    label: '⛰️ Topo contours',     note: 'county contours — 100 ft, 20 ft then 5 ft as you zoom in', svc: 'SDs/Topography', op: 0.92 },
@@ -3340,22 +3370,49 @@ app.get('/', (req, res) => {
       return null;
     }
 
+    var vcBaseSwapTimer = null;
     function vcSetBase(id) {
       var def = vcDefById(VC_BASES, id);
       if (!def) return;
+      if (def.year) vcLastFlight = id;
+      var want = vcBaseLayer(def);
+      var stale = [];
       for (var i = 0; i < VC_BASES.length; i++) {
         var other = VC_BASES[i];
         if (other.id === id) continue;
         var lyr = other.ready || vcBaseCache[other.id];
-        if (lyr && map.hasLayer(lyr)) map.removeLayer(lyr);
+        if (lyr && map.hasLayer(lyr)) stale.push(lyr);
       }
-      var want = vcBaseLayer(def);
+      // the new imagery goes on top; the old stays underneath until the new has drawn,
+      // so scrubbing the year slider never flashes to blank
+      if (want.setZIndex) want.setZIndex(1);
       if (!map.hasLayer(want)) want.addTo(map);
-      if (want.setZIndex) want.setZIndex(0);
+      var settle = function () {
+        clearTimeout(vcBaseSwapTimer);
+        for (var k = 0; k < stale.length; k++) if (map.hasLayer(stale[k]) && stale[k] !== want) map.removeLayer(stale[k]);
+        if (want.setZIndex) want.setZIndex(0);
+      };
+      clearTimeout(vcBaseSwapTimer);
+      if (stale.length && want.once) { want.once('load', settle); vcBaseSwapTimer = setTimeout(settle, 3500); }
+      else settle();
       vcActiveBase = id;
       try { localStorage.setItem('ojaiMapBase', id); } catch (e) {}
       vcSyncPanel();
       if (window.vcSync3DLayers) window.vcSync3DLayers();
+    }
+    // the year slider: index into VC_FLIGHTS
+    var vcFlightTimer = null;
+    function vcFlightIndexOf(id) { for (var i = 0; i < VC_FLIGHTS.length; i++) if (VC_FLIGHTS[i].id === id) return i; return VC_FLIGHTS.length - 1; }
+    function vcFlightLabel(f) { return f.when + (f.note ? ' \u00b7 ' + f.note : ''); }
+    function vcSetFlight(idx, immediate) {
+      var f = VC_FLIGHTS[Math.max(0, Math.min(VC_FLIGHTS.length - 1, idx))];
+      var lab = document.getElementById('lp-year-label');
+      if (lab) lab.textContent = vcFlightLabel(f);
+      var big = document.getElementById('lp-year-big');
+      if (big) big.textContent = f.year;
+      clearTimeout(vcFlightTimer);
+      if (immediate) vcSetBase(f.id);
+      else vcFlightTimer = setTimeout(function () { vcSetBase(f.id); }, 160);
     }
 
     function vcToggleOverlay(id) {
@@ -3412,13 +3469,32 @@ app.get('/', (req, res) => {
       h += '<div class="lp-group">Base imagery</div>';
       for (var j = 0; j < VC_BASES.length; j++) {
         var b = VC_BASES[j];
+        if (b.year) continue;
         h += vcRow('radio', b.id, b.label, b.note, vcActiveBase === b.id);
       }
+      var curDef = vcDefById(VC_BASES, vcActiveBase), onFlight = !!(curDef && curDef.year);
+      var fi = vcFlightIndexOf(onFlight ? vcActiveBase : vcLastFlight), fcur = VC_FLIGHTS[fi];
+      h += '<div class="lp-row radio lp-flight' + (onFlight ? ' on' : '') + '" data-kind="radio" data-id="' + fcur.id + '">'
+         + '<span class="lp-dot"></span>'
+         + '<span class="lp-txt">🛩️ County aerial flights<span class="lp-note">' + VC_FLIGHTS.length + ' flights, 1945 to 2025 \u2014 drag the year</span></span>'
+         + '</div>';
+      h += '<div class="lp-years' + (onFlight ? ' live' : '') + '">'
+         + '<div class="lp-year-head"><b id="lp-year-big">' + fcur.year + '</b><span id="lp-year-label">' + vcFlightLabel(fcur) + '</span></div>'
+         + '<input type="range" id="lp-year" min="0" max="' + (VC_FLIGHTS.length - 1) + '" value="' + fi + '" step="1" aria-label="Aerial flight year">'
+         + '<div class="lp-year-ticks"><span>1945</span><span>2005</span><span>2015</span><span>2025</span></div>'
+         + '</div>';
       body.innerHTML = h;
+      var yr = document.getElementById('lp-year');
+      if (yr) {
+        yr.addEventListener('input', function () { vcSetFlight(parseInt(this.value, 10), false); });
+        yr.addEventListener('change', function () { vcSetFlight(parseInt(this.value, 10), true); });
+        yr.addEventListener('click', function (e) { e.stopPropagation(); });
+      }
       var rows = body.querySelectorAll('.lp-row');
       for (var k = 0; k < rows.length; k++) {
         rows[k].addEventListener('click', function () {
           var id = this.getAttribute('data-id');
+          if (this.classList.contains('lp-flight')) { vcSetFlight(vcFlightIndexOf(vcLastFlight), true); return; }
           if (this.getAttribute('data-kind') === 'radio') vcSetBase(id); else vcToggleOverlay(id);
         });
       }
@@ -3437,11 +3513,18 @@ app.get('/', (req, res) => {
       var body = document.getElementById('lp-body');
       if (!body) return;
       var rows = body.querySelectorAll('.lp-row');
+      var curDef = vcDefById(VC_BASES, vcActiveBase), onFlight = !!(curDef && curDef.year);
       for (var i = 0; i < rows.length; i++) {
         var r = rows[i], id = r.getAttribute('data-id');
-        var on = r.getAttribute('data-kind') === 'radio' ? (vcActiveBase === id) : !!vcActiveOverlays[id];
+        var on = r.classList.contains('lp-flight') ? onFlight
+          : (r.getAttribute('data-kind') === 'radio' ? (vcActiveBase === id) : !!vcActiveOverlays[id]);
         r.classList.toggle('on', on);
       }
+      var yrs = body.querySelector('.lp-years'); if (yrs) yrs.classList.toggle('live', onFlight);
+      var yr = document.getElementById('lp-year');
+      if (yr && onFlight) { var fi = vcFlightIndexOf(vcActiveBase); if (parseInt(yr.value, 10) !== fi) yr.value = fi;
+        var big = document.getElementById('lp-year-big'), lab = document.getElementById('lp-year-label');
+        if (big) big.textContent = VC_FLIGHTS[fi].year; if (lab) lab.textContent = vcFlightLabel(VC_FLIGHTS[fi]); }
       var btn = document.getElementById('layers-toggle');
       if (btn) btn.classList.toggle('active', Object.keys(vcActiveOverlays).length > 0 || vcActiveBase !== 'esri');
     }
