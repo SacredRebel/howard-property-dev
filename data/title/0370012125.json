@@ -1,0 +1,301 @@
+{
+  "schema": 1,
+  "apn": "037-0-012-125",
+  "apn10": "0370012125",
+  "source": {
+    "provider": "PropertyChecker",
+    "kind": "purchased property report",
+    "preparedOn": "2025-03-16",
+    "title": "Property Report - 11962 Sulphur Mountain Rd, Ojai, CA 93023"
+  },
+  "situs": "11962 SULPHUR MOUNTAIN RD, OJAI, CA 93023",
+  "county": "VENTURA",
+  "latlon": [
+    34.432693,
+    -119.156021
+  ],
+  "propertyType": "SINGLE FAMILY RESIDENCE",
+  "use": "RESIDENTIAL",
+  "owner": {
+    "names": [
+      "11962 SULPHUR MOUNTAIN LLC"
+    ],
+    "mailing": "28175 S Anchovy Ave, San Pedro, CA 65026",
+    "type": "Company",
+    "company": true,
+    "occupied": false,
+    "ownershipLength": "7mo",
+    "trust": null
+  },
+  "timeline": [
+    {
+      "year": 2024,
+      "party": "11962 Sulphur Mountain Llc",
+      "type": "GRANT DEED",
+      "date": "2024-07-29",
+      "price": null
+    },
+    {
+      "year": 2024,
+      "party": "Tanny Beau Brooks",
+      "type": "DEED OF TRUST",
+      "date": "2024-07-01",
+      "price": null
+    },
+    {
+      "year": 2018,
+      "party": "Tanny B Brooks",
+      "type": "GRANT DEED",
+      "date": "2018-12-18",
+      "price": 800000
+    },
+    {
+      "year": 1996,
+      "party": "John W Dolan",
+      "type": "DEED OF TRUST",
+      "date": "1996-04-02",
+      "price": null
+    }
+  ],
+  "deed": {
+    "grantee": "11962 SULPHUR MOUNTAIN LLC",
+    "grantor": null,
+    "ownerAddress": "11962 SULPHUR MOUNTAIN RD, OJAI, CA 93023",
+    "category": "Company",
+    "ownerOccupied": false,
+    "document": "0000052341",
+    "recorded": "2024-08-02",
+    "documentType": null,
+    "transactionType": null,
+    "amount": null,
+    "mortgage": null,
+    "titleCompany": null
+  },
+  "loans": [
+    {
+      "amount": 1300000,
+      "date": "2024-08-02",
+      "lender": "SPREO CAPITAL MANAGER LLC",
+      "lenderType": "NON LENDING INSTITUTION",
+      "loanType": "COMMERCIAL"
+    },
+    {
+      "amount": 300000,
+      "date": "2024-07-01",
+      "lender": "ARTHUR HUNOT",
+      "lenderType": "PRIVATE PARTY",
+      "loanType": "COMMERCIAL"
+    },
+    {
+      "amount": 680000,
+      "date": "2019-01-22",
+      "lender": "W J & DOLAN R 2017 TRUST (RT)",
+      "lenderType": "UNKNOWN OR NOT PROVIDED",
+      "loanType": "CONVENTIONAL WITH PMI"
+    },
+    {
+      "amount": 100000,
+      "date": "1996-04-02",
+      "lender": "AMERICA'S WHOLESALE LENDER",
+      "lenderType": "MORTGAGE FUNDING COMPANY",
+      "loanType": "UNKNOWN OR NOT PROVIDED"
+    }
+  ],
+  "liens": [
+    {
+      "debtor": "N. D.",
+      "matchedAddress": "11962 Sulphur Mountain RD; Ojai, CA 93023-8354",
+      "type": "STATE TAX LIEN",
+      "filed": "2015-12-09",
+      "reported": "2015-12-23",
+      "amount": 13815,
+      "caseNumber": "20151209001775610",
+      "otherCaseNumber": "15327546185",
+      "state": "CA",
+      "creditor": "STATE OF CALIFORNIA",
+      "court": "VENTURA COUNTY COURT (RD)",
+      "courtPhone": "8056542266"
+    },
+    {
+      "debtor": "J. M. D.",
+      "matchedAddress": "11962 Sulphur Mountain RD; Ojai, CA 93023-8354",
+      "type": "STATE TAX LIEN",
+      "filed": "2011-08-22",
+      "reported": "2011-09-02",
+      "amount": 1043,
+      "caseNumber": "20110822001230000",
+      "otherCaseNumber": "11228347512",
+      "state": "CA",
+      "creditor": "STATE OF CALIFORNIA",
+      "court": "VENTURA COUNTY COURT (RD)",
+      "courtPhone": "8056542266"
+    },
+    {
+      "debtor": "N. M.",
+      "matchedAddress": "11962 Sulphur Mountain RD; Ojai, CA 93023-8354",
+      "type": "STATE TAX LIEN",
+      "filed": "2009-03-18",
+      "reported": "2009-04-30",
+      "amount": 8470,
+      "caseNumber": "20090318000424710",
+      "otherCaseNumber": "09069659653",
+      "state": null,
+      "creditor": null,
+      "court": "VENTURA COUNTY COURT (RD)",
+      "courtPhone": "8056542266"
+    }
+  ],
+  "judgments": [],
+  "preForeclosures": [],
+  "values": {
+    "marketEstimate": 1495000,
+    "perSqFt": 1171,
+    "rentEstimate": 6637,
+    "lastSaleDate": "2018-12-18",
+    "lastSaleAmount": 800000
+  },
+  "taxes": {
+    "bill": 9558,
+    "year": 2024,
+    "assessedTotal": 874915,
+    "assessedLand": 765552,
+    "assessedImprovements": 109363,
+    "previousAssessed": 874915,
+    "changePct": "12%",
+    "rollUpdated": "2024-07-01",
+    "exemption": null,
+    "delinquent": "2023",
+    "zoningCode": "RA5AC",
+    "zoningType": "RESIDENTIAL",
+    "useCode": "385"
+  },
+  "taxHistory": [
+    {
+      "year": 2012,
+      "tax": 2209,
+      "taxChange": null,
+      "assessment": 211849,
+      "assessmentChange": null
+    },
+    {
+      "year": 2013,
+      "tax": 2209,
+      "taxChange": "0.00%",
+      "assessment": 216085,
+      "assessmentChange": "2.00%"
+    },
+    {
+      "year": 2014,
+      "tax": 2251,
+      "taxChange": "1.90%",
+      "assessment": 217064,
+      "assessmentChange": "0.45%"
+    },
+    {
+      "year": 2015,
+      "tax": 2453,
+      "taxChange": "8.93%",
+      "assessment": 221400,
+      "assessmentChange": "2.00%"
+    },
+    {
+      "year": 2016,
+      "tax": 2453,
+      "taxChange": "0.00%",
+      "assessment": 224774,
+      "assessmentChange": "1.52%"
+    },
+    {
+      "year": 2017,
+      "tax": 2511,
+      "taxChange": "2.41%",
+      "assessment": 229269,
+      "assessmentChange": "2.00%"
+    },
+    {
+      "year": 2018,
+      "tax": 2511,
+      "taxChange": "0.00%",
+      "assessment": 233853,
+      "assessmentChange": "2.00%"
+    },
+    {
+      "year": 2019,
+      "tax": 2565,
+      "taxChange": "2.15%",
+      "assessment": 238529,
+      "assessmentChange": "2.00%"
+    },
+    {
+      "year": 2020,
+      "tax": 8783,
+      "taxChange": "242.42%",
+      "assessment": 816000,
+      "assessmentChange": "242.10%"
+    },
+    {
+      "year": 2021,
+      "tax": 9011,
+      "taxChange": "2.58%",
+      "assessment": 824453,
+      "assessmentChange": "1.04%"
+    },
+    {
+      "year": 2022,
+      "tax": 9047,
+      "taxChange": "0.41%",
+      "assessment": 840942,
+      "assessmentChange": "2.00%"
+    },
+    {
+      "year": 2023,
+      "tax": 9047,
+      "taxChange": "0.00%",
+      "assessment": 857760,
+      "assessmentChange": "2.00%"
+    }
+  ],
+  "permits": [
+    {
+      "number": "B18-000674",
+      "date": "2018-06-18",
+      "type": "Demolition",
+      "subType": null,
+      "status": "complete",
+      "jobValue": null,
+      "fees": 248,
+      "contractor": null,
+      "description": "Demolition permit due to thomas fire (opt-out). Reference sap18-127"
+    },
+    {
+      "number": "E00-000037",
+      "date": "2000-01-21",
+      "type": "Electrical agricultural",
+      "subType": null,
+      "status": "expired",
+      "jobValue": null,
+      "fees": null,
+      "contractor": null,
+      "description": "Existing barn workshop provide seperate 200 amp electric panel 3 motors 1 subpanel and general wiring throughout"
+    }
+  ],
+  "building": {
+    "beds": 2,
+    "baths": 1,
+    "sqft": 1277,
+    "yearBuilt": 1920,
+    "stories": 1,
+    "rooms": 5,
+    "units": 0,
+    "lotAcres": 9,
+    "lotSqFt": 412513,
+    "garageSqft": 480,
+    "parkingSpaces": 2,
+    "construction": "WOOD",
+    "fireplace": 1,
+    "pool": false
+  },
+  "legal": "PR APN 0370010735",
+  "importedAt": "2026-09-16T22:04:37.697Z",
+  "importedFrom": "property-report-11962-sulphur-mountain-rd-ojai-ca-93023"
+}

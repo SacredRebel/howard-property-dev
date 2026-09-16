@@ -15,6 +15,7 @@ export interface RecordData {
   part?: string; apn: string | null; apn10?: string | null; situs: string | null; acreage: number | null; center?: [number, number]; bbox?: { xmin: number; ymin: number; xmax: number; ymax: number } | null;
   geometry?: { rings: [number, number][][] } | null; county?: County | null; flags: Flag[]; sections: Section[]; records?: RecMap[]; raw?: [string, string][]; portals?: Portal[]; terrain?: Terrain | null;
   sourcesQueried?: number; sourcesAnswered?: number; sourcesLate?: number; partial?: boolean; resolvedAt?: string; cached?: boolean; ms?: number; error?: string;
+  evidence?: { provider: string | null; preparedOn: string | null; importedAt: string | null; path: string } | null;
 }
 export interface Target { apn?: string; county?: string; lat?: number; lng?: number; label?: string; }
 export interface Dim { id: string; label: string; value: string; score: number | null; note: string; }
@@ -60,8 +61,8 @@ export function readFrom(rec: RecordData): Dim[] {
   dims.push({ id: 'water', label: 'Water', value: (/No public water/.test(wl) ? 'no public water line' : wl ? 'public water nearby' : '—') + ' · ' + (/No public sewer/.test(sw) ? 'septic' : sw ? 'sewer nearby' : '—'), score: wl || sw ? Math.min(100, wscore) : null, note: [get('wells_on') && /^\d+ — /.test(get('wells_on')) ? get('wells_on').split(' — ')[0] + ' well report' + (get('wells_on').startsWith('1 ') ? '' : 's') + ' on the parcel' : '', gw, get('gsa'), get('wells_water')].filter(Boolean).join(' · ') });
   const road = get('road');
   dims.push({ id: 'access', label: 'Access & utilities', value: road ? road.split(' · ').slice(0, 2).join(' · ') : '—', score: road ? (/No public road/.test(road) ? 25 : /on the parcel|~\d+ m/.test(road) ? 90 : 60) : null, note: [get('electric') ? get('electric').split(' · ')[0] : '', get('fire_station') ? 'fire station ' + ((get('fire_station').match(/~[^ ]+ (?:m|km)/) || [''])[0]) : '', get('transmission') ? 'transmission line within 1 km' : '', get('comms') ? get('comms') + ' comms facilities within 2 mi' : '', get('county_ease')].filter(Boolean).join(' · ') || 'recorded easements are in the deed, not GIS' });
-  const total = get('total_value'), land = get('land_value'), per = get('value_per_ac'), docRow = get('doc_nr'), dd = docRow.split(' · ')[2] || '', sale = get('sale_price');
-  dims.push({ id: 'value', label: 'Value signal', value: total ? total + ' assessed' : '—', score: null, note: [land ? 'land ' + land : '', per ? per + '/ac' : '', /^\$/.test(sale) ? 'last sale ' + sale.split(' — ')[0] : '', dd ? 'last document ' + dd : '', get('value_change') ? '2018 → now ' + ((get('value_change').match(/\(([^)]+)\)/) || [])[1] || '') : ''].filter(Boolean).join(' · ') });
+  const total = get('total_value'), land = get('land_value'), per = get('value_per_ac'), docRow = get('doc_nr'), dd = docRow.split(' · ')[2] || '', sale = get('sale_price'), est = get('market_estimate');
+  dims.push({ id: 'value', label: 'Value signal', value: total ? total + ' assessed' : '—', score: null, note: [land ? 'land ' + land : '', per ? per + '/ac' : '', /^\$/.test(sale) ? 'last sale ' + sale.split(' — ')[0] : '', /^\$/.test(est) ? 'estimate ' + est.split(' ')[0] : '', dd ? 'last document ' + dd : '', get('value_change') ? '2018 → now ' + ((get('value_change').match(/\(([^)]+)\)/) || [])[1] || '') : ''].filter(Boolean).join(' · ') });
   const recs = (rec.records || []).filter(r => r.type !== 'WCR'), chain = flat.filter(r => /^chain\d/.test(String(r[2] || ''))).length;
   dims.push({ id: 'change', label: 'Change over time', value: recs.length ? (recs.length + ' recorded maps, ' + (recs[recs.length - 1].year || '') + ' → ' + (recs[0].year || '')) : '—', score: null, note: (chain ? chain + ' title event' + (chain > 1 ? 's' : '') + ' on the public roll · ' : '') + (get('fires') && !/No recorded/.test(get('fires')) ? get('fires') : '') + (get('bldg_imagery') ? ' · footprints traced ' + get('bldg_imagery') : '') });
   return dims;
@@ -89,8 +90,10 @@ export class RecordStore {
 
 // ---- rendering ----------------------------------------------------------------------
 const rowHTML = (r: Row) => `<div class="r${r[0] ? '' : ' cont'}"${r[2] ? ` data-key="${esc(r[2])}"` : ''}><span class="k">${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`;
-export function sectionsHTML(rec: RecordData, open = true) {
-  return rec.sections.map(s => `<details class="fold sub rec-sec" data-sec="${s.id}"${open ? ' open' : ''}><summary>${esc(s.label)}<span class="cnt">${s.rows.length}</span></summary><div class="rows">${s.rows.map(rowHTML).join('')}</div></details>`).join('');
+export function sectionsHTML(rec: RecordData, open = true, importable = false) {
+  // editor mode: the Ownership & title section offers the report import (a purchased property report → owner, loans, liens, taxes, permits for this APN)
+  const importBtn = importable && rec.apn ? `<div class="acts up"><button class="mini" data-rec="import">＋ import a property report (PDF)</button><span class="hint">${rec.evidence ? esc((rec.evidence.provider || 'a') + ' report' + (rec.evidence.preparedOn ? ' of ' + rec.evidence.preparedOn : '') + ' on file — importing another replaces it') : 'PropertyChecker report PDF for this APN — names, loans, liens and taxes then resolve here'}</span></div>` : '';
+  return rec.sections.map(s => `<details class="fold sub rec-sec" data-sec="${s.id}"${open ? ' open' : ''}><summary>${esc(s.label)}<span class="cnt">${s.rows.length}</span></summary><div class="rows">${s.rows.map(rowHTML).join('')}</div>${s.id === 'title' ? importBtn : ''}</details>`).join('');
 }
 export function flagsHTML(flags: Flag[]) {
   return flags.map(f => `<div class="ds-flag ${f.level === 'watch' ? 'warn' : esc(f.level)}">${esc(f.text)}</div>`).join('');
@@ -131,7 +134,7 @@ function footHTML(rec: RecordData, deepState: 'loading' | 'done' | 'failed') {
   return `<div class="ds-foot">${rec.sourcesAnswered || 0} of ${rec.sourcesQueried || 0} public sources answered${rec.sourcesLate ? ` (${rec.sourcesLate} late — refresh to fill them in)` : ''} · resolved ${d}${rec.cached ? ' (from the 30-day cache)' : ''}${deepState === 'loading' ? ' · <span class="wait">state &amp; federal layers and the terrain grid still loading…</span>' : deepState === 'failed' ? ' · the state/federal resolver did not answer' : ''}.<br>Assessor figures are the county’s own and are not an appraisal. Recorded documents, not GIS, are the authority on boundaries and easements. Every row names its publisher; nothing here is inferred.</div>`;
 }
 
-export interface RenderOpts { onSave?: (rec: RecordData) => void; saved?: boolean; title?: string; }
+export interface RenderOpts { onSave?: (rec: RecordData) => void; saved?: boolean; title?: string; onImport?: (apn: string, file: File) => Promise<boolean>; }
 // render the record into `box`, filling in as core and deep arrive; returns a cancel token
 export function renderRecord(box: HTMLElement, t: Target, store: RecordStore, opts: RenderOpts = {}): { cancel: () => void } {
   let alive = true;
@@ -147,7 +150,7 @@ export function renderRecord(box: HTMLElement, t: Target, store: RecordStore, op
       <div class="rec-acts"><button class="mini" data-rec="expand">${expanded ? 'collapse all' : 'expand all'}</button><button class="mini" data-rec="refresh" title="re-resolve from every source">refresh</button><button class="mini" data-rec="print" title="open a clean report in a new tab">report ↗</button><button class="mini" data-rec="json">JSON</button>${rec.apn ? `<button class="mini" data-copy="${esc(rec.apn)}">copy APN</button>` : ''}${opts.onSave ? `<button class="mini gold" data-rec="save">${opts.saved ? '★ in research list' : '☆ save to research'}</button>` : ''}</div></div>`;
     h += flagsHTML(rec.flags);
     h += `<div class="rec-sub">The read — seven things the record can answer${deepState === 'loading' ? ' <span class="wait">(terrain grid loading)</span>' : ''}</div>` + readHTML(dims);
-    h += sectionsHTML(rec, expanded);
+    h += sectionsHTML(rec, expanded, !!opts.onImport);
     h += recordsHTML(rec.records || []);
     h += portalsHTML(rec.portals || [], rec.apn);
     h += rawHTML(rec.raw || []);
@@ -165,6 +168,7 @@ export function renderRecord(box: HTMLElement, t: Target, store: RecordStore, op
       else if (a === 'print') { if (coreData) openReport(mergeRecord(coreData, deepData)); }
       else if (a === 'json') { if (coreData) { const rec = mergeRecord(coreData, deepData); const blob = new Blob([JSON.stringify({ ...rec, read: readFrom(rec) }, null, 2)], { type: 'application/json' }); const u = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = u; link.download = 'county-record-' + (rec.apn || 'point').replace(/[^0-9a-z-]/gi, '') + '.json'; link.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); } }
       else if (a === 'save') { if (coreData && opts.onSave) { opts.onSave(mergeRecord(coreData, deepData)); b.textContent = '★ in research list'; } }
+      else if (a === 'import') { if (!coreData || !coreData.apn || !opts.onImport) return; const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf'; input.onchange = async () => { const f = input.files && input.files[0]; if (!f) return; b.textContent = 'importing…'; (b as HTMLButtonElement).disabled = true; const ok = await opts.onImport!(coreData!.apn!, f); if (ok) { deepState = 'loading'; load(true); } else { b.textContent = '＋ import a property report (PDF)'; (b as HTMLButtonElement).disabled = false; } }; input.click(); }
     }));
     root.querySelectorAll<HTMLElement>('.pf, a.pl').forEach(el => el.addEventListener(el.tagName === 'FORM' ? 'submit' : 'click', () => { const apn = el.dataset.apn; if (apn) { try { navigator.clipboard?.writeText(apn); } catch { /* fine */ } } }));
   };

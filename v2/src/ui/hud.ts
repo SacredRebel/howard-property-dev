@@ -482,8 +482,28 @@ export class Hud {
     const body = this.root.querySelector('#rec-body') as HTMLElement | null; if (!body) return;
     this.recordToken = renderRecord(body, t, this.store, {
       saved: t.apn ? research.has(t.apn) : false,
-      onSave: rec => { const it = research.fromRecord(rec); if (it) { research.add(it); this.say('Saved to the research list — open the Research tab to compare.'); void this.cloudPush('add', { item: it }); } else this.say('This point has no parcel to save.'); }
+      onSave: rec => { const it = research.fromRecord(rec); if (it) { research.add(it); this.say('Saved to the research list — open the Research tab to compare.'); void this.cloudPush('add', { item: it }); } else this.say('This point has no parcel to save.'); },
+      onImport: this.editing ? (apn, file) => this.importReport(apn, file) : undefined,
     });
+  }
+  // a purchased property report (PDF) for this APN → POST /api/title-report → data/title/<apn10>.json;
+  // the record re-resolves and the Ownership & title section fills with the owner, loans, liens, taxes, permits
+  private async importReport(apn: string, file: File): Promise<boolean> {
+    const pin = askPin(); if (!pin) return false;
+    if (file.size > 8 * 1024 * 1024) { this.say('That PDF is over 8 MB — export a smaller copy.'); return false; }
+    this.say(`Reading ${file.name}…`);
+    try {
+      const payload = await readDataUrl(file);
+      const r = await fetch('/api/title-report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin, apn, name: file.name, data: payload.data }) });
+      const j = await r.json().catch(() => ({})) as { ok?: boolean; error?: string; reportApn?: string; evidence?: { provider: string | null; preparedOn: string | null; owner: string[]; loans: number; liens: number } };
+      if (!r.ok || !j.ok) {
+        if (r.status === 401) { try { localStorage.removeItem('ojaiMapEditPin'); } catch { /* fine */ } }
+        this.say(r.status === 501 ? 'Imports are not configured on the server (EDIT_PIN + GITHUB_TOKEN).' : r.status === 401 ? 'Wrong PIN.' : r.status === 409 ? `That report is for APN ${j.reportApn || '?'}, not ${apn}.` : r.status === 422 ? 'That PDF is not a property report the atlas can read yet (PropertyChecker reports are).' : 'Import failed: ' + (j.error || r.status));
+        return false;
+      }
+      const e = j.evidence; this.say(`Imported ${e?.provider || 'the'} report${e?.preparedOn ? ' of ' + e.preparedOn : ''} — owner ${e?.owner?.join(' & ') || '?'}, ${e?.loans ?? 0} loans, ${e?.liens ?? 0} liens. The record is re-resolving.`);
+      return true;
+    } catch (err) { this.say('Import failed: ' + String((err as Error).message || err)); return false; }
   }
   // APN or "lat, lng" -> the county's parcel -> outline + fly + card
   async lookup(v: string) {

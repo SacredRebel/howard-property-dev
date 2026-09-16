@@ -1,0 +1,1054 @@
+Property Report Prepared On
+
+4410 Quail Ridge
+Rd, Ojai, CA
+93023
+=====PAGE 1
+Beds/Baths:
+
+2br / 1ba
+
+Living Area:
+
+1,277 sqft
+
+Lot Size:
+
+9 acres
+
+Year Built:
+
+1920
+
+Ownership Length:
+
+7mo
+
+Market Value:
+
+$1,495,000
+
+Summary
+
+Property Address:
+
+4410 QUAIL RIDGE RD
+
+City, State, Zipcode:
+
+OJAI, CA 93023
+
+Latitude:
+
+34.400000
+
+Longitude:
+
+-119.200000
+
+County:
+
+VENTURA
+
+APN:
+
+099-0-123-456
+
+Legal Description:
+
+PR APN 0990120000
+
+Legal Subdivision:
+
+N/A
+
+Property Type:
+
+SINGLE FAMILY RESIDENCE
+
+Owner Status:
+
+NOT OCCUPIED
+=====PAGE 2
+Owner Type:
+
+Company
+
+Trust Description:
+
+N/A
+
+Company Flag:
+
+YES
+
+Property Use:
+
+RESIDENTIAL
+
+Stories:
+
+1
+
+Structure Style:
+
+N/A
+
+Ownership
+
+Owner's Name(s)
+
+4410 QUAIL RIDGE HOLDINGS LLC
+
+Owner's Mailing Address
+
+12 Example Way, Somewhere, CA 90000
+
+Ownership Timeline
+
+2024 4410 Quail Ridge Holdings Llc
+
+Transaction Type: GRANT DEED
+
+Date of Transaction: 07/29/2024
+=====PAGE 3
+2024 Pat Example Seller
+
+Transaction Type: DEED OF TRUST
+
+Date of Transaction: 07/01/2024
+
+2018 Pat E Seller
+
+Transaction Type: GRANT DEED
+
+Date of Transaction: 12/18/2018
+
+Transaction Price: $750,000
+
+1996 Sam Prior Owner
+
+Transaction Type: DEED OF TRUST
+
+Date of Transaction: 04/02/1996
+
+Deeds
+
+Grantee’s Name(s):
+
+4410 QUAIL RIDGE HOLDINGS LLC
+
+Deed Owner Address:
+
+4410 QUAIL RIDGE RD, OJAI, CA
+93023
+
+Ownership Category:
+
+Company
+
+Owner Occupied:
+
+0
+
+Grantor’s Name(s):
+
+N/A
+
+Transaction Amount:
+
+N/A
+
+Transaction Mortgage Amount:
+
+N/A
+
+Transaction Type:
+
+N/A
+=====PAGE 4
+Document:
+
+0000099999
+
+Title Company:
+
+N/A
+
+Transaction Date:
+
+08/02/2024
+
+Document Type:
+
+N/A
+
+Property Type:
+
+Residential
+
+County:
+
+N/A
+
+Transfer Doc #:
+
+N/A
+
+Transfer Transaction #:
+
+0000099999
+
+Sale Document Book #:
+
+N/A
+
+Last Document #:
+
+N/A
+
+Building Permits
+
+Permit #1
+
+Effective Date: 06/18/2018
+
+Job Value: N/A
+
+Status: complete
+
+Type: Demolition
+
+Sub Type: N/A
+
+Business Name: N/A
+=====PAGE 5
+Home Owner: N/A
+
+Fees: $248
+
+Permit Number: B18-000001
+
+Description: Demolition permit due to thomas fire (opt-out). Reference sap18-001
+
+Permit #2
+
+Effective Date: 01/21/2000
+
+Job Value: N/A
+
+Status: expired
+
+Type: Electrical agricultural
+
+Sub Type: N/A
+
+Business
+Name:
+
+N/A
+
+Home Owner: N/A
+
+Fees: N/A
+
+Permit
+Number:
+
+E00-000002
+
+Description: Existing barn workshop provide seperate 200 amp electric panel 3 motors 1 subpanel and
+general wiring throughout
+
+Liens & Judgments
+=====PAGE 6
+Liens and Judgments information can vary in accuracy and may be subject to change over
+time due to updates or corrections made by relevant authorities. Additionally, please be
+aware that the address information used to match Lien and Judgment records may not
+always precisely match the property address.
+
+Liens
+
+Lien: Alex Former Tenant | 4410 Quail Ridge RD; Ojai, CA 93023-1111
+
+Case Number: 20151209000000001
+
+Filing Date: 12/9/2015
+
+Entity: I
+
+Report Date: 12/23/2015
+
+Original Department: FT
+
+Source Type: 1
+
+Filing Type: ST
+
+File State: CA
+
+Other Case Number: 15300000001
+
+Action Type: 03
+
+Association Code: 1
+
+Liability Amount: 12000.0
+
+Deptor
+=====PAGE 7
+Type: debtoraddress
+
+First Name: Alex
+
+Last Name: Tenant
+
+Tahoe Id: G0000000000000000001
+
+Full Name: Alex Former Tenant
+
+House Number: 4410
+
+Street Name: Quail Ridge
+
+Street Type: RD
+
+City: Ojai
+
+State: CA
+
+Zip Code: 93023
+
+Zip4: 8354
+
+County: Ventura
+
+Longitude: -119.200000
+
+Latitude: 34.400000
+
+Full Address: 4410 Quail Ridge RD; Ojai, CA 93023-1111
+
+Raw Verification Codes: AS01
+
+Verification Codes: ["AS01"]
+
+Creditor
+
+Type: creditor
+
+Is Business: 1
+=====PAGE 8
+Last Name: STATE OF CALIFORNIA
+
+Business Name: STATE OF CALIFORNIA
+
+Court
+
+Court Id: CAVENC1
+
+Name: VENTURA COUNTY COURT (RD)
+
+Phone: 8056542266
+
+Lien: Chris M Tenant | 4410 Quail Ridge RD; Ojai, CA 93023-1111
+
+Case Number: 20110822000000002
+
+Filing Date: 8/22/2011
+
+Entity: I
+
+Report Date: 9/2/2011
+
+Original Department: FT
+
+Source Type: 1
+
+Filing Type: ST
+
+Filing Type Description: STATE TAX LIEN
+
+File State: CA
+
+Other Case Number: 11200000002
+
+Action Type: 03
+
+Action Type Description: STATE TAX LIEN
+=====PAGE 9
+Association Code: 1
+
+Liability Amount: 1000.0
+
+Deptor
+
+Type: debtoraddress
+
+First Name: Chris
+
+Middle Name: M
+
+Last Name: Tenant
+
+Tahoe Id: G-0000000000000000002
+
+Full Name: Chris M Tenant
+
+House Number: 4410
+
+Street Name: Quail Ridge
+
+Street Type: RD
+
+City: Ojai
+
+State: CA
+
+Zip Code: 93023
+
+Zip4: 8354
+
+County: Ventura
+
+Longitude: -119.200000
+
+Latitude: 34.400000
+
+Full Address: 4410 Quail Ridge RD; Ojai, CA 93023-1111
+
+Raw Verification Codes: AS01
+=====PAGE 10
+Verification Codes: ["AS01"]
+
+Creditor
+
+Type: creditor
+
+Is Business: 1
+
+Last Name: STATE OF CALIFORNIA
+
+Business Name: STATE OF CALIFORNIA
+
+Court
+
+Court Id: CAVENC1
+
+Name: VENTURA COUNTY COURT (RD)
+
+Phone: 8056542266
+
+Lien: Alex Renter | 4410 Quail Ridge RD; Ojai, CA 93023-1111
+
+Case Number: 20090318000000003
+
+Filing Date: 3/18/2009
+
+Entity: S
+
+Report Date: 4/30/2009
+
+Original Department: FT
+
+Source Type: 1
+
+Filing Type: ST
+=====PAGE 11
+Other Case Number: 09000000003
+
+Action Type: 03
+
+Plaintiff Law Firm: STATE OF CALIFORNIA
+
+Primary Industry Business: I
+
+Association Code: 1
+
+Liability Amount: 8000.0
+
+Deptor
+
+Type: debtoraddress
+
+First Name: Alex
+
+Last Name: Renter
+
+Tahoe Id: G0000000000000000001
+
+Full Name: Alex Renter
+
+House Number: 4410
+
+Street Name: Quail Ridge
+
+Street Type: RD
+
+City: Ojai
+
+State: CA
+
+Zip Code: 93023
+
+Zip4: 8354
+
+County: Ventura
+
+Longitude: -119.200000
+=====PAGE 12
+Latitude: 34.400000
+
+Full Address: 4410 Quail Ridge RD; Ojai, CA 93023-1111
+
+Raw Verification Codes: AS01
+
+Verification Codes: ["AS01"]
+
+Court
+
+Court Id: CAVENC1
+
+Name: VENTURA COUNTY COURT (RD)
+
+Phone: 8056542266
+
+Type: courtaddress
+
+House Number: 800
+
+Street Direction: S
+
+Street Name: Victoria
+
+Street Type: AVE
+
+City: Ventura
+
+State: CA
+
+Zip Code: 93009
+
+Zip4: 0001
+
+County: Ventura
+
+Full Address: 800 S Victoria AVE; Ventura, CA 93009-0001
+
+Raw Verification Codes: AE09,AS02
+
+Verification Codes: ["AE09","AS02"]
+=====PAGE 13
+We could not locate any judgment records. It's important to keep in mind that the lack of
+information or results in our reports may not always be entirely accurate, comprehensive, or
+current. Therefore, we kindly advise against solely relying on our findings and recommend
+conducting your own thorough research.
+
+Pre-Foreclosures
+
+We could not locate any pre-foreclosure records. It's important to keep in mind that the lack
+of information or results in our reports may not always be entirely accurate, comprehensive,
+or current. Therefore, we kindly advise against solely relying on our findings and recommend
+conducting your own thorough research.
+
+Values
+
+Market Value Estimate:
+
+$1,495,000
+
+Property Square Footage:
+
+1,277 Sq Ft
+
+Market Value Per Sq Ft:
+
+$1,171 / Sq Ft
+
+Rent Estimate:
+
+$6,637
+
+Last Sale Date:
+
+12/18/2018
+
+Last Sale Amount:
+
+$750,000
+=====PAGE 14
+Taxes
+
+Tax Bill Amount:
+
+$9,558
+
+Tax Year Assessed:
+
+2024
+
+Total Assessed Value:
+
+$874,915
+
+Land Assessed Value:
+
+$765,552
+
+Additions Assessed Value:
+
+$109,363
+
+Tax Assessed Change %:
+
+12%
+
+Previous Assessed Value:
+
+$874,915
+
+Last Assessor Tax Roll Update:
+
+07/01/2024
+
+Assessor Last Updated:
+
+2024
+
+Zoning Category:
+
+Company
+
+Zoned Code Local:
+
+RA5AC
+
+Zoning Type:
+
+RESIDENTIAL
+
+Property Use Standardized:
+
+385
+
+Property Use Municode:
+
+1112
+
+Year Built:
+
+1920
+
+Tax Exemption:
+
+N/A
+
+Tax Delinquent:
+
+2023
+=====PAGE 15
+Tax History
+
+YEAR PROPERTY TAXES CHANGE TAX ASSESSMENT CHANGE
+
+2023 $9,047 0.00% $857,760 2.00%
+2022 $9,047 0.41% $840,942 2.00%
+2021 $9,011 2.58% $824,453 1.04%
+2020 $8,783 242.42% $816,000 242.10%
+2019 $2,565 2.15% $238,529 2.00%
+2018 $2,511 0.00% $233,853 2.00%
+2017 $2,511 2.41% $229,269 2.00%
+2016 $2,453 0.00% $224,774 1.52%
+2015 $2,453 8.93% $221,400 2.00%
+2014 $2,251 1.90% $217,064 0.45%
+2013 $2,209 0.00% $216,085 2.00%
+2012 $2,209 - $211,849 -
+
+Property Details
+
+Bedrooms:
+
+2
+
+Bathrooms:
+
+1
+=====PAGE 16
+Living Area:
+
+1,277 Sq Ft
+
+Area Building Code:
+
+10
+
+Lot Size:
+
+9 Acres
+
+Year Built:
+
+1920
+
+Rooms
+
+Bath Count: 1
+
+Bath Partial Count: 0
+
+Bedrooms Count: 2
+
+Rooms Count: 5
+
+Stories Count: 1
+
+Units Count: 0
+
+Bonus Room: Not on File
+
+Breakfast Nook: Not on File
+
+Cellar Room: Not on File
+
+Wine Cellar Room: Not on File
+
+Exercise Room: Not on File
+
+Family Room: Not on File
+
+Game Room: Not on File
+
+Great Room: Not on File
+
+Hobby Room: Not on File
+=====PAGE 17
+Laundry Room: Not on File
+
+Media Room: Not on File
+
+Mud Room: Not on File
+
+Office Room: Not on File
+
+Safe Room: Not on File
+
+Sitting Room: Not on File
+
+Storm Room: Not on File
+
+Study Room: Not on File
+
+Sunroom: Not on File
+
+Utility Room: Not on File
+
+Area
+
+Building: 1277
+
+Building Definition Code: Living Area
+
+Gross: 1277
+
+1st Floor: 1277
+
+2nd Floor: 0
+
+Upper Floors: 0
+
+Lot Acres: 9 Acres
+
+Lot SF: 412513.00
+
+Lot Depth: 0.0
+
+Lot Width: 0.0
+=====PAGE 18
+Rooms Attic: Not on File
+
+Rooms Basement: 0
+
+Rooms Basement Finished: Not on File
+
+Patio: 0
+
+Deck: Not on File
+
+Balcony: Not on File
+
+Parking
+
+Garage: Type Not Specified
+
+Garage Area: 480
+
+Carport: 0
+
+RV Parking Flag: Not on File
+
+Space Count: 2
+
+Driveway Area: 0
+
+Construction Details
+
+Roof Material: Not on File
+
+Roof Construction: Not on File
+
+Structure Style: Not on File
+
+Exterior Code: Not on File
+
+Foundation: Not on File
+=====PAGE 19
+Construction: WOOD
+
+Interior Structure: Not on File
+
+Plumbing Fixtures Count: 0
+
+Safety Fire Sprinklers Flag: Not on File
+
+Property Features
+
+Fireplace: YES
+
+Fireplace Count: 1
+
+Pool: Not on File
+
+Pool Area: 0
+
+Security Alarm Flag: Not on File
+
+Accessibility Elevator Flag: Not on File
+
+Accessibility Handicap Flag: Not on File
+
+Escalator Flag: 0
+
+Central Vacuum Flag: Not on File
+
+Content Intercom Flag: Not on File
+
+Content Sound System Flag: Not on File
+
+Wet Bar Flag: Not on File
+
+Content Storm Shutter Flag: Not on File
+
+Content Overhead Door Flag: Not on File
+
+Porch Code: Not on File
+
+Porch Area: 0
+=====PAGE 20
+Deck Flag: Not on File
+
+Feature Balcony Flag: Not on File
+
+Breezeway Flag: Not on File
+
+Topography Code: Not on File
+
+Fence Area: 0
+
+Courtyard Flag: Not on File
+
+Arbor Pergola Flag: Not on File
+
+Golf Course Green Flag: Not on File
+
+Tennis Court Flag: Not on File
+
+Sports Court Flag: Not on File
+
+Arena Flag: Not on File
+
+Water Feature Flag: Not on File
+
+Pond Flag: Not on File
+
+Boat Lift Flag: Not on File
+
+Buildings Count: Not on File
+
+Bath House Flag: Not on File
+
+Boat Access Flag: Not on File
+
+Boat House Flag: Not on File
+
+Cabin Area: Not on File
+
+Cabin Flag: Not on File
+
+Canopy Area: Not on File
+
+Canopy Flag: Not on File
+
+Gazebo Area: Not on File
+=====PAGE 21
+Gazebo Flag: Not on File
+
+Grainery Area: Not on File
+
+Grainery Flag: Not on File
+
+Green House Area: Not on File
+
+Green House Flag: Not on File
+
+Guest House Flag: Not on File
+
+Kennel Flag: Not on File
+
+Milk House Flag: Not on File
+
+Outdoor Kitchen Fireplace Flag: Not on File
+
+Pool House Flag: Not on File
+
+Poultry House Flag: Not on File
+
+Quonset Flag: Not on File
+
+Shed Code: Not on File
+
+Silo Flag: Not on File
+
+Stable Flag: Not on File
+
+Storage Building Flag: Not on File
+
+Pole Structure Flag: Not on File
+
+Publication Date: 12/04/2024
+
+Parcel Shell Record: Not on File
+
+Utilities / Green Energy Details
+
+HVAC Cooling Detail: Not on File
+=====PAGE 22
+HVAC Heating Detail: NONE
+
+HVAC Heating Fuel: Not on File
+
+Utilities Sewage Usage: Not on File
+
+Utilities Water Source: Not on File
+
+Utilities Mobile Home Hookup Flag: Not on File
+
+Parcel
+
+Raw: 099-0-123-456
+
+Formatted: Not on File
+
+Year Added: 0
+
+Alternate: Not on File
+
+Map Book: Not on File
+
+Map Page: Not on File
+
+Year Change: 0
+
+Previous: Not on File
+
+Account Number: Not on File
+
+Legal
+
+Description: PR APN 0990120000
+
+Range: Not on File
+
+Township: Not on File
+
+Section: Not on File
+=====PAGE 23
+Quarter: Not on File
+
+Subdivision: Not on File
+
+Phase: Not on File
+
+Tract Number: 0
+
+Block 1: Not on File
+
+Block 2: Not on File
+
+Lot Number 1: Not on File
+
+Lot Number 2: Not on File
+
+Lot Number 3: Not on File
+
+Unit: Not on File
+
+Loans
+
+Previous Loans
+
+Loan #1
+
+Transaction Mortgage Amount: $1,200,000
+
+Mortgage Date: 08/02/2024
+
+Lender Type: NON LENDING INSTITUTION
+
+Loan Type: COMMERCIAL
+
+Lender: EXAMPLE CAPITAL LLC
+=====PAGE 24
+Lender Code: -1
+
+Loan #2
+
+Transaction Mortgage Amount: $300,000
+
+Mortgage Date: 07/01/2024
+
+Lender Type: PRIVATE PARTY
+
+Loan Type: COMMERCIAL
+
+Lender: PRIVATE LENDER ONE
+
+Lender Code: -1
+
+Loan #3
+
+Transaction Mortgage Amount: $680,000
+
+Mortgage Date: 01/22/2019
+
+Lender Type: UNKNOWN OR NOT PROVIDED
+
+Loan Type: CONVENTIONAL WITH PMI
+
+Lender: PRIOR OWNER 2017 TRUST (RT)
+
+Lender Code: N/A
+
+Loan #4
+
+Transaction Mortgage Amount: $100,000
+
+Mortgage Date: 04/02/1996
+
+Lender Type: MORTGAGE FUNDING COMPANY
+=====PAGE 25
+Loan Type: UNKNOWN OR NOT PROVIDED
+
+Lender: SOME MORTGAGE CO
+
+Lender Code: 5337
+

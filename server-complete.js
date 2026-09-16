@@ -8,7 +8,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { IMAGE_URLS } from './image-urls.js';
-import { resolveCore, resolveDeep, resolveParcel, mergeRecord, readFrom, COUNTY_ADAPTERS } from './lib/dossier.js';
+import { resolveCore, resolveDeep, resolveParcel, mergeRecord, readFrom, COUNTY_ADAPTERS, evidencePath, loadEvidence } from './lib/dossier.js';
+import { parsePdf } from './lib/title-report.js';
 import { configured as storeConfigured, pinOk, readJson, updateJson, commitFiles, cached as storeCached, remember, RESEARCH_PATH, UPLOADS_PATH, slug } from './lib/store.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -8530,6 +8531,14 @@ async function cachedPart(q, part, fresh) {
   const data = await p;
   return Object.assign({ cached: false }, data);
 }
+// drop every cached part for one APN (after a title-evidence import, so the next read composes with it)
+function dossierForget(apn10) {
+  const tag = 'apn:' + String(apn10 || '').replace(/[^0-9]/g, '');
+  if (tag === 'apn:') return 0;
+  let n = 0;
+  for (const k of [...dossierCache.keys()]) if (k.includes(tag)) { dossierCache.delete(k); n++; }
+  return n;
+}
 function dossierQuery(req) {
   const apn = req.query.apn ? String(req.query.apn) : null;
   const lat = req.query.lat != null ? parseFloat(req.query.lat) : null;
@@ -8737,6 +8746,39 @@ app.post('/api/upload', async (req, res) => {
     const commit = await commitFiles(files, 'upload: ' + path.split('/').slice(1).join('/'));
     remember(UPLOADS_PATH, manifest);
     res.json({ ok: true, path, url: '/' + path, commit });
+  } catch (e) { res.status(502).json({ ok: false, error: 'github_error', message: String(e && e.message).slice(0, 300) }); }
+});
+// ============================================================================
+//  TITLE EVIDENCE (V0.32): a purchased property report (PDF) imported for one
+//  APN → data/title/<apn10>.json (lib/title-report.js parses it; the PDF itself
+//  is not stored — the repository is public). The record then shows the owner
+//  of record, loans, liens, taxes and permits for that parcel, dated.
+// ============================================================================
+app.get('/api/title/:apn', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const ev = await loadEvidence(String(req.params.apn || ''));
+  if (!ev) return res.status(404).json({ ok: false, error: 'no_evidence', path: evidencePath(req.params.apn) });
+  res.json({ ok: true, evidence: ev });
+});
+app.post('/api/title-report', async (req, res) => {
+  try {
+    const { pin, apn, name, data } = req.body || {};
+    if (!storeConfigured()) return res.status(501).json({ ok: false, error: 'not_configured' });
+    if (!pinOk(pin)) return res.status(401).json({ ok: false, error: 'bad_pin' });
+    if (typeof data !== 'string') return res.status(400).json({ ok: false, error: 'bad_type' });
+    const buf = Buffer.from(data.replace(/^data:[^,]*,/, ''), 'base64');
+    if (!buf.length || buf.length > 8 * 1024 * 1024) return res.status(413).json({ ok: false, error: 'too_large' });
+    if (buf.subarray(0, 5).toString() !== '%PDF-') return res.status(400).json({ ok: false, error: 'bad_type' });
+    let ev;
+    try { ev = await parsePdf(buf); } catch (e) { return res.status(422).json({ ok: false, error: 'not_a_known_report', message: 'The PDF is not a property report this reader knows (PropertyChecker today).' }); }
+    if (apn && ev.apn10 !== String(apn).replace(/[^0-9]/g, '')) return res.status(409).json({ ok: false, error: 'apn_mismatch', reportApn: ev.apn });
+    ev.importedAt = new Date().toISOString();
+    ev.importedFrom = slug(name || 'report');
+    const path = evidencePath(ev.apn10);
+    const commit = await commitFiles([{ path, content: JSON.stringify(ev, null, 2) + '\n' }], 'title: import ' + ((ev.source || {}).provider || 'property') + ' report for ' + ev.apn);
+    remember(path, ev);
+    dossierForget(ev.apn10);
+    res.json({ ok: true, apn: ev.apn, path, commit, evidence: { provider: (ev.source || {}).provider || null, preparedOn: (ev.source || {}).preparedOn || null, importedAt: ev.importedAt, owner: (ev.owner || {}).names || [], loans: (ev.loans || []).length, liens: (ev.liens || []).length, permits: (ev.permits || []).length } });
   } catch (e) { res.status(502).json({ ok: false, error: 'github_error', message: String(e && e.message).slice(0, 300) }); }
 });
 

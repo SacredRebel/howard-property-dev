@@ -321,3 +321,6 @@ button { font: inherit; color: inherit; }
 .cloud { font-size: 11px; line-height: 1.5; color: var(--ink-3); margin-top: 8px; }
 .cloud .mini { margin-left: 4px; }
 .acts.up { margin-top: 6px; }
+/* V0.32 — the report import inside the Ownership & title section */
+.rec .acts.up { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 10px 8px; }
+.rec .acts.up .hint { font-size: 11px; color: var(--ink-3); }
