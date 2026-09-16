@@ -2961,6 +2961,33 @@ function serveClassic(req, res) {
     .ds-doc-l i { font-style: normal; font-size: 12px; color: #7d8792; font-weight: 600; }
     .ds-doc-o { font-size: 12px; font-weight: 700; color: #8a6423; white-space: nowrap; background: rgba(193, 144, 74, 0.16); padding: 5px 10px; border-radius: 999px; flex: none; }
     .ds-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(193, 144, 74, 0.26); font-size: 11.5px; line-height: 1.6; color: #8d97a1; font-weight: 500; }
+    /* V0.29.2 — the full County Record on the classic page */
+    .ds-auth { flex-basis: 100%; font-size: 12px; font-weight: 600; color: #8a6423; }
+    .ds-acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+    .ds-btn { font: inherit; font-size: 12px; font-weight: 700; line-height: 1.2; color: #6b4f1d; background: rgba(193, 144, 74, 0.14); border: 1px solid rgba(193, 144, 74, 0.35); border-radius: 999px; padding: 5px 11px; cursor: pointer; text-decoration: none; display: inline-block; }
+    .ds-btn:hover { background: rgba(193, 144, 74, 0.26); }
+    .ds-sub { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #a08652; margin: 14px 0 8px; }
+    .ds-wait-i { color: #a08652; font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .ds-read { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-bottom: 10px; }
+    .ds-rd { background: rgba(255, 255, 255, 0.72); border: 1px solid rgba(193, 144, 74, 0.26); border-radius: 12px; padding: 9px 11px; min-width: 0; }
+    .ds-rd-l { font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #a08652; }
+    .ds-rd-v { font-size: 13.5px; font-weight: 700; color: #2b3540; margin: 2px 0; line-height: 1.4; overflow-wrap: anywhere; }
+    .ds-bar { height: 4px; border-radius: 2px; background: rgba(193, 144, 74, 0.18); overflow: hidden; margin: 5px 0; }
+    .ds-bar i { display: block; height: 100%; background: linear-gradient(90deg, #b8862f, #e0b45c); }
+    .ds-rd-n { font-size: 11.5px; color: #7d8792; font-weight: 500; line-height: 1.45; }
+    .ds-row.cont .ds-k { visibility: hidden; }
+    .ds-v { overflow-wrap: anywhere; }
+    .ds-rows.mono .ds-k, .ds-rows.mono .ds-v { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .ds-portals { padding: 2px 0 14px 20px; }
+    .ds-pg { margin-bottom: 10px; }
+    .ds-pg-l { font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #a08652; margin: 6px 0 5px; }
+    .ds-pi { margin: 0 0 7px; }
+    .ds-pf { display: inline; margin: 0; }
+    .ds-pl { display: inline-block; font: inherit; font-size: 13px; font-weight: 700; line-height: 1.3; color: #8a6423; text-decoration: none; background: rgba(255, 255, 255, 0.72); border: 1px solid rgba(193, 144, 74, 0.3); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+    .ds-pl:hover { background: #fff; box-shadow: 0 4px 12px rgba(193, 144, 74, 0.22); }
+    .ds-pn { font-size: 12px; color: #7d8792; margin: 3px 0 0 4px; line-height: 1.45; }
+    .ds-lot-link { display: inline-block; margin-top: 7px; font-size: 12px; font-weight: 700; color: #8a6423; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+    @media (max-width: 640px) { .ds-read { grid-template-columns: 1fr 1fr; } .ds-rows, .ds-portals { padding-left: 8px; } .ds-k { max-width: 44%; } }
     #community-card {
       position: fixed; inset: 0; z-index: 2500; display: none;
       align-items: center; justify-content: center;
@@ -4164,7 +4191,8 @@ function serveClassic(req, res) {
             lotPoly.bindPopup(
               '<div style="font-weight:700;margin-bottom:4px;">' + (lot.name || 'Lot') + '</div>' +
               '<div style="font-family:monospace;font-size:12px;margin-bottom:2px;">APN ' + lot.apn + '</div>' +
-              '<div style="font-size:12px;color:#555;">' + lot.acreage + ' acres</div>'
+              '<div style="font-size:12px;color:#555;">' + lot.acreage + ' acres</div>' +
+              (lot.apn ? '<span class="ds-lot-link" onclick="window.openLotRecord(&quot;' + prop.id + '&quot;,&quot;' + String(lot.apn).replace(/[^0-9A-Za-z-]/g, '') + '&quot;)">&#128451; county record for this lot</span>' : '')
             );
           });
         });
@@ -8073,77 +8101,255 @@ function serveClassic(req, res) {
       h += '</div>';
       return h;
     };
-    // ---- county dossier card ------------------------------------------
+    // ---- the County Record, in full (V0.29.2: the classic page renders the same record as the atlas) ----
     window.dossierSectionHTML = function(prop) {
       if (!prop || (!prop.apn && !prop.center)) return '';
+      var sub = prop.lots && prop.lots.length > 1
+        ? 'This property is ' + prop.lots.length + ' separate parcels. Below is the one under the centre pin; click any lot line on the map and choose &ldquo;county record for this lot&rdquo; to read another.'
+        : 'Everything the public record holds on this parcel: the county, the state and the federal record, resolved live from the record keepers&rsquo; own servers when you opened this panel.';
       return '<div class="dossier-section" id="dossier-section">'
         + '<h4>&#128451;&#65039; The County Record</h4>'
-        + '<p class="section-sub">' + (prop.lots && prop.lots.length > 1
-            ? 'This property is ' + prop.lots.length + ' separate parcels. Shown below is the one under the centre pin — pulled live from Ventura County GIS, FEMA and USGS.'
-            : 'Everything the public record holds on this parcel — pulled live from Ventura County GIS, FEMA and USGS when you opened this panel.') + '</p>'
-        + '<div id="dossier-body"><div class="ds-wait"><span class="ds-spin"></span>Reading the county…</div></div>'
+        + '<p class="section-sub" id="dossier-sub">' + sub + '</p>'
+        + '<div id="dossier-body"><div class="ds-wait"><span class="ds-spin"></span>Reading the county record…</div></div>'
         + '</div>';
     };
     function dsEsc(s) {
       return String(s === null || s === undefined ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-    window.dossierHTML = function(d) {
+    var DS_MAPTYPES = { PM: 'Parcel map', RS: 'Record of survey', MR: 'Miscellaneous record', TR: 'Tract map' };
+    function dsRow(r) {
+      return '<div class="ds-row' + (r[0] ? '' : ' cont') + '"' + (r[2] ? ' data-key="' + dsEsc(r[2]) + '"' : '')
+        + '><span class="ds-k">' + dsEsc(r[0]) + '</span><span class="ds-v">' + dsEsc(r[1]) + '</span></div>';
+    }
+    function dsSections(rec, open) {
       var h = '';
-      h += '<div class="ds-head"><span class="ds-apn">' + dsEsc(d.apn) + '</span>'
-         + (d.situs ? '<span class="ds-situs">' + dsEsc(d.situs) + '</span>' : '')
-         + (d.acreage ? '<span class="ds-situs">' + d.acreage.toFixed(2) + ' ac</span>' : '')
-         + '</div>';
-      (d.flags || []).forEach(function(f) {
-        h += '<div class="ds-flag ' + dsEsc(f.level) + '">' + dsEsc(f.text) + '</div>';
-      });
-      (d.sections || []).forEach(function(s, i) {
-        h += '<details class="ds-fold"' + (i < 2 ? ' open' : '') + '>'
+      (rec.sections || []).forEach(function(s) {
+        h += '<details class="ds-fold ds-sec" data-sec="' + dsEsc(s.id) + '"' + (open ? ' open' : '') + '>'
            + '<summary>' + dsEsc(s.label) + '<span class="ds-count">' + s.rows.length + '</span></summary>'
-           + '<div class="ds-rows">';
-        s.rows.forEach(function(r) {
-          h += '<div class="ds-row"><span class="ds-k">' + dsEsc(r[0]) + '</span><span class="ds-v">' + dsEsc(r[1]) + '</span></div>';
-        });
-        h += '</div></details>';
+           + '<div class="ds-rows">' + s.rows.map(dsRow).join('') + '</div></details>';
       });
-      if (d.records && d.records.length) {
-        h += '<details class="ds-fold"><summary>Recorded maps &amp; surveys<span class="ds-count">' + d.records.length + '</span></summary><div class="ds-rows">';
-        h += '<p class="ds-note">Every map ever filed over this land — the same documents a surveyor retraces. Each one opens as the county’s own scan.</p>';
-        d.records.forEach(function(r) {
-          var meta = [r.year, r.surveyor, r.note, (r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null)]
-            .filter(Boolean).join(' · ');
-          if (r.url) {
-            h += '<a class="ds-doc" href="' + dsEsc(r.url) + '" target="_blank" rel="noopener">'
-               + '<span class="ds-doc-l"><b>' + dsEsc(r.label) + '</b><i>' + dsEsc(meta) + '</i></span>'
-               + '<span class="ds-doc-o">open ↗</span></a>';
+      return h;
+    }
+    function dsRead(dims) {
+      if (!dims || !dims.length) return '';
+      return '<div class="ds-read">' + dims.map(function(d) {
+        return '<div class="ds-rd"><div class="ds-rd-l">' + dsEsc(d.label) + '</div><div class="ds-rd-v">' + dsEsc(d.value) + '</div>'
+          + (d.score !== null && d.score !== undefined ? '<div class="ds-bar"><i style="width:' + Math.max(0, Math.min(100, d.score)) + '%"></i></div>' : '')
+          + (d.note ? '<div class="ds-rd-n">' + dsEsc(d.note) + '</div>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    function dsRecords(recs) {
+      if (!recs || !recs.length) return '';
+      var h = '<details class="ds-fold ds-sec" data-sec="recmaps" open><summary>Recorded maps &amp; surveys<span class="ds-count">' + recs.length + '</span></summary><div class="ds-rows">'
+        + '<p class="ds-note">Every map ever filed over this land — the same documents a surveyor retraces. Each one opens as the county&rsquo;s own scan.</p>';
+      recs.forEach(function(r) {
+        var meta = [r.type ? (DS_MAPTYPES[r.type] || r.type) : null, r.year, r.surveyor, r.note, (r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null)]
+          .filter(Boolean).join(' · ');
+        if (r.url) {
+          h += '<a class="ds-doc" href="' + dsEsc(r.url) + '" target="_blank" rel="noopener">'
+             + '<span class="ds-doc-l"><b>' + dsEsc(r.label) + '</b><i>' + dsEsc(meta) + '</i></span>'
+             + '<span class="ds-doc-o">open ↗</span></a>';
+        } else {
+          h += '<div class="ds-row"><span class="ds-k">' + dsEsc(r.label) + '</span><span class="ds-v">' + dsEsc(meta) + '</span></div>';
+        }
+      });
+      return h + '</div></details>';
+    }
+    function dsPortals(portals, apn) {
+      if (!portals || !portals.length) return '';
+      var groups = [['county', 'County'], ['state', 'State'], ['federal', 'Federal']];
+      var h = '<details class="ds-fold ds-sec" data-sec="portals" open><summary>Where to look — the record keepers<span class="ds-count">' + portals.length + '</span></summary><div class="ds-portals">'
+        + '<p class="ds-note">GIS answers most questions; the rest live in the county&rsquo;s own systems. These open the right desk' + (apn ? ' — the APN is copied to your clipboard on the way' : '') + '.</p>';
+      groups.forEach(function(g) {
+        var items = portals.filter(function(p) { return p.group === g[0]; });
+        if (!items.length) return;
+        h += '<div class="ds-pg"><div class="ds-pg-l">' + g[1] + '</div>';
+        items.forEach(function(p) {
+          var link;
+          if (p.method === 'post') {
+            link = '<form class="ds-pf" method="post" action="' + dsEsc(p.url) + '" target="_blank" rel="noopener" data-apn="' + dsEsc(apn || '') + '">';
+            Object.keys(p.fields || {}).forEach(function(k) { link += '<input type="hidden" name="' + dsEsc(k) + '" value="' + dsEsc(p.fields[k]) + '">'; });
+            link += '<button class="ds-pl" type="submit">' + dsEsc(p.label) + ' ↗</button></form>';
           } else {
-            h += '<div class="ds-row"><span class="ds-k">' + dsEsc(r.label) + '</span><span class="ds-v">' + dsEsc(meta) + '</span></div>';
+            link = '<a class="ds-pl" href="' + dsEsc(p.url) + '" target="_blank" rel="noopener" data-apn="' + dsEsc(apn || '') + '">' + dsEsc(p.label) + ' ↗</a>';
           }
+          h += '<div class="ds-pi">' + link + (p.note ? '<div class="ds-pn">' + dsEsc(p.note) + '</div>' : '') + '</div>';
         });
-        h += '</div></details>';
+        h += '</div>';
+      });
+      return h + '</div></details>';
+    }
+    function dsRaw(raw) {
+      if (!raw || !raw.length) return '';
+      return '<details class="ds-fold ds-sec" data-sec="raw"><summary>Raw assessor record<span class="ds-count">' + raw.length + ' fields</span></summary><div class="ds-rows mono">'
+        + raw.map(function(kv) { return '<div class="ds-row"><span class="ds-k">' + dsEsc(kv[0]) + '</span><span class="ds-v">' + dsEsc(kv[1]) + '</span></div>'; }).join('')
+        + '</div></details>';
+    }
+    function dsFoot(rec, deepState) {
+      var d = rec.resolvedAt ? new Date(rec.resolvedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+      return '<div class="ds-foot">' + (rec.sourcesAnswered || 0) + ' of ' + (rec.sourcesQueried || 0) + ' public sources answered'
+        + (rec.sourcesLate ? ' (' + rec.sourcesLate + ' late — refresh to fill them in)' : '')
+        + ' · resolved ' + d + (rec.cached ? ' (from the 30-day cache)' : '')
+        + (deepState === 'loading' ? ' · <span class="ds-wait-i">state &amp; federal layers and the terrain grid still loading…</span>'
+          : deepState === 'failed' ? ' · the state/federal resolver did not answer — refresh to try again' : '')
+        + '.<br>Assessor figures are the county&rsquo;s own and are not an appraisal. Recorded documents, not GIS, are the authority on boundaries and easements. Every row names its publisher; nothing here is inferred.</div>';
+    }
+    window.dossierHTML = function(rec, deepState, expanded) {
+      var c = rec.county;
+      var auth = c ? dsEsc(c.name) + (c.stateName ? ', ' + dsEsc(c.stateName) : '')
+        + (c.adapter ? ' · ' + dsEsc(c.authority || ('county adapter: ' + c.adapter)) : ' · no parcel adapter — federal + state record only') : '';
+      var h = '<div class="ds-head"><span class="ds-apn">' + dsEsc(rec.apn || (rec.center ? rec.center[0].toFixed(5) + ', ' + rec.center[1].toFixed(5) : '')) + '</span>'
+         + (rec.situs ? '<span class="ds-situs">' + dsEsc(rec.situs) + '</span>' : '')
+         + (rec.acreage ? '<span class="ds-situs">' + rec.acreage.toFixed(2) + ' ac</span>' : '')
+         + (auth ? '<span class="ds-auth">' + auth + '</span>' : '')
+         + '</div>';
+      h += '<div class="ds-acts">'
+         + '<button class="ds-btn" type="button" data-ds="expand">' + (expanded ? 'collapse all' : 'expand all') + '</button>'
+         + '<button class="ds-btn" type="button" data-ds="refresh" title="re-resolve from every source">refresh</button>'
+         + '<button class="ds-btn" type="button" data-ds="print" title="open a clean report in a new tab">report ↗</button>'
+         + '<button class="ds-btn" type="button" data-ds="json" title="download the whole record as JSON">JSON</button>'
+         + (rec.apn ? '<button class="ds-btn" type="button" data-ds="copy">copy APN</button>'
+             + '<a class="ds-btn" href="/?apn=' + encodeURIComponent(rec.apn) + '" target="_blank" rel="noopener" title="open this parcel in the atlas — search, save to research, compare">open in the atlas ↗</a>' : '')
+         + '</div>';
+      (rec.flags || []).forEach(function(f) { h += '<div class="ds-flag ' + dsEsc(f.level) + '">' + dsEsc(f.text) + '</div>'; });
+      if (rec.read && rec.read.length) {
+        h += '<div class="ds-sub">The read — seven things the record can answer' + (deepState === 'loading' ? ' <span class="ds-wait-i">(terrain grid loading)</span>' : '') + '</div>' + dsRead(rec.read);
       }
-      h += '<div class="ds-foot">Resolved from ' + (d.sourcesAnswered || 0) + ' public sources on '
-         + new Date(d.resolvedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-         + '. County assessor figures are not an appraisal; recorded documents, not GIS, are the authority on boundaries.</div>';
+      h += dsSections(rec, expanded);
+      h += dsRecords(rec.records);
+      h += dsPortals(rec.portals, rec.apn);
+      h += dsRaw(rec.raw);
+      h += dsFoot(rec, deepState);
       return h;
     };
+    var dsState = { token: 0, target: null, core: null, all: null, deepState: 'loading', expanded: true };
+    function dsCopy(text, btn) {
+      try { if (navigator.clipboard) navigator.clipboard.writeText(text); } catch (e) { /* clipboard unavailable */ }
+      if (btn) { var old = btn.textContent; btn.textContent = 'copied'; setTimeout(function() { btn.textContent = old; }, 1200); }
+    }
+    function dsDownload(rec) {
+      var blob = new Blob([JSON.stringify(rec, null, 2)], { type: 'application/json' });
+      var u = URL.createObjectURL(blob); var a = document.createElement('a');
+      a.href = u; a.download = 'county-record-' + String(rec.apn || 'point').replace(/[^0-9a-z-]/gi, '') + '.json'; a.click();
+      setTimeout(function() { URL.revokeObjectURL(u); }, 2000);
+    }
+    function dsOpenReport(rec) {
+      var esc = dsEsc;
+      var rows = function(rs) { return rs.map(function(r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join(''); };
+      var h = '<!doctype html><html><head><meta charset="utf-8"><title>County record — ' + esc(rec.apn || 'parcel') + '</title>'
+        + '<style>body{font:13px/1.5 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1f1c;max-width:860px;margin:28px auto;padding:0 20px}h1{font-size:22px;margin:0 0 2px}h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#4c5a52;margin:26px 0 6px;border-bottom:1px solid #d8ded9;padding-bottom:4px}.sub{color:#4c5a52;margin:0 0 14px}table{border-collapse:collapse;width:100%}th{text-align:left;width:34%;font-weight:600;color:#4c5a52;padding:4px 8px 4px 0;vertical-align:top;border-bottom:1px solid #eef1ee}td{padding:4px 0;vertical-align:top;border-bottom:1px solid #eef1ee}.flag{padding:6px 10px;border-left:3px solid #b98a2b;background:#fbf6e7;margin:4px 0}.flag.good{border-color:#4c8a3f;background:#eef6ea}.read{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}.rd{border:1px solid #d8ded9;border-radius:6px;padding:8px 10px}.rd b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#4c5a52}.rd i{display:block;font-style:normal;color:#4c5a52;font-size:11.5px}a{color:#1f5fa0}.foot{margin-top:24px;font-size:11px;color:#4c5a52}@media print{body{margin:0}}</style></head><body>'
+        + '<h1>' + esc(rec.apn || 'Point') + (rec.situs ? ' · ' + esc(rec.situs) : '') + '</h1>'
+        + '<p class="sub">' + (rec.acreage ? rec.acreage.toFixed(2) + ' ac · ' : '')
+        + (rec.county ? esc(rec.county.name) + (rec.county.stateName ? ', ' + esc(rec.county.stateName) : '') + ' · ' : '')
+        + 'resolved ' + (rec.resolvedAt ? new Date(rec.resolvedAt).toLocaleString() : '') + ' from ' + (rec.sourcesAnswered || 0) + ' public sources · Ojai Atlas county record</p>';
+      (rec.flags || []).forEach(function(f) { h += '<div class="flag ' + esc(f.level) + '">' + esc(f.text) + '</div>'; });
+      if (rec.read && rec.read.length) {
+        h += '<h2>The read</h2><div class="read">' + rec.read.map(function(d) {
+          return '<div class="rd"><b>' + esc(d.label) + '</b>' + esc(d.value) + (d.score !== null && d.score !== undefined ? ' · ' + d.score + '/100' : '') + '<i>' + esc(d.note) + '</i></div>';
+        }).join('') + '</div>';
+      }
+      (rec.sections || []).forEach(function(s) { h += '<h2>' + esc(s.label) + '</h2><table>' + rows(s.rows) + '</table>'; });
+      if (rec.records && rec.records.length) {
+        h += '<h2>Recorded maps &amp; surveys</h2><table>' + rec.records.map(function(r) {
+          return '<tr><th>' + esc(r.label) + '</th><td>' + [r.year, r.surveyor, r.note].filter(Boolean).map(function(x) { return esc(x); }).join(' · ') + (r.url ? ' — <a href="' + esc(r.url) + '">scan</a>' : '') + '</td></tr>';
+        }).join('') + '</table>';
+      }
+      if (rec.portals && rec.portals.length) {
+        h += '<h2>Where to look</h2><table>' + rec.portals.map(function(p) { return '<tr><th><a href="' + esc(p.url) + '">' + esc(p.label) + '</a></th><td>' + esc(p.note || '') + '</td></tr>'; }).join('') + '</table>';
+      }
+      if (rec.raw && rec.raw.length) {
+        h += '<h2>Raw assessor record</h2><table>' + rec.raw.map(function(kv) { return '<tr><th>' + esc(kv[0]) + '</th><td>' + esc(kv[1]) + '</td></tr>'; }).join('') + '</table>';
+      }
+      h += '<p class="foot">Assessor figures are the county&rsquo;s own and are not an appraisal. Recorded documents, not GIS, are the authority on boundaries and easements. Sources: county GIS, California Geological Survey, FEMA, USGS, NRCS, BLM, US Census — each row names its publisher.</p></body></html>';
+      var w = window.open('', '_blank'); if (!w) return;
+      w.document.open(); w.document.write(h); w.document.close();
+    }
+    function dsWire() {
+      var body = document.getElementById('dossier-body'); if (!body) return;
+      body.querySelectorAll('[data-ds]').forEach(function(b) {
+        b.addEventListener('click', function() {
+          var a = b.getAttribute('data-ds');
+          var rec = dsState.all || dsState.core;
+          if (a === 'expand') {
+            dsState.expanded = !dsState.expanded;
+            body.querySelectorAll('details.ds-sec').forEach(function(d) { if (d.getAttribute('data-sec') !== 'raw') d.open = dsState.expanded; });
+            b.textContent = dsState.expanded ? 'collapse all' : 'expand all';
+          } else if (a === 'refresh') { dsLoad(true); }
+          else if (a === 'print') { if (rec) dsOpenReport(rec); }
+          else if (a === 'json') { if (rec) dsDownload(rec); }
+          else if (a === 'copy') { if (rec && rec.apn) dsCopy(rec.apn, b); }
+        });
+      });
+      body.querySelectorAll('.ds-pf, a.ds-pl').forEach(function(el) {
+        el.addEventListener(el.tagName === 'FORM' ? 'submit' : 'click', function() { var apn = el.getAttribute('data-apn'); if (apn) dsCopy(apn); });
+      });
+    }
+    function dsDraw() {
+      var body = document.getElementById('dossier-body'); if (!body) return;
+      var rec = dsState.all || dsState.core; if (!rec) return;
+      body.innerHTML = window.dossierHTML(rec, dsState.deepState, dsState.expanded);
+      dsWire();
+    }
+    // core (the county) and all (county + state + federal + terrain, merged server-side) are asked for at
+    // once; the server shares the in-flight county fan-out between them, so the card fills in twice: the
+    // county record first, the whole record when the state/federal layers and the terrain grid land.
+    function dsLoad(refresh) {
+      var t = dsState.target; if (!t) return;
+      var token = ++dsState.token;
+      var q = t.apn ? 'apn=' + encodeURIComponent(t.apn) + (t.county ? '&county=' + encodeURIComponent(t.county) : '') : 'lat=' + t.lat + '&lon=' + t.lon;
+      var tail = '&read=1' + (refresh ? '&refresh=1' : '');
+      dsState.deepState = 'loading';
+      if (refresh) {
+        dsState.core = null; dsState.all = null;
+        var b0 = document.getElementById('dossier-body');
+        if (b0) b0.innerHTML = '<div class="ds-wait"><span class="ds-spin"></span>Re-resolving from every source…</div>';
+      }
+      fetch('/api/dossier?' + q + '&part=core' + tail)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (token !== dsState.token) return;
+          if (d.error) throw new Error(d.error);
+          if (!dsState.all) { dsState.core = d; dsDraw(); }
+        })
+        .catch(function(e) {
+          if (token !== dsState.token || dsState.core || dsState.all) return;
+          var b = document.getElementById('dossier-body');
+          if (b) b.innerHTML = '<div class="ds-wait">Could not reach the county records right now. ' + dsEsc(e.message || '') + ' <button class="ds-btn" type="button" data-ds="refresh">try again</button></div>';
+          dsWire();
+        });
+      fetch('/api/dossier?' + q + '&part=all' + tail)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (token !== dsState.token) return;
+          if (d.error) throw new Error(d.error);
+          dsState.all = d; dsState.deepState = 'done'; dsDraw();
+        })
+        .catch(function() {
+          if (token !== dsState.token) return;
+          dsState.deepState = 'failed';
+          if (dsState.core) dsDraw();
+        });
+    }
     window.loadDossier = function(prop) {
       var body = document.getElementById('dossier-body');
       if (!body || !prop) return;
-      var q = prop.apn ? 'apn=' + encodeURIComponent(prop.apn)
-            : (prop.center ? 'lat=' + prop.center[0] + '&lon=' + prop.center[1] : null);
-      if (!q) { body.innerHTML = '<div class="ds-wait">No parcel reference for this property yet.</div>'; return; }
-      fetch('/api/dossier?' + q)
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-          if (!document.getElementById('dossier-body')) return;
-          if (d.error) throw new Error(d.error);
-          document.getElementById('dossier-body').innerHTML = window.dossierHTML(d);
-        })
-        .catch(function(e) {
-          var b = document.getElementById('dossier-body');
-          if (b) b.innerHTML = '<div class="ds-wait">Could not reach the county records right now. ' + dsEsc(e.message || '') + '</div>';
-        });
+      var o = window.dossierOverride; window.dossierOverride = null;
+      var t = o ? { apn: o.apn, county: o.county } : (prop.apn ? { apn: prop.apn, county: prop.county } : (prop.center ? { lat: prop.center[0], lon: prop.center[1] } : null));
+      if (!t) { body.innerHTML = '<div class="ds-wait">No parcel reference for this property yet.</div>'; return; }
+      if (o && o.label) { var sub = document.getElementById('dossier-sub'); if (sub) sub.textContent = o.label; }
+      dsState = { token: dsState.token, target: t, core: null, all: null, deepState: 'loading', expanded: true };
+      dsLoad(false);
+    };
+    // a lot line's popup -> the property panel, with the record for that lot alone
+    window.openLotRecord = function(propId, apn) {
+      var prop = propertiesById[propId]; if (!prop) return;
+      var lot = (prop.lots || []).filter(function(l) { return l.apn === apn; })[0];
+      map.closePopup();
+      window.dossierOverride = { apn: apn, county: prop.county,
+        label: (lot && lot.name ? lot.name + ' — ' : '') + 'APN ' + apn + (lot && lot.acreage ? ' · ' + lot.acreage + ' ac' : '') + ', one of the ' + (prop.lots || []).length + ' parcels of ' + prop.name + '. The county, state and federal record for this lot alone.' };
+      openPropertyPanel(propId);
+      setTimeout(function() { var s = document.getElementById('dossier-section'); if (s && s.scrollIntoView) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 420);
     };
     window.docsSectionHTML = function(prop) {
       if (!prop.docs || !prop.docs.length) return '';
@@ -8290,17 +8496,27 @@ function parseBudget(budgetStr) {
 //  (county adapters, state + federal layers, the terrain grid, the read).
 //  Here: the routes and the 30-day in-memory cache, per part.
 // ============================================================================
-const DOSSIER_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+const DOSSIER_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days for a complete answer
+const DOSSIER_SHORT_TTL_MS = 1000 * 60 * 60;     // 1 hour when a source errored (transient upstream failures heal themselves)
 const dossierCache = new Map();
+const dossierInflight = new Map();   // key -> promise: concurrent asks for the same part share one fan-out
 function dossierKey(q, part) {
   return part + ':' + (q.apn ? 'apn:' + String(q.apn).replace(/[^0-9]/g, '') + (q.county ? '@' + q.county : '') : 'pt:' + q.lat.toFixed(5) + ',' + q.lon.toFixed(5));
 }
 async function cachedPart(q, part, fresh) {
   const key = dossierKey(q, part);
   const hit = dossierCache.get(key);
-  if (hit && !fresh && Date.now() - hit.ts < DOSSIER_TTL_MS) return Object.assign({ cached: true }, hit.data);
-  const data = part === 'deep' ? await resolveDeep(q) : await resolveCore(q);
-  if (!data.partial) dossierCache.set(key, { ts: Date.now(), data });     // a partial answer is never cached
+  if (hit && !fresh && Date.now() - hit.ts < hit.ttl) return Object.assign({ cached: true }, hit.data);
+  let p = dossierInflight.get(key);
+  if (!p || fresh) {
+    p = (part === 'deep' ? resolveDeep(q) : resolveCore(q)).then((data) => {
+      // a partial (late) answer is never cached; one with errored sources only briefly
+      if (!data.partial) dossierCache.set(key, { ts: Date.now(), ttl: (data.sourcesAnswered || 0) >= (data.sourcesQueried || 0) ? DOSSIER_TTL_MS : DOSSIER_SHORT_TTL_MS, data });
+      return data;
+    }).finally(() => { if (dossierInflight.get(key) === p) dossierInflight.delete(key); });
+    dossierInflight.set(key, p);
+  }
+  const data = await p;
   return Object.assign({ cached: false }, data);
 }
 function dossierQuery(req) {
