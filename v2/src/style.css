@@ -316,3 +316,8 @@ button { font: inherit; color: inherit; }
 .cmp tr.dim th { color: var(--gold); }
 .cmp .bad { color: var(--red); }
 @media (max-width: 760px) { .apn-search input { width: 120px; } .apn-search input:focus { width: 160px; } .crumb { display: none; } .read { grid-template-columns: 1fr; } }
+
+/* —— V0.31: shared research list, uploads, editor gate —— */
+.cloud { font-size: 11px; line-height: 1.5; color: var(--ink-3); margin-top: 8px; }
+.cloud .mini { margin-left: 4px; }
+.acts.up { margin-top: 6px; }

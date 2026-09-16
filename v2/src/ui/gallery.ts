@@ -8,6 +8,7 @@ export function cdn(src: string, w: number): string { return `https://wsrv.nl/?u
 
 interface ImagesResponse { success?: boolean; images?: string[]; hasSubcategories?: boolean; subcategoryData?: Record<string, string[]> | null; }
 const cache = new Map<string, Promise<ImagesResponse>>();
+export function invalidate(pid: string, zid: string) { for (const k of [...cache.keys()]) if (k.startsWith(`${pid}/${zid}/`)) cache.delete(k); }
 function fetchImages(pid: string, zid: string, cat: string): Promise<ImagesResponse> {
   const k = `${pid}/${zid}/${cat}`;
   let p = cache.get(k);

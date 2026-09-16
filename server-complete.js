@@ -9,6 +9,7 @@ import { dirname, join } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { IMAGE_URLS } from './image-urls.js';
 import { resolveCore, resolveDeep, resolveParcel, mergeRecord, readFrom, COUNTY_ADAPTERS } from './lib/dossier.js';
+import { configured as storeConfigured, pinOk, readJson, updateJson, commitFiles, cached as storeCached, remember, RESEARCH_PATH, UPLOADS_PATH, slug } from './lib/store.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -6883,6 +6884,15 @@ function serveClassic(req, res) {
     
         // ── Position Editor: pick property → edit all icons at once → capture ──
     const adminToggle = document.getElementById('admin-menu-toggle');
+    // editor mode: ?edit=1 turns the editor on for this browser (remembered), ?edit=0 turns it off
+    (function editorGate() {
+      try {
+        var q = new URLSearchParams(location.search).get('edit');
+        if (q === '1') localStorage.setItem('ojaiMapEditor', '1');
+        if (q === '0') localStorage.removeItem('ojaiMapEditor');
+        if (adminToggle && localStorage.getItem('ojaiMapEditor') !== '1') adminToggle.style.display = 'none';
+      } catch (e) { if (adminToggle) adminToggle.style.display = 'none'; }
+    })();
     const adminPopup = document.getElementById('admin-popup');
     const closePopup = document.getElementById('close-popup');
     const statusIndicator = document.getElementById('edit-status');
@@ -8451,8 +8461,9 @@ function serveClassic(req, res) {
 </html>`
 
     // Replace placeholders with actual data
+    uploadsNow().catch(() => null);   // refresh in the background; the page uses the last known manifest
     const finalHtml = htmlContent
-      .replace('PROPERTIES_PLACEHOLDER', JSON.stringify(PROPERTIES));
+      .replace('PROPERTIES_PLACEHOLDER', JSON.stringify(withUploadedDocs(PROPERTIES, storeCached(UPLOADS_PATH) || EMPTY_UPLOADS)));
 
     // Set correct content type header and send as HTML
     res.type('html');
@@ -8532,9 +8543,9 @@ function dossierQuery(req) {
 const SURVEY_FILES = { 'sulphur-mountain': 'sulphur-survey.json' };
 // V2 engine (docs/engine-blueprint.md): the same properties as JSON, positions already applied,
 // and the built single-engine app served at /v2 (source in v2/, output committed to public/v2)
-app.get('/api/properties', (req, res) => {
+app.get('/api/properties', async (req, res) => {
   res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
-  res.json(PROPERTIES);
+  res.json(withUploadedDocs(PROPERTIES, await uploadsNow()));
 });
 // Edge-cached tile proxy (V0.28): the slow dynamic GIS services (county + CGS /export, SSURGO WMS)
 // are fetched here once and cached at the CDN edge (s-maxage) - the first viewer pays the county's
@@ -8641,12 +8652,92 @@ app.get('/api/project-zones', (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
     zones: PROJECT_ZONES.length,
-    propertyLines: PERMANENT_PROPERTY_LINES.length
+    propertyLines: PERMANENT_PROPERTY_LINES.length,
+    commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
+    writes: storeConfigured() ? 'configured' : 'not_configured',
   });
+});
+
+// ============================================================================
+//  GIT-BACKED DATA (V0.31): the research list and the uploads live in the repo
+//  (lib/store.js). Every write needs the PIN; without EDIT_PIN + GITHUB_TOKEN
+//  on Vercel the routes answer 501 and the clients keep working locally.
+// ============================================================================
+const EMPTY_UPLOADS = { images: {}, docs: {} };
+const uploadsNow = async () => { const u = await readJson(UPLOADS_PATH, EMPTY_UPLOADS, 60000); return u && u.images ? u : EMPTY_UPLOADS; };
+// properties with the uploaded documents merged into their docs list
+function withUploadedDocs(props, uploads) {
+  const docs = (uploads && uploads.docs) || {};
+  return props.map((p) => (docs[p.id] && docs[p.id].length ? Object.assign({}, p, { docs: (p.docs || []).concat(docs[p.id].map((d) => ({ label: d.label, file: d.file, uploaded: true }))) }) : p));
+}
+// the research list: parcels anyone with the PIN has saved, shared across every browser
+app.get('/api/research', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const j = await readJson(RESEARCH_PATH, { items: [] }, 30000);
+  res.json({ items: (j && j.items) || [], synced: storeConfigured() });
+});
+app.post('/api/research', async (req, res) => {
+  try {
+    const { pin, op, item, items, apn, note } = req.body || {};
+    if (!storeConfigured()) return res.status(501).json({ ok: false, error: 'not_configured' });
+    if (!pinOk(pin)) return res.status(401).json({ ok: false, error: 'bad_pin' });
+    const okItem = (it) => it && typeof it.apn === 'string' && it.apn.length < 40 && Array.isArray(it.center) && it.center.length === 2;
+    const strip = (it) => ({ apn: it.apn, county: it.county || null, situs: it.situs || null, acreage: typeof it.acreage === 'number' ? it.acreage : null, center: [Number(it.center[0]), Number(it.center[1])], bbox: it.bbox || null, rings: Array.isArray(it.rings) ? it.rings : null, savedAt: it.savedAt || new Date().toISOString(), note: typeof it.note === 'string' ? it.note.slice(0, 2000) : undefined });
+    let msg = 'research: update';
+    const r = await updateJson(RESEARCH_PATH, (cur) => {
+      const list = (cur && Array.isArray(cur.items) ? cur.items : []).slice();
+      if (op === 'add' && okItem(item)) { const i = list.findIndex((x) => x.apn === item.apn); const v = strip(item); if (i >= 0) list[i] = Object.assign({}, list[i], v, { savedAt: list[i].savedAt }); else list.unshift(v); msg = 'research: save ' + item.apn; }
+      else if (op === 'merge' && Array.isArray(items)) { let n = 0; items.filter(okItem).forEach((it) => { if (!list.some((x) => x.apn === it.apn)) { list.push(strip(it)); n++; } }); msg = 'research: merge ' + n + ' parcel' + (n === 1 ? '' : 's'); }
+      else if (op === 'remove' && typeof apn === 'string') { const i = list.findIndex((x) => x.apn === apn); if (i >= 0) list.splice(i, 1); msg = 'research: remove ' + apn; }
+      else if (op === 'note' && typeof apn === 'string') { const it = list.find((x) => x.apn === apn); if (it) it.note = String(note || '').slice(0, 2000); msg = 'research: note on ' + apn; }
+      else throw Object.assign(new Error('bad_op'), { status: 400 });
+      return { items: list.slice(0, 200) };
+    }, msg);
+    res.json({ ok: true, items: r.data.items, commit: r.commit });
+  } catch (e) { res.status(e.status || 502).json({ ok: false, error: e.status ? e.message : 'github_error', message: String(e && e.message).slice(0, 300) }); }
+});
+// uploads: one photo (jpeg/png/webp, resized by the client) or one PDF per request, committed to
+// images/uploads/<pid>/<zid>/<cat>/ or docs/uploads/<pid>/ together with the manifest data/uploads.json
+const UPLOAD_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'application/pdf': 'pdf' };
+app.post('/api/upload', async (req, res) => {
+  try {
+    const { pin, propertyId, zoneId, category, name, type, data, label } = req.body || {};
+    if (!storeConfigured()) return res.status(501).json({ ok: false, error: 'not_configured' });
+    if (!pinOk(pin)) return res.status(401).json({ ok: false, error: 'bad_pin' });
+    const prop = PROPERTIES.find((p) => p.id === propertyId);
+    if (!prop) return res.status(400).json({ ok: false, error: 'bad_property' });
+    const ext = UPLOAD_TYPES[type];
+    if (!ext || typeof data !== 'string') return res.status(400).json({ ok: false, error: 'bad_type' });
+    const buf = Buffer.from(data.replace(/^data:[^,]*,/, ''), 'base64');
+    if (!buf.length || buf.length > 4.2 * 1024 * 1024) return res.status(413).json({ ok: false, error: 'too_large' });
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15).replace('T', '-');
+    const files = [];
+    let manifest = JSON.parse(JSON.stringify(await readJson(UPLOADS_PATH, EMPTY_UPLOADS, 0)));
+    if (!manifest.images) manifest.images = {}; if (!manifest.docs) manifest.docs = {};
+    let path;
+    if (ext === 'pdf') {
+      path = 'docs/uploads/' + prop.id + '/' + stamp + '-' + slug(name) + '.pdf';
+      (manifest.docs[prop.id] = manifest.docs[prop.id] || []).push({ label: String(label || name || 'Document').slice(0, 120).replace(/\.pdf$/i, ''), file: path, uploadedAt: new Date().toISOString() });
+    } else {
+      const zid = zoneId === 'property' || (prop.zones || []).some((z) => z.id === zoneId) ? zoneId : null;
+      const cat = category === 'vision' ? 'vision' : 'current';
+      if (!zid) return res.status(400).json({ ok: false, error: 'bad_zone' });
+      path = 'images/uploads/' + prop.id + '/' + zid + '/' + cat + '/' + stamp + '-' + slug(name) + '.' + ext;
+      const byZone = (manifest.images[prop.id] = manifest.images[prop.id] || {});
+      const byCat = (byZone[zid] = byZone[zid] || {});
+      (byCat[cat] = byCat[cat] || []).push(path);
+    }
+    files.push({ path, content: buf });
+    files.push({ path: UPLOADS_PATH, content: JSON.stringify(manifest, null, 2) + '\n' });
+    const commit = await commitFiles(files, 'upload: ' + path.split('/').slice(1).join('/'));
+    remember(UPLOADS_PATH, manifest);
+    res.json({ ok: true, path, url: '/' + path, commit });
+  } catch (e) { res.status(502).json({ ok: false, error: 'github_error', message: String(e && e.message).slice(0, 300) }); }
 });
 
 // Save the icon layout to git. The editor posts { pin, positions } here;
@@ -8737,9 +8828,15 @@ app.get('/api/images/:propertyId/:zoneId/:category', async (req, res) => {
     const { propertyId, zoneId, category } = req.params;
     const categoryLower = category.toLowerCase();
     
-    // Get images from configuration
+    // Get images from configuration, plus anything uploaded through the editor (data/uploads.json)
     const zoneImages = (IMAGE_URLS[propertyId] || {})[zoneId] || {};
     let categoryData = zoneImages[categoryLower];
+    const up = (((await uploadsNow()).images || {})[propertyId] || {})[zoneId];
+    const uploaded = (up && up[categoryLower]) || [];
+    if (uploaded.length) {
+      if (categoryData && typeof categoryData === 'object' && !Array.isArray(categoryData)) categoryData = Object.assign({}, categoryData, { Uploaded: (categoryData.Uploaded || []).concat(uploaded) });
+      else categoryData = (Array.isArray(categoryData) ? categoryData : []).concat(uploaded);
+    }
     
     // Check if category data has subcategories (is an object with subcategory keys)
     let hasSubcategories = false;
@@ -8757,8 +8854,8 @@ app.get('/api/images/:propertyId/:zoneId/:category', async (req, res) => {
       images = categoryData;
     }
     
-    // Aggressive caching for images (1 year) since URLs contain content hash
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    // short cache: uploads can add to this list at any time
+    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
     res.setHeader('Access-Control-Allow-Origin', '*');
     
     res.json({

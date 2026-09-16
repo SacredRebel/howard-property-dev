@@ -209,6 +209,33 @@ export const research = {
   }
 };
 
+// ---- the shared list: the same parcels for everyone, kept in the repository (data/research.json) ----
+// The local list is the working copy; the cloud copy is merged in at boot and written through
+// /api/research with the edit PIN. Without the PIN (or on a site without EDIT_PIN + GITHUB_TOKEN)
+// the list simply stays in this browser.
+export const cloud = { checked: false, synced: false, shared: 0 };
+export function storedPin(): string { try { return localStorage.getItem('ojaiMapEditPin') || ''; } catch { return ''; } }
+export function askPin(): string { let pin = storedPin(); if (!pin) { pin = window.prompt('Edit PIN (the same PIN the position editor uses)') || ''; if (pin) { try { localStorage.setItem('ojaiMapEditPin', pin); } catch { /* fine */ } } } return pin; }
+export async function syncResearch(): Promise<{ synced: boolean; added: number }> {
+  try {
+    const r = await fetch('/api/research'); const j = await r.json() as { items?: ResearchItem[]; synced?: boolean };
+    cloud.checked = true; cloud.synced = !!j.synced; const remote = j.items || []; cloud.shared = remote.length;
+    const merged = research.list(); let added = 0;
+    for (const it of remote) { const i = merged.findIndex(x => x.apn === it.apn); if (i < 0) { merged.push(it); added++; } else merged[i] = { ...merged[i], ...it, note: it.note ?? merged[i].note }; }
+    research.save(merged);
+    return { synced: cloud.synced, added };
+  } catch { cloud.checked = true; return { synced: false, added: 0 }; }
+}
+export async function pushResearch(op: 'add' | 'remove' | 'note' | 'merge', payload: Record<string, unknown>, pin: string): Promise<{ ok: boolean; error?: string; status: number }> {
+  try {
+    const r = await fetch('/api/research', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin, op, ...payload }) });
+    const j = await r.json().catch(() => ({})) as { ok?: boolean; error?: string; items?: ResearchItem[] };
+    if (r.ok && j.items) cloud.shared = j.items.length;
+    if (r.status === 401) { try { localStorage.removeItem('ojaiMapEditPin'); } catch { /* fine */ } }
+    return { ok: !!j.ok, error: j.error, status: r.status };
+  } catch { return { ok: false, error: 'unreachable', status: 0 }; }
+}
+
 // ---- compare ----------------------------------------------------------------------
 export interface CompareCol { label: string; sub?: string; target: Target; }
 export function compareHTML(cols: CompareCol[], recs: (RecordData | null)[]) {

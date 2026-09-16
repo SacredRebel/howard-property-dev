@@ -22,7 +22,7 @@
         "GET"
       ],
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600"
       }
     },
     {
@@ -40,5 +40,6 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "ignoreCommand": "bash scripts/vercel-ignore.sh"
 }

@@ -1,0 +1,47 @@
+name: warm the edge cache after a deploy
+
+# Every push to main becomes a Vercel deployment with a cold edge cache. This workflow waits until
+# the site reports the pushed commit as live (/api/health → commit), pre-resolves the six county
+# records, then pre-bakes every raster tile the atlas can request over the property areas
+# (scripts/warm-tiles.mjs) so the first visitor after a deploy gets a warm map.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'data/research.json'
+      - 'data/uploads.json'
+      - 'data/zone-positions.json'
+      - 'images/uploads/**'
+      - 'docs/uploads/**'
+  workflow_dispatch:
+
+concurrency:
+  group: warm-edge-cache
+  cancel-in-progress: true
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SITE: https://howard-property-dev.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wait for Vercel to serve this commit
+        run: |
+          for i in $(seq 1 60); do
+            live=$(curl -sS -m 20 "$SITE/api/health" | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{try{console.log(JSON.parse(d).commit||"")}catch(e){console.log("")}})')
+            if [ "$live" = "$GITHUB_SHA" ]; then echo "live: $live"; exit 0; fi
+            echo "waiting ($i/60): live=$live want=$GITHUB_SHA"; sleep 20
+          done
+          echo "the deployment did not appear within 20 minutes"; exit 1
+      - name: Pre-resolve the county records
+        run: |
+          for q in apn=037-0-012-125 apn=032-0-010-090 apn=011-0-040-135 apn=034-0-220-135 apn=015-0-010-120 "lat=34.4700&lon=-119.2130"; do
+            curl -sS -m 60 -o /dev/null -w "$q -> %{http_code} in %{time_total}s\n" "$SITE/api/dossier?$q&part=all&read=1" || true
+          done
+      - name: Pre-bake the tiles
+        run: node scripts/warm-tiles.mjs "$SITE" --zooms 12-16

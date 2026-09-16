@@ -8,12 +8,22 @@ import { BASE_LABELS, ml } from '../engine/map';
 import { GROUPS, OVERLAYS, FLIGHTS, HIST_YEARS, HIST_NOTES, overlayById, histYear, type OverlayDef } from '../layers/registry';
 import { legendFor } from '../layers/legend';
 import type { PropertyLayer, Property, Zone, LotPick } from '../data/properties';
-import { galleryFor, galleryHTML, wireGallery, isOpen as lightboxOpen } from './gallery';
+import { galleryFor, galleryHTML, wireGallery, isOpen as lightboxOpen, invalidate as invalidateGallery } from './gallery';
 import { Editor } from './editor';
-import { RecordStore, renderRecord, research, compareHTML, type Target, type RecordData, type ResearchItem, type CompareCol } from './record';
+import { RecordStore, renderRecord, research, compareHTML, type Target, type RecordData, type ResearchItem, type CompareCol, cloud, storedPin, askPin, syncResearch, pushResearch } from './record';
 
 interface RichProperty extends Property { panel?: { title: string; html: string }; visionPanel?: { title: string; html: string }; cta?: { heading?: string; paragraph?: string; contacts?: { name: string; email: string }[]; buttons?: { label: string; url: string }[] }; }
 const stripClassicGallery = (html: string) => html.replace(/<div class="image-gallery-section"[\s\S]*?<\/div><\/div><\/div>/, '');
+// a file as a data URL (PDFs), and a photo shrunk to `max` px on the long side as JPEG — the server
+// accepts up to ~4 MB per file, and a 1600 px JPEG at 0.85 is usually 300–600 KB
+function readDataUrl(f: File): Promise<{ type: string; data: string }> { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res({ type: f.type || 'application/pdf', data: String(r.result) }); r.onerror = () => rej(r.error); r.readAsDataURL(f); }); }
+async function shrinkImage(f: File, max: number, q: number): Promise<{ type: string; data: string }> {
+  const bmp = await createImageBitmap(f);
+  const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
+  return { type: 'image/jpeg', data: c.toDataURL('image/jpeg', q) };
+}
 function lotBoundsCenter(rings: [number, number][][]): [number, number] { let la = 0, lo = 0, n = 0; for (const r of rings) for (const q of r) { la += q[0]; lo += q[1]; n++; } return n ? [la / n, lo / n] : [0, 0]; }
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 const el = (html: string) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild as HTMLElement; };
@@ -39,6 +49,18 @@ export class Hud {
   private lowFps = 0;
   private galleryToken = 0;
 
+  // editor mode: ?edit=1 turns the position editor and the upload buttons on for this browser
+  // (remembered), ?edit=0 turns them off; visitors never see them
+  static editorEnabled(): boolean {
+    try {
+      const q = new URLSearchParams(location.search).get('edit');
+      if (q === '1') localStorage.setItem('atlasEditor', '1');
+      if (q === '0') localStorage.removeItem('atlasEditor');
+      return localStorage.getItem('atlasEditor') === '1';
+    } catch { return false; }
+  }
+  private get editing() { return Hud.editorEnabled(); }
+
   constructor(container: HTMLElement, o: HudOpts) {
     this.eng = o.eng; this.props = o.props; this.mode = o.mode; this.onMode = o.onMode;
     this.root = el('<div class="hud"></div>');
@@ -47,6 +69,8 @@ export class Hud {
     this.editor = new Editor(this.root, this.eng, this.props, m => this.say(m));
     this.wire();
     this.syncAll();
+    if (!this.editing) this.q('#ctl-edit').hidden = true;
+    syncResearch().then(r => { if (r.added) this.say(r.added + ' shared parcel' + (r.added > 1 ? 's' : '') + ' joined your research list.'); if (!this.q('#insp-research').hidden) this.renderResearch(); });
   }
 
   // ---- top bar ---------------------------------------------------------------
@@ -156,6 +180,7 @@ export class Hud {
       const lot = t.closest('[data-lot]') as HTMLElement | null; if (lot) { const [pid, lid] = lot.dataset.lot!.split('/'); this.props.flyToLot(pid, lid); return; }
       const copy = t.closest('[data-copy]') as HTMLElement | null; if (copy) { try { navigator.clipboard?.writeText(copy.dataset.copy!); this.say('Copied ' + copy.dataset.copy); } catch { /* fine */ } return; }
       const rs = t.closest('[data-rs]') as HTMLElement | null; if (rs) { this.researchAction(rs.dataset.rs!, rs.dataset.apn || '', rs.dataset.pid || ''); return; }
+      const up = t.closest('[data-up]') as HTMLElement | null; if (up) { this.upload(up.dataset.up as 'photos' | 'doc', up.dataset.pid!, up.dataset.zid || 'property'); return; }
     });
     // the APN / coordinate search
     this.q('#apn-form').addEventListener('submit', e => { e.preventDefault(); const v = this.q<HTMLInputElement>('#apn-in').value.trim(); if (v) this.lookup(v); });
@@ -231,7 +256,7 @@ export class Hud {
       case 'l': this.dockOpen = !this.dockOpen; this.lastPanel = 'dock'; this.syncPanels(); break;
       case 'i': this.inspectorOpen = !this.inspectorOpen; this.lastPanel = 'insp'; this.syncPanels(); break;
       case 'h': this.eng.toggleOverlay('histtopo'); break;
-      case 'p': this.editor.toggle(); break;
+      case 'p': if (this.editing) this.editor.toggle(); break;
       case 'g': { const c = map.getCenter(); window.open(`https://earth.google.com/web/@${c.lat},${c.lng},0a,${Math.round(40075016 / Math.pow(2, map.getZoom()) * 0.6)}d,35y,${Math.round(map.getBearing())}h,${Math.round(map.getPitch())}t,0r`, '_blank'); break; }
       case '?': this.help(); break;
       case ' ': e.preventDefault(); this.mode = this.mode === 'today' ? 'vision' : 'today'; this.onMode(this.mode); this.syncAll(); break;
@@ -366,6 +391,7 @@ export class Hud {
       if (st?.note) h += `<div class="note-p">${esc(st.note)}</div>`;
       h += `<div class="acts"><button class="mini" data-fly="${p.id}">fly here</button><button class="mini violet" data-dive="${p.id}">🌀 Enter the Vision</button><a class="mini" href="/classic" target="_blank" rel="noopener">classic page ↗</a></div>`;
       if (p.docs?.length) h += '<div class="docs">' + p.docs.map(d => `<a href="https://raw.githubusercontent.com/SacredRebel/howard-property-dev/main/${esc(d.file)}" target="_blank" rel="noopener">📄 ${esc(d.label)}</a>`).join('') + '</div>';
+      if (this.editing) h += `<div class="acts up"><button class="mini" data-up="photos" data-pid="${esc(p.id)}" data-zid="property">＋ add photos</button><button class="mini" data-up="doc" data-pid="${esc(p.id)}">＋ add document (PDF)</button></div>`;
       if (panel?.html) h += `<details class="fold"><summary>${esc(panel.title || 'Full details')}<span class="cnt">details</span></summary><div class="classic">${stripClassicGallery(panel.html)}</div></details>`;
       if (p.cta) {
         h += `<details class="fold" open><summary>${esc(p.cta.heading || 'Get in touch')}</summary><div class="cta">${p.cta.paragraph ? `<p class="desc">${esc(p.cta.paragraph)}</p>` : ''}`
@@ -387,6 +413,7 @@ export class Hud {
       h += `<div class="acts"><button class="mini" data-fly="${p.id}">property</button><button class="mini violet" data-dive="${p.id}">🌀 Enter the Vision</button></div></div>`;
       box.innerHTML = h;
       this.fillGallery(box, p.id, z.id, token);
+      if (this.editing) { const slot = box.querySelector('.gal-slot') as HTMLElement | null; const holder = slot ? slot.parentElement! : box; holder.insertAdjacentHTML('beforeend', `<div class="acts up"><button class="mini" data-up="photos" data-pid="${esc(p.id)}" data-zid="${esc(z.id)}">＋ add photos to this zone</button></div>`); }
     } else if (kind === 'lot') {
       const l = payload as LotPick, hit = this.props.lotOf(l.pid, l.lid), p = hit?.property;
       const bk = /Bk\s*(\d+)\s*Pg\s*(\d+)/i.exec(l.name || ''), title = (l.name || '').replace(/\s*\(.*\)\s*$/, '');
@@ -455,7 +482,7 @@ export class Hud {
     const body = this.root.querySelector('#rec-body') as HTMLElement | null; if (!body) return;
     this.recordToken = renderRecord(body, t, this.store, {
       saved: t.apn ? research.has(t.apn) : false,
-      onSave: rec => { const it = research.fromRecord(rec); if (it) { research.add(it); this.say('Saved to the research list — open the Research tab to compare.'); } else this.say('This point has no parcel to save.'); }
+      onSave: rec => { const it = research.fromRecord(rec); if (it) { research.add(it); this.say('Saved to the research list — open the Research tab to compare.'); void this.cloudPush('add', { item: it }); } else this.say('This point has no parcel to save.'); }
     });
   }
   // APN or "lat, lng" -> the county's parcel -> outline + fly + card
@@ -490,9 +517,48 @@ export class Hud {
       <p class="note-p">Type an APN or coordinates in the search box at the top to pull any parcel’s county record; save the ones you are looking at here. Our own properties are always in the comparison.</p>
       <div class="rs-list">${list.length ? list.map(it => `<div class="rs"><div class="rs-t"><b>${esc(it.situs || it.apn)}</b><i>${esc(it.apn)}${it.acreage ? ' · ' + it.acreage.toFixed(2) + ' ac' : ''}${it.county ? ' · ' + esc(it.county) : ''}</i></div><div class="rs-a"><button class="mini" data-rs="fly" data-apn="${esc(it.apn)}">fly</button><button class="mini" data-rs="open" data-apn="${esc(it.apn)}">record</button><button class="mini" data-rs="remove" data-apn="${esc(it.apn)}" title="remove">✕</button></div></div>`).join('') : '<div class="empty">Nothing saved yet. Look a parcel up, then “☆ save to research”.</div>'}</div>
       <div class="acts"><button class="mini gold" data-rs="compare">compare all (${this.props.props.length + list.length})</button>${list.length ? `<button class="mini" data-rs="export">export list</button><button class="mini" data-rs="clearlist">clear list</button>` : ''}</div>
+      <div class="cloud">${cloud.synced ? (storedPin() ? `☁ shared list · ${cloud.shared} parcel${cloud.shared === 1 ? '' : 's'} in the repository · every save syncs` : `☁ shared list · ${cloud.shared} in the repository · <button class="mini" data-rs="sync">enter the PIN to share yours</button>`) : cloud.checked ? '☁ this list lives in this browser only (sharing is not configured on the server)' : '☁ checking the shared list…'}</div>
       <div id="cmp-body"></div></div>`;
     box.innerHTML = h;
     if (this.compareRecs.size) this.renderCompare(false);
+  }
+  // write-through to the shared list when the PIN is already known; otherwise the list stays local
+  private async cloudPush(op: 'add' | 'remove' | 'note', payload: Record<string, unknown>) {
+    const pin = storedPin(); if (!cloud.synced || !pin) return;
+    const r = await pushResearch(op, payload, pin);
+    if (!r.ok) this.say(r.status === 401 ? 'The shared list did not accept the PIN — saved locally only.' : 'Saved locally; the shared list did not answer (' + (r.error || r.status) + ').');
+  }
+  private async syncNow() {
+    const pin = askPin(); if (!pin) return;
+    this.say('Sharing your research list…');
+    const r = await pushResearch('merge', { items: research.list() }, pin);
+    if (!r.ok) { this.say(r.status === 401 ? 'Wrong PIN.' : r.status === 501 ? 'Sharing is not configured on the server (EDIT_PIN + GITHUB_TOKEN).' : 'The shared list did not answer.'); this.renderResearch(); return; }
+    const m = await syncResearch(); this.say('Shared — ' + cloud.shared + ' parcel' + (cloud.shared === 1 ? '' : 's') + ' in the repository' + (m.added ? ', ' + m.added + ' new here' : '') + '.');
+    this.renderResearch();
+  }
+  // photos (resized in the browser) and PDFs go straight into the repository through /api/upload
+  private upload(kind: 'photos' | 'doc', pid: string, zid: string) {
+    const pin = askPin(); if (!pin) return;
+    const input = document.createElement('input'); input.type = 'file'; input.accept = kind === 'doc' ? 'application/pdf' : 'image/*'; input.multiple = kind === 'photos';
+    input.onchange = async () => {
+      const files = [...(input.files || [])]; if (!files.length) return;
+      let n = 0;
+      for (const f of files) {
+        this.say(`Uploading ${f.name} (${n + 1} of ${files.length})…`);
+        try {
+          const payload = kind === 'doc' ? await readDataUrl(f) : await shrinkImage(f, 1600, 0.85);
+          const r = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin, propertyId: pid, zoneId: zid, category: this.mode === 'vision' ? 'vision' : 'current', name: f.name, type: payload.type, data: payload.data, label: kind === 'doc' ? f.name.replace(/\.pdf$/i, '') : undefined }) });
+          const j = await r.json().catch(() => ({})) as { ok?: boolean; error?: string; path?: string };
+          if (!r.ok || !j.ok) { if (r.status === 401) { try { localStorage.removeItem('ojaiMapEditPin'); } catch { /* fine */ } } this.say(r.status === 501 ? 'Uploads are not configured on the server (EDIT_PIN + GITHUB_TOKEN).' : r.status === 401 ? 'Wrong PIN.' : 'Upload failed: ' + (j.error || r.status)); return; }
+          n++;
+          if (kind === 'doc' && j.path) { const p = this.props.props.find(x => x.id === pid); if (p) p.docs = [...(p.docs || []), { label: f.name.replace(/\.pdf$/i, ''), file: j.path }]; }
+        } catch (e) { this.say('Upload failed: ' + String((e as Error).message || e)); return; }
+      }
+      invalidateGallery(pid, zid);
+      this.say(`${n} file${n === 1 ? '' : 's'} committed to the repository — they show on the ${kind === 'doc' ? 'card' : 'gallery'} now and everywhere within a few minutes.`);
+      this.renderParcel();
+    };
+    input.click();
   }
   private async renderCompare(fetchAll: boolean) {
     const cols = this.researchCols();
@@ -508,12 +574,13 @@ export class Hud {
     const it = research.list().find(x => x.apn === apn);
     if (a === 'fly') { if (it) this.openCandidate({ apn: it.apn, situs: it.situs || null, acreage: it.acreage ?? null, center: it.center, bbox: it.bbox || null, rings: it.rings || null, county: it.county ? { name: it.county, fips: it.county, adapter: 'saved' } : null }); else if (this.selected?.kind === 'search') { const c = this.selected.payload as { bbox?: { xmin: number; ymin: number; xmax: number; ymax: number } | null; center: [number, number] }; if (c.bbox) this.props.flyToBox(c.bbox); else this.eng.map.flyTo({ center: [c.center[1], c.center[0]], zoom: 16 }); } return; }
     if (a === 'open') { if (it) this.openCandidate({ apn: it.apn, situs: it.situs || null, acreage: it.acreage ?? null, center: it.center, bbox: it.bbox || null, rings: it.rings || null, county: it.county ? { name: it.county, fips: it.county, adapter: 'saved' } : null }); return; }
-    if (a === 'remove') { research.remove(apn); this.say('Removed from the research list.'); if (this.selected?.kind === 'search') this.renderParcel(); this.renderResearch(); return; }
-    if (a === 'save') { const c = this.selected?.payload as { apn: string | null; situs: string | null; acreage: number | null; center: [number, number]; bbox?: ResearchItem['bbox']; geometry?: { rings: [number, number][][] } | null; county?: { fips: string } | null } | undefined; if (c && c.apn) { research.add({ apn: c.apn, county: c.county?.fips, situs: c.situs, acreage: c.acreage, center: c.center, bbox: c.bbox || null, rings: c.geometry?.rings || null, savedAt: new Date().toISOString() }); this.say('Saved to the research list.'); this.renderParcel(); } return; }
+    if (a === 'remove') { research.remove(apn); this.say('Removed from the research list.'); void this.cloudPush('remove', { apn }); if (this.selected?.kind === 'search') this.renderParcel(); this.renderResearch(); return; }
+    if (a === 'save') { const c = this.selected?.payload as { apn: string | null; situs: string | null; acreage: number | null; center: [number, number]; bbox?: ResearchItem['bbox']; geometry?: { rings: [number, number][][] } | null; county?: { fips: string } | null } | undefined; if (c && c.apn) { const it: ResearchItem = { apn: c.apn, county: c.county?.fips, situs: c.situs, acreage: c.acreage, center: c.center, bbox: c.bbox || null, rings: c.geometry?.rings || null, savedAt: new Date().toISOString() }; research.add(it); this.say('Saved to the research list.'); void this.cloudPush('add', { item: it }); this.renderParcel(); } return; }
     if (a === 'clear') { this.props.clearCandidate(); return; }
     if (a === 'compare') { this.renderCompare(true); return; }
     if (a === 'export') { const blob = new Blob([JSON.stringify(research.list(), null, 2)], { type: 'application/json' }); const u = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = u; link.download = 'research-list.json'; link.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); return; }
     if (a === 'clearlist') { research.save([]); this.compareRecs.clear(); this.renderResearch(); return; }
+    if (a === 'sync') { void this.syncNow(); return; }
   }
   setCrumb(text: string) { this.q('#crumb').textContent = text; }
 }
