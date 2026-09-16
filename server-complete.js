@@ -8117,7 +8117,7 @@ function serveClassic(req, res) {
       return String(s === null || s === undefined ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-    var DS_MAPTYPES = { PM: 'Parcel map', RS: 'Record of survey', MR: 'Miscellaneous record', TR: 'Tract map' };
+    var DS_MAPTYPES = { PM: 'Parcel map', RS: 'Record of survey', MR: 'Miscellaneous record', TR: 'Tract map', WCR: 'Well completion report (DWR)' };
     function dsRow(r) {
       return '<div class="ds-row' + (r[0] ? '' : ' cont') + '"' + (r[2] ? ' data-key="' + dsEsc(r[2]) + '"' : '')
         + '><span class="ds-k">' + dsEsc(r[0]) + '</span><span class="ds-v">' + dsEsc(r[1]) + '</span></div>';
@@ -8141,8 +8141,8 @@ function serveClassic(req, res) {
     }
     function dsRecords(recs) {
       if (!recs || !recs.length) return '';
-      var h = '<details class="ds-fold ds-sec" data-sec="recmaps" open><summary>Recorded maps &amp; surveys<span class="ds-count">' + recs.length + '</span></summary><div class="ds-rows">'
-        + '<p class="ds-note">Every map ever filed over this land — the same documents a surveyor retraces. Each one opens as the county&rsquo;s own scan.</p>';
+      var h = '<details class="ds-fold ds-sec" data-sec="recmaps" open><summary>Recorded maps, surveys &amp; well reports<span class="ds-count">' + recs.length + '</span></summary><div class="ds-rows">'
+        + '<p class="ds-note">Every map ever filed over this land — the same documents a surveyor retraces — and every well completion report the state holds nearby. Each one opens as the record keeper&rsquo;s own scan.</p>';
       recs.forEach(function(r) {
         var meta = [r.type ? (DS_MAPTYPES[r.type] || r.type) : null, r.year, r.surveyor, r.note, (r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null)]
           .filter(Boolean).join(' · ');
@@ -8251,7 +8251,7 @@ function serveClassic(req, res) {
       }
       (rec.sections || []).forEach(function(s) { h += '<h2>' + esc(s.label) + '</h2><table>' + rows(s.rows) + '</table>'; });
       if (rec.records && rec.records.length) {
-        h += '<h2>Recorded maps &amp; surveys</h2><table>' + rec.records.map(function(r) {
+        h += '<h2>Recorded maps, surveys &amp; well reports</h2><table>' + rec.records.map(function(r) {
           return '<tr><th>' + esc(r.label) + '</th><td>' + [r.year, r.surveyor, r.note].filter(Boolean).map(function(x) { return esc(x); }).join(' · ') + (r.url ? ' — <a href="' + esc(r.url) + '">scan</a>' : '') + '</td></tr>';
         }).join('') + '</table>';
       }

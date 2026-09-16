@@ -21,7 +21,7 @@ export interface Dim { id: string; label: string; value: string; score: number |
 export interface ResearchItem { apn: string; county?: string; situs?: string | null; acreage?: number | null; center: [number, number]; bbox?: RecordData['bbox']; rings?: [number, number][][] | null; savedAt: string; note?: string; }
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
-export const SECTION_ORDER = ['identity', 'valuation', 'landuse', 'structures', 'hazards', 'seismic', 'fire', 'terrain', 'ground', 'water', 'habitat', 'cultural', 'access', 'districts', 'survey', 'permits', 'records'];
+export const SECTION_ORDER = ['identity', 'valuation', 'title', 'landuse', 'structures', 'hazards', 'seismic', 'fire', 'terrain', 'ground', 'water', 'habitat', 'cultural', 'access', 'districts', 'survey', 'permits', 'records'];
 
 export function targetKey(t: Target): string {
   if (t.apn) return 'apn=' + encodeURIComponent(t.apn) + (t.county ? '&county=' + t.county : '');
@@ -36,7 +36,7 @@ export function mergeRecord(core: RecordData, deep?: RecordData | null): RecordD
     if (!a && !b) return null;
     return { id, label: (a || b)!.label, rows: [...(a?.rows || []), ...(b?.rows || [])] };
   }).filter(Boolean) as Section[];
-  return { ...core, part: 'all', sections, flags: [...core.flags, ...deep.flags], terrain: deep.terrain, sourcesQueried: (core.sourcesQueried || 0) + (deep.sourcesQueried || 0), sourcesAnswered: (core.sourcesAnswered || 0) + (deep.sourcesAnswered || 0), sourcesLate: (core.sourcesLate || 0) + (deep.sourcesLate || 0), partial: !!(core.partial || deep.partial) };
+  return { ...core, part: 'all', sections, flags: [...core.flags, ...deep.flags], terrain: deep.terrain, records: [...(core.records || []), ...(deep.records || [])], sourcesQueried: (core.sourcesQueried || 0) + (deep.sourcesQueried || 0), sourcesAnswered: (core.sourcesAnswered || 0) + (deep.sourcesAnswered || 0), sourcesLate: (core.sourcesLate || 0) + (deep.sourcesLate || 0), partial: !!(core.partial || deep.partial) };
 }
 
 // the seven dimensions — mirrors lib/dossier.js readFrom(); every number cites row keys
@@ -57,13 +57,13 @@ export function readFrom(rec: RecordData): Dim[] {
   dims.push({ id: 'hazards', label: 'Hazard load', value: !anyHz ? '—' : hits.length ? hits.join(' · ') : 'no mapped hazard on the parcel', score: anyHz ? Math.max(0, 100 - hits.length * 20) : null, note: [(get('pga475') ? 'PGA ' + get('pga475').split(' ')[0] + ' (475-yr)' : ''), (get('fires') && !/No recorded/.test(get('fires')) ? 'fires on record' : '')].filter(Boolean).join(' · ') });
   const wl = get('waterline'), sw = get('sewer'), gw = get('gw_basin');
   const wscore = (/No public water/.test(wl) ? 0 : 40) + (/No public sewer/.test(sw) ? 0 : 20) + (/Outside/.test(gw) || !gw ? 10 : 30) + (has('streams') && !/No county/.test(get('streams')) ? 10 : 0);
-  dims.push({ id: 'water', label: 'Water', value: (/No public water/.test(wl) ? 'no public water line' : wl ? 'public water nearby' : '—') + ' · ' + (/No public sewer/.test(sw) ? 'septic' : sw ? 'sewer nearby' : '—'), score: wl || sw ? Math.min(100, wscore) : null, note: [gw, get('gsa'), get('wells_water')].filter(Boolean).join(' · ') });
+  dims.push({ id: 'water', label: 'Water', value: (/No public water/.test(wl) ? 'no public water line' : wl ? 'public water nearby' : '—') + ' · ' + (/No public sewer/.test(sw) ? 'septic' : sw ? 'sewer nearby' : '—'), score: wl || sw ? Math.min(100, wscore) : null, note: [get('wells_on') && /^\d+ — /.test(get('wells_on')) ? get('wells_on').split(' — ')[0] + ' well report' + (get('wells_on').startsWith('1 ') ? '' : 's') + ' on the parcel' : '', gw, get('gsa'), get('wells_water')].filter(Boolean).join(' · ') });
   const road = get('road');
-  dims.push({ id: 'access', label: 'Access & utilities', value: road ? road.split(' · ').slice(0, 2).join(' · ') : '—', score: road ? (/No public road/.test(road) ? 25 : /on the parcel|~\d+ m/.test(road) ? 90 : 60) : null, note: [get('transmission') ? 'transmission line within 1 km' : '', get('comms') ? get('comms') + ' comms facilities within 2 mi' : '', get('county_ease')].filter(Boolean).join(' · ') || 'recorded easements are in the deed, not GIS' });
-  const total = get('total_value'), land = get('land_value'), per = get('value_per_ac'), dd = get('doc_date');
-  dims.push({ id: 'value', label: 'Value signal', value: total ? total + ' assessed' : '—', score: null, note: [land ? 'land ' + land : '', per ? per + '/ac' : '', dd ? 'last document ' + dd : ''].filter(Boolean).join(' · ') });
-  const recs = rec.records || [];
-  dims.push({ id: 'change', label: 'Change over time', value: recs.length ? (recs.length + ' recorded maps, ' + (recs[recs.length - 1].year || '') + ' → ' + (recs[0].year || '')) : '—', score: null, note: (get('fires') && !/No recorded/.test(get('fires')) ? get('fires') : '') + (get('bldg_imagery') ? ' · footprints traced ' + get('bldg_imagery') : '') });
+  dims.push({ id: 'access', label: 'Access & utilities', value: road ? road.split(' · ').slice(0, 2).join(' · ') : '—', score: road ? (/No public road/.test(road) ? 25 : /on the parcel|~\d+ m/.test(road) ? 90 : 60) : null, note: [get('electric') ? get('electric').split(' · ')[0] : '', get('fire_station') ? 'fire station ' + ((get('fire_station').match(/~[^ ]+ (?:m|km)/) || [''])[0]) : '', get('transmission') ? 'transmission line within 1 km' : '', get('comms') ? get('comms') + ' comms facilities within 2 mi' : '', get('county_ease')].filter(Boolean).join(' · ') || 'recorded easements are in the deed, not GIS' });
+  const total = get('total_value'), land = get('land_value'), per = get('value_per_ac'), docRow = get('doc_nr'), dd = docRow.split(' · ')[2] || '', sale = get('sale_price');
+  dims.push({ id: 'value', label: 'Value signal', value: total ? total + ' assessed' : '—', score: null, note: [land ? 'land ' + land : '', per ? per + '/ac' : '', /^\$/.test(sale) ? 'last sale ' + sale.split(' — ')[0] : '', dd ? 'last document ' + dd : '', get('value_change') ? '2018 → now ' + ((get('value_change').match(/\(([^)]+)\)/) || [])[1] || '') : ''].filter(Boolean).join(' · ') });
+  const recs = (rec.records || []).filter(r => r.type !== 'WCR'), chain = flat.filter(r => /^chain\d/.test(String(r[2] || ''))).length;
+  dims.push({ id: 'change', label: 'Change over time', value: recs.length ? (recs.length + ' recorded maps, ' + (recs[recs.length - 1].year || '') + ' → ' + (recs[0].year || '')) : '—', score: null, note: (chain ? chain + ' title event' + (chain > 1 ? 's' : '') + ' on the public roll · ' : '') + (get('fires') && !/No recorded/.test(get('fires')) ? get('fires') : '') + (get('bldg_imagery') ? ' · footprints traced ' + get('bldg_imagery') : '') });
   return dims;
 }
 
@@ -100,8 +100,9 @@ export function readHTML(dims: Dim[]) {
 }
 export function recordsHTML(recs: RecMap[]) {
   if (!recs.length) return '';
-  let h = `<details class="fold sub rec-sec" data-sec="recmaps" open><summary>Recorded maps &amp; surveys<span class="cnt">${recs.length}</span></summary><div class="rows"><p class="note-p">Every map ever filed over this land — the same documents a surveyor retraces. Each opens as the county’s own scan.</p>`;
-  for (const r of recs) { const meta = [r.type ? { PM: 'Parcel map', RS: 'Record of survey', MR: 'Miscellaneous record', TR: 'Tract map' }[r.type] || r.type : null, r.year, r.surveyor, r.note, r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null].filter(Boolean).join(' · '); h += r.url ? `<a class="doc" href="${esc(r.url)}" target="_blank" rel="noopener"><span><b>${esc(r.label)}</b><i>${esc(meta)}</i></span><span class="o">open ↗</span></a>` : `<div class="r"><span class="k">${esc(r.label)}</span><span class="v">${esc(meta)}</span></div>`; }
+  const wells = recs.filter(r => r.type === 'WCR').length;
+  let h = `<details class="fold sub rec-sec" data-sec="recmaps" open><summary>Recorded maps, surveys &amp; well reports<span class="cnt">${recs.length}</span></summary><div class="rows"><p class="note-p">Every map ever filed over this land — the same documents a surveyor retraces — and every well completion report the state holds nearby${wells ? ` (${wells} well report${wells > 1 ? 's' : ''})` : ''}. Each opens as the record keeper’s own scan.</p>`;
+  for (const r of recs) { const meta = [r.type ? { PM: 'Parcel map', RS: 'Record of survey', MR: 'Miscellaneous record', TR: 'Tract map', WCR: 'Well completion report (DWR)' }[r.type] || r.type : null, r.year, r.surveyor, r.note, r.pages ? r.pages + (r.pages > 1 ? ' sheets' : ' sheet') : null].filter(Boolean).join(' · '); h += r.url ? `<a class="doc" href="${esc(r.url)}" target="_blank" rel="noopener"><span><b>${esc(r.label)}</b><i>${esc(meta)}</i></span><span class="o">open ↗</span></a>` : `<div class="r"><span class="k">${esc(r.label)}</span><span class="v">${esc(meta)}</span></div>`; }
   return h + '</div></details>';
 }
 export function portalsHTML(portals: Portal[], apn: string | null) {
@@ -185,7 +186,7 @@ export function openReport(rec: RecordData) {
 ${rec.flags.map(f => `<div class="flag ${f.level}">${esc(f.text)}</div>`).join('')}
 <h2>The read</h2><div class="read">${dims.map(d => `<div class="rd"><b>${esc(d.label)}</b>${esc(d.value)}${d.score != null ? ' · ' + d.score + '/100' : ''}<i>${esc(d.note)}</i></div>`).join('')}</div>
 ${rec.sections.map(s => `<h2>${esc(s.label)}</h2><table>${rows(s.rows)}</table>`).join('')}
-${(rec.records || []).length ? `<h2>Recorded maps &amp; surveys</h2><table>${(rec.records || []).map(r => `<tr><th>${esc(r.label)}</th><td>${[r.year, r.surveyor, r.note].filter(Boolean).map(esc).join(' · ')}${r.url ? ` — <a href="${esc(r.url)}">scan</a>` : ''}</td></tr>`).join('')}</table>` : ''}
+${(rec.records || []).length ? `<h2>Recorded maps, surveys &amp; well reports</h2><table>${(rec.records || []).map(r => `<tr><th>${esc(r.label)}</th><td>${[r.year, r.surveyor, r.note].filter(Boolean).map(esc).join(' · ')}${r.url ? ` — <a href="${esc(r.url)}">scan</a>` : ''}</td></tr>`).join('')}</table>` : ''}
 ${(rec.portals || []).length ? `<h2>Where to look</h2><table>${(rec.portals || []).map(p => `<tr><th><a href="${esc(p.url)}">${esc(p.label)}</a></th><td>${esc(p.note || '')}</td></tr>`).join('')}</table>` : ''}
 ${(rec.raw || []).length ? `<h2>Raw assessor record</h2><table>${(rec.raw || []).map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>` : ''}
 <p class="foot">Assessor figures are the county’s own and are not an appraisal. Recorded documents, not GIS, are the authority on boundaries and easements. Sources: county GIS, California Geological Survey, FEMA, USGS, NRCS, BLM, US Census — each row names its publisher.</p></body></html>`;
