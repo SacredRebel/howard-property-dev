@@ -1,5 +1,1915 @@
 {
   "schema": 1,
-  "updatedAt": null,
-  "parcels": {}
+  "updatedAt": "2026-09-17T00:45:01.087Z",
+  "parcels": {
+    "0370012125": {
+      "apn": "037-0-012-125",
+      "county": "06111",
+      "label": "Sulphur Mountain Eco-Village",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "2024000052341",
+          "date": "2024-08-02",
+          "kind": "D"
+        },
+        "transfer": "2024-08-02",
+        "baseYear": null,
+        "values": {
+          "land": 961860,
+          "imp": 116280,
+          "total": 1078140,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 9.47,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "situs": "11962 SULPHUR MOUNTAIN RD",
+      "acreage": 9.47
+    },
+    "0320010090": {
+      "apn": "032-0-010-090",
+      "county": "06111",
+      "label": "Howard Property",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "100103265",
+          "date": "2010-07-15",
+          "kind": "D"
+        },
+        "transfer": "2010-07-15",
+        "baseYear": null,
+        "values": {
+          "land": 1416044,
+          "imp": 422438,
+          "total": 1838482,
+          "rollYear": null
+        },
+        "sale": 1150000,
+        "acreage": 43.92,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "situs": "1320 BALDWIN RD",
+      "acreage": 43.92
+    },
+    "0110040135": {
+      "apn": "011-0-040-135",
+      "county": "06111",
+      "label": "Keri's Property",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "210112576",
+          "date": "2021-06-08",
+          "kind": "D"
+        },
+        "transfer": "2021-06-08",
+        "baseYear": null,
+        "values": {
+          "land": 603567,
+          "imp": 616629,
+          "total": 1220196,
+          "rollYear": null
+        },
+        "sale": 385000,
+        "acreage": 34.88,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "situs": "14209 DE LA GARRIGUE RD",
+      "acreage": 34.88
+    },
+    "0340220135": {
+      "apn": "034-0-220-135",
+      "county": "06111",
+      "label": "Cher's Property",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "210115321",
+          "date": "2021-06-14",
+          "kind": "D"
+        },
+        "transfer": "2021-06-14",
+        "baseYear": null,
+        "values": {
+          "land": 941828,
+          "imp": 507134,
+          "total": 1448962,
+          "rollYear": null
+        },
+        "sale": 1200000,
+        "acreage": 2,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "situs": "10622 ENCINO DR",
+      "acreage": 2
+    },
+    "0350020010": {
+      "apn": "035-0-020-010",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 1 (Bk 35 Pg 02 — North Ridge)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129781",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 3919319,
+          "imp": null,
+          "total": 3919319,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 610.41,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 610.41
+    },
+    "0350030055": {
+      "apn": "035-0-030-055",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 5",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 1152250,
+          "imp": null,
+          "total": 1152250,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030065": {
+      "apn": "035-0-030-065",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 6",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 1152251,
+          "imp": 8705,
+          "total": 1160956,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.02,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.02
+    },
+    "0350030095": {
+      "apn": "035-0-030-095",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 9",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 444594,
+          "imp": 151639,
+          "total": 596233,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030085": {
+      "apn": "035-0-030-085",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 8",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101490,
+          "imp": null,
+          "total": 101490,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030075": {
+      "apn": "035-0-030-075",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 7",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 838761,
+          "imp": null,
+          "total": 838761,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030105": {
+      "apn": "035-0-030-105",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 10",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 554934,
+          "imp": null,
+          "total": 554934,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030115": {
+      "apn": "035-0-030-115",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 11",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 117643,
+          "imp": null,
+          "total": 117643,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030125": {
+      "apn": "035-0-030-125",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 12",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 237211,
+          "imp": null,
+          "total": 237211,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030145": {
+      "apn": "035-0-030-145",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 14",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101490,
+          "imp": null,
+          "total": 101490,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030155": {
+      "apn": "035-0-030-155",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 15",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101649,
+          "imp": null,
+          "total": 101649,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030135": {
+      "apn": "035-0-030-135",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 13",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101410,
+          "imp": null,
+          "total": 101410,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030165": {
+      "apn": "035-0-030-165",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 16",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101649,
+          "imp": null,
+          "total": 101649,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.2,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.2
+    },
+    "0350030185": {
+      "apn": "035-0-030-185",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 18",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 119267,
+          "imp": null,
+          "total": 119267,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.3,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.3
+    },
+    "0350030175": {
+      "apn": "035-0-030-175",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 17",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 187006,
+          "imp": null,
+          "total": 187006,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.25,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.25
+    },
+    "0350030205": {
+      "apn": "035-0-030-205",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 20",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 231482,
+          "imp": null,
+          "total": 231482,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030195": {
+      "apn": "035-0-030-195",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 19",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 118594,
+          "imp": null,
+          "total": 118594,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030215": {
+      "apn": "035-0-030-215",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 21",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 406342,
+          "imp": null,
+          "total": 406342,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030225": {
+      "apn": "035-0-030-225",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 22",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 406659,
+          "imp": null,
+          "total": 406659,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.09,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.09
+    },
+    "0350030245": {
+      "apn": "035-0-030-245",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 24",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 236842,
+          "imp": 54389,
+          "total": 291231,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030235": {
+      "apn": "035-0-030-235",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 23",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 871975,
+          "imp": 45662,
+          "total": 917637,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350030255": {
+      "apn": "035-0-030-255",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 25",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101649,
+          "imp": null,
+          "total": 101649,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.09,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.09
+    },
+    "0350030265": {
+      "apn": "035-0-030-265",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 26",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 125036,
+          "imp": null,
+          "total": 125036,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 49.24,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 49.24
+    },
+    "0350030275": {
+      "apn": "035-0-030-275",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 27",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 152554,
+          "imp": 8705,
+          "total": 161259,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 60.03,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 60.03
+    },
+    "0350030285": {
+      "apn": "035-0-030-285",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 28",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 454955,
+          "imp": null,
+          "total": 454955,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 43.71,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 43.71
+    },
+    "0350030305": {
+      "apn": "035-0-030-305",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 30",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 107580,
+          "imp": null,
+          "total": 107580,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 42.33,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 42.33
+    },
+    "0350030325": {
+      "apn": "035-0-030-325",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 32",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129782",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 332893,
+          "imp": 174743,
+          "total": 507636,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 11.435,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 11.4348
+    },
+    "0350030295": {
+      "apn": "035-0-030-295",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 29",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 103795,
+          "imp": null,
+          "total": 103795,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 41.01,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 41.01
+    },
+    "0350030335": {
+      "apn": "035-0-030-335",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 33",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129782",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 3475186,
+          "imp": 4664154,
+          "total": 8139340,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 280.59,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 280.59
+    },
+    "0350030345": {
+      "apn": "035-0-030-345",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 34",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129782",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 231828,
+          "imp": 210291,
+          "total": 442119,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 7.958,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 7.9581
+    },
+    "0350350015": {
+      "apn": "035-0-350-015",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 1 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101984,
+          "imp": null,
+          "total": 101984,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.15,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.15
+    },
+    "0350350035": {
+      "apn": "035-0-350-035",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 3 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101852,
+          "imp": null,
+          "total": 101852,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.09,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.09
+    },
+    "0350350025": {
+      "apn": "035-0-350-025",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 2 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101411,
+          "imp": null,
+          "total": 101411,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.06,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.06
+    },
+    "0350350045": {
+      "apn": "035-0-350-045",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 4 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 118400,
+          "imp": null,
+          "total": 118400,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.11,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.11
+    },
+    "0350350055": {
+      "apn": "035-0-350-055",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 5 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101025,
+          "imp": null,
+          "total": 101025,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.9,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.9
+    },
+    "0350350065": {
+      "apn": "035-0-350-065",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 6 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 100855,
+          "imp": null,
+          "total": 100855,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.02,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.02
+    },
+    "0350350085": {
+      "apn": "035-0-350-085",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 8 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101410,
+          "imp": null,
+          "total": 101410,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350075": {
+      "apn": "035-0-350-075",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 7 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101649,
+          "imp": null,
+          "total": 101649,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.02,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.02
+    },
+    "0350350095": {
+      "apn": "035-0-350-095",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 9 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 118594,
+          "imp": null,
+          "total": 118594,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350105": {
+      "apn": "035-0-350-105",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 10 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101649,
+          "imp": null,
+          "total": 101649,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350115": {
+      "apn": "035-0-350-115",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 11 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101569,
+          "imp": null,
+          "total": 101569,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350125": {
+      "apn": "035-0-350-125",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 12 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 189023,
+          "imp": null,
+          "total": 189023,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350135": {
+      "apn": "035-0-350-135",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 13 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 177898,
+          "imp": null,
+          "total": 177898,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350145": {
+      "apn": "035-0-350-145",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 14 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 145478,
+          "imp": null,
+          "total": 145478,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40
+    },
+    "0350350155": {
+      "apn": "035-0-350-155",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 15 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 190268,
+          "imp": null,
+          "total": 190268,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 52.23,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 52.23
+    },
+    "0350350165": {
+      "apn": "035-0-350-165",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 16 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 104190,
+          "imp": null,
+          "total": 104190,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 41,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 41
+    },
+    "0350350175": {
+      "apn": "035-0-350-175",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 17 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 318548,
+          "imp": null,
+          "total": 318548,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 88.11,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 88.11
+    },
+    "0350350185": {
+      "apn": "035-0-350-185",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 18 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 169373,
+          "imp": null,
+          "total": 169373,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.09,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.09
+    },
+    "0350350205": {
+      "apn": "035-0-350-205",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 20 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 125070,
+          "imp": null,
+          "total": 125070,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.28,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.28
+    },
+    "0350350195": {
+      "apn": "035-0-350-195",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 19 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 105375,
+          "imp": null,
+          "total": 105375,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 41.51,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 41.51
+    },
+    "0350350225": {
+      "apn": "035-0-350-225",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 22 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 103336,
+          "imp": null,
+          "total": 103336,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.07,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.07
+    },
+    "0350350215": {
+      "apn": "035-0-350-215",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 21 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 171196,
+          "imp": null,
+          "total": 171196,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.48,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.48
+    },
+    "0350350235": {
+      "apn": "035-0-350-235",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 23 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 101819,
+          "imp": null,
+          "total": 101819,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.09,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.09
+    },
+    "0350350245": {
+      "apn": "035-0-350-245",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 24 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 102334,
+          "imp": null,
+          "total": 102334,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.31,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.31
+    },
+    "0350350255": {
+      "apn": "035-0-350-255",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 25 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 117304,
+          "imp": null,
+          "total": 117304,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.31,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.31
+    },
+    "0350350265": {
+      "apn": "035-0-350-265",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 26 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 137073,
+          "imp": null,
+          "total": 137073,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 53.97,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 53.97
+    },
+    "0350350275": {
+      "apn": "035-0-350-275",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 27 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 138430,
+          "imp": null,
+          "total": 138430,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 54.57,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 54.57
+    },
+    "0350350285": {
+      "apn": "035-0-350-285",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 28 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 117106,
+          "imp": null,
+          "total": 117106,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 43.2,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 43.2
+    },
+    "0350350295": {
+      "apn": "035-0-350-295",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 29 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 102664,
+          "imp": null,
+          "total": 102664,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 40.41,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 40.41
+    },
+    "0350350305": {
+      "apn": "035-0-350-305",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 30 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 104915,
+          "imp": null,
+          "total": 104915,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 41.39,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 41.39
+    },
+    "0350350315": {
+      "apn": "035-0-350-315",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 31 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 110891,
+          "imp": null,
+          "total": 110891,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 43.66,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 43.66
+    },
+    "0350350325": {
+      "apn": "035-0-350-325",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 32 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 118933,
+          "imp": null,
+          "total": 118933,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 46.82,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 46.82
+    },
+    "0350350335": {
+      "apn": "035-0-350-335",
+      "county": "06111",
+      "label": "⛰️ Black Mtn · Lot 33 (Bk 35 Pg 35)",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "010129783",
+          "date": "2001-07-09",
+          "kind": "D"
+        },
+        "transfer": "2001-07-09",
+        "baseYear": null,
+        "values": {
+          "land": 84700,
+          "imp": null,
+          "total": 84700,
+          "rollYear": null
+        },
+        "sale": null,
+        "acreage": 2.66,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "acreage": 2.66
+    },
+    "0150010120": {
+      "apn": "015-0-010-120",
+      "county": "06111",
+      "label": "Rose Valley Property",
+      "firstSeen": "2026-09-17T00:45:01.087Z",
+      "checks": 1,
+      "history": [],
+      "current": {
+        "doc": {
+          "nr": "2026000061625",
+          "date": "2026-08-07",
+          "kind": "D"
+        },
+        "transfer": "2026-08-07",
+        "baseYear": null,
+        "values": {
+          "land": 373698,
+          "imp": 83661,
+          "total": 457359,
+          "rollYear": null
+        },
+        "sale": 810000,
+        "acreage": 40.016,
+        "exemption": null
+      },
+      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "situs": "7343 ROSE VALLEY RD",
+      "acreage": 40.016
+    }
+  }
 }
