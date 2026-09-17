@@ -277,10 +277,10 @@
     "https://developers.rentcast.io/reference/property-data-schema",
     "https://www.rentcast.io/terms-api"
    ],
-   "cost": "Developer $0 (50/mo) · Foundation $74/mo (1,000) · Growth $199/mo · Scale $449/mo",
+   "cost": "Developer $0 (50/mo, then $0.20 each) · Foundation $74/mo (1,000, $0.06) · Growth $199/mo (5,000, $0.03) · Scale $449/mo (25,000, $0.015)",
    "cadence": "unstated",
    "terms": "API terms §1: use, store, display and distribute permitted; §3.4: no attribution required (verified 2026-09-17).",
-   "atlas": "wired (V0.35): lib/providers.js rentcastTitle — active with RENTCAST_KEY; free plan 50 requests/month, answers held 30 days, never on the watch loop",
+   "atlas": "wired (V0.35), metered (V0.36): lib/providers.js rentcastTitle — active with RENTCAST_KEY; the free plan is 50/month and bills $0.20 after, so a durable meter (data/provider-meter.json, counts only) caps it at RENTCAST_MAX_MONTH (45), the lookup is skipped while a report under 12 months old is on file, and &provider=0 turns it off (the warm job uses it)",
    "verified": "2026-09-17"
   },
   {

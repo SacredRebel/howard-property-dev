@@ -8548,6 +8548,7 @@ function dossierQuery(req) {
   const q = { apn, lat, lon };
   if (req.query.county && /^\d{5}$/.test(String(req.query.county))) q.county = String(req.query.county);
   if (req.query.debug === '1') q.debug = true;
+  if (req.query.provider === '0') q.provider = false;   // skip the metered provider lookup (the warm job does)
   return q;
 }
 const SURVEY_FILES = { 'sulphur-mountain': 'sulphur-survey.json' };

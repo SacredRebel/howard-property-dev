@@ -102,6 +102,27 @@ check('compose: provider rows sit right after the owner block', withEntity.slice
   const both = await providerTitle({ apn: '037-0-012-125', apn10: '0370012125', fips: '06111', state: 'CA', lat: 34.4326, lon: -119.1564, situs: '11962 SULPHUR MOUNTAIN RD' });
   check('providers: the fan-out runs only the providers whose key is set', both && both.providers.join() === 'RentCast' && both.rows.length === 1, both);
   rentcastCacheClear();
+
+  // ---- the spend meter: the free plan is 50/month and bills $0.20 after, so it must be capped
+  const { meterCap, meterCount, meterBump, meterRead, meterReset, METER_PATH } = await import('../lib/providers.js');
+  meterReset();
+  check('meter: the default cap leaves five of the fifty in hand, and RENTCAST_MAX_MONTH overrides it', meterCap() === 45 && (() => { process.env.RENTCAST_MAX_MONTH = '10'; const c = meterCap(); delete process.env.RENTCAST_MAX_MONTH; return c === 10; })(), meterCap());
+  // a fake store: exactly the two calls lib/store.js exposes
+  let stored = null, writes = 0;
+  const store = { readJson: async (path, dflt) => (path === METER_PATH ? stored || dflt : dflt), updateJson: async (path, mutate) => { writes++; stored = mutate(stored); return { data: stored }; } };
+  await meterBump(store, 'rentcast'); await meterBump(store, 'rentcast');
+  const month = new Date().toISOString().slice(0, 7);
+  check('meter: counts persist through the store, per provider per month, with no names in the file', meterCount(await meterRead(store), 'rentcast') === 2 && writes === 2 && stored.months[month].rentcast === 2 && !/name|owner|address|apn/i.test(JSON.stringify(stored.months)), stored);
+  check('meter: a store that throws never breaks the lookup — the count still holds in memory', await (async () => { const bad = { readJson: async () => { throw new Error('no token'); }, updateJson: async () => { throw new Error('no token'); } }; await meterBump(bad, 'rentcast'); return meterCount(await meterRead(bad), 'rentcast') === 3; })());
+  meterReset();
+  process.env.RENTCAST_MAX_MONTH = '2';
+  const capStore = { readJson: async () => ({ schema: 1, months: { [month]: { rentcast: 2 } } }), updateJson: async () => { throw new Error('should not write'); } };
+  let capCalls = 0;
+  globalThis.fetch = async () => { capCalls++; return { ok: true, json: async () => [REC] }; };
+  const capped = await rentcastTitle({ apn10: '0370012125', lat: 34.4326, lon: -119.1564, situs: '11962 SULPHUR MOUNTAIN RD', store: capStore });
+  check('meter: at the cap the adapter does not call, and says so with the numbers', capCalls === 0 && capped.capped === true && /budget is spent \(2 of 2 requests; the free plan allows 50 and bills \$0\.20 for each one after\)/.test(capped.rows[0][1]), capped.rows[0][1]);
+  delete process.env.RENTCAST_MAX_MONTH; meterReset(); rentcastCacheClear();
+
   globalThis.fetch = realFetch2; delete process.env.RENTCAST_KEY;
 }
 
@@ -129,6 +150,26 @@ check('compose: provider rows sit right after the owner block', withEntity.slice
   check('resolveCore: the parcel anchors and the identity rows are built', rec && rec.apn10 === '0370012125' && rec.situs === '11962 SULPHUR MOUNTAIN RD' && rec.acreage === 9.47 && rec.sections.some(s => s.id === 'identity'), rec && { apn10: rec.apn10, acreage: rec.acreage });
   check('resolveCore: the evidence on file is read beside the fan-out and composes the owner-first title section', rec && rec.evidence && rec.evidence.provider === 'PropertyChecker' && rec.sections.find(s => s.id === 'title').rows[0][2] === 'owner_now' && /11962 Sulphur Mountain LLC/.test(String(rec.sections.find(s => s.id === 'title').rows[0][1])), rec && rec.evidence);
   check('resolveCore: the side reads are reported beside the fan-out, not as late county sources', rec && (rec.diag || []).filter(d => /beside the fan-out/.test(d[0])).length >= 2 && (rec.diag || []).find(d => d[0] === 'evidence (beside the fan-out)')[1] === 'ok', rec && (rec.diag || []).filter(d => /beside/.test(d[0])));
+  // the paid lookup is not spent where a fresh report already names the owner
+  process.env.RENTCAST_KEY = 'rc-test';
+  let rcCalls = 0;
+  const realFetch4 = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (/api\.rentcast\.io/.test(u)) { rcCalls++; return { ok: true, json: async () => [] }; }
+    if (/\/query/.test(u)) return { ok: true, json: async () => ({ features: /\/Parcels\/MapServer\/0\/query/.test(u) ? [PARCEL] : [] }) };
+    if (/raw\.githubusercontent|api\.github\.com/.test(u)) return { ok: false, status: 404, json: async () => ({}) };
+    return { ok: true, json: async () => ({ results: [], features: [] }), text: async () => '' };
+  };
+  process.env.PROVIDER_SKIP_MONTHS = '240';   // treat the fixture's 2025 report as fresh
+  const withFresh = await resolveCore({ apn: '037-0-012-125', debug: true });
+  delete process.env.PROVIDER_SKIP_MONTHS;
+  const withStale = await resolveCore({ apn: '037-0-012-125', debug: true, refresh: true });
+  const off = await resolveCore({ apn: '037-0-012-125', debug: true, provider: false, refresh: true });
+  globalThis.fetch = realFetch4; delete process.env.RENTCAST_KEY;
+  check('resolveCore: a metered lookup is skipped while the report on file is still fresh, and runs once it is stale', rcCalls === 1 && /skipped — a report of March 16, 2025 is on file and still fresh/.test(String((withFresh.diag || []).find(d => /^provider/.test(d[0]))[1])) && (withStale.diag || []).find(d => /^provider/.test(d[0]))[1] === 'ok', { rcCalls, fresh: (withFresh.diag || []).find(d => /^provider/.test(d[0])), stale: (withStale.diag || []).find(d => /^provider/.test(d[0])) });
+  check('resolveCore: provider=0 turns the metered lookup off entirely', !(off.diag || []).some(d => /^provider/.test(d[0])), (off.diag || []).filter(d => /beside/.test(d[0])).map(d => d[0]));
+
   check('resolveCore: the flags name the owner and the liens from the evidence', rec && rec.flags.some(f => f.key === 'owner_named') && rec.flags.some(f => f.key === 'liens'), rec && rec.flags.map(f => f.key));
 }
 

@@ -42,7 +42,7 @@ jobs:
       - name: Pre-resolve the county records
         run: |
           for q in apn=037-0-012-125 apn=032-0-010-090 apn=011-0-040-135 apn=034-0-220-135 apn=015-0-010-120 "lat=34.4700&lon=-119.2130"; do
-            curl -sS -m 60 -o /dev/null -w "$q -> %{http_code} in %{time_total}s\n" "$SITE/api/dossier?$q&part=all&read=1" || true
+            curl -sS -m 60 -o /dev/null -w "$q -> %{http_code} in %{time_total}s\n" "$SITE/api/dossier?$q&part=all&read=1&provider=0" || true
           done
       - name: Pre-bake the tiles
         run: node scripts/warm-tiles.mjs "$SITE" --zooms 12-16
