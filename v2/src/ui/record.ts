@@ -8,7 +8,7 @@ export type Row = [string, string, string?];
 export interface Flag { level: string; key?: string; text: string; }
 export interface Section { id: string; label: string; rows: Row[]; }
 export interface RecMap { label: string; type?: string; year?: string | null; surveyor?: string | null; note?: string | null; pages?: number | null; url?: string | null; }
-export interface Portal { group: 'county' | 'state' | 'federal'; label: string; url: string; note?: string; method?: 'post'; fields?: Record<string, string>; }
+export interface Portal { group: 'county' | 'state' | 'federal' | 'directory'; label: string; url: string; note?: string; method?: 'post'; fields?: Record<string, string>; }
 export interface Terrain { samples: number; spacingM: number; lowFt: number; highFt: number; meanFt: number; reliefFt: number; meanSlope: number; medianSlope: number; classes: { label: string; acres: number; share: number }[]; aspect: string; aspectShare: number; gentleAcres: number; buildableAcres: number; areaAcres: number; }
 export interface County { fips: string; name: string; state: string | null; stateName: string | null; adapter: string | null; authority?: string | null; }
 export interface RecordData {
@@ -110,7 +110,7 @@ export function recordsHTML(recs: RecMap[]) {
 }
 export function portalsHTML(portals: Portal[], apn: string | null) {
   if (!portals.length) return '';
-  const groups: [Portal['group'], string][] = [['county', 'County'], ['state', 'State'], ['federal', 'Federal']];
+  const groups: [Portal['group'], string][] = [['county', 'County'], ['state', 'State'], ['federal', 'Federal'], ['directory', 'Directories']];
   let h = `<details class="fold sub rec-sec" data-sec="portals" open><summary>Where to look — the record keepers<span class="cnt">${portals.length}</span></summary><div class="portals"><p class="note-p">GIS answers most questions; the rest live in the county’s own systems. These open the right desk${apn ? ' — the APN is copied to your clipboard on the way' : ''}.</p>`;
   for (const [g, label] of groups) {
     const items = portals.filter(p => p.group === g); if (!items.length) continue;

@@ -8169,7 +8169,7 @@ function serveClassic(req, res) {
     }
     function dsPortals(portals, apn) {
       if (!portals || !portals.length) return '';
-      var groups = [['county', 'County'], ['state', 'State'], ['federal', 'Federal']];
+      var groups = [['county', 'County'], ['state', 'State'], ['federal', 'Federal'], ['directory', 'Directories']];
       var h = '<details class="ds-fold ds-sec" data-sec="portals" open><summary>Where to look — the record keepers<span class="ds-count">' + portals.length + '</span></summary><div class="ds-portals">'
         + '<p class="ds-note">GIS answers most questions; the rest live in the county&rsquo;s own systems. These open the right desk' + (apn ? ' — the APN is copied to your clipboard on the way' : '') + '.</p>';
       groups.forEach(function(g) {
@@ -8754,6 +8754,12 @@ app.post('/api/upload', async (req, res) => {
 //  is not stored — the repository is public). The record then shows the owner
 //  of record, loans, liens, taxes and permits for that parcel, dated.
 // ============================================================================
+// the register of sources (data/sources.json): where every kind of parcel fact comes from and on what terms
+app.get('/api/sources', async (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+  try { const j = JSON.parse(readFileSync(join(__dirname, 'data', 'sources.json'), 'utf8')); res.json(j); }
+  catch (e) { res.status(500).json({ error: 'sources_unavailable' }); }
+});
 app.get('/api/title/:apn', async (req, res) => {
   res.set('Cache-Control', 'no-store');
   const ev = await loadEvidence(String(req.params.apn || ''));

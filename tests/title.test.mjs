@@ -48,6 +48,25 @@ const dims = readFrom({ sections: [{ id: 'title', rows }, { id: 'valuation', row
 check('read: the value dimension carries the last sale and the vendor estimate', /last sale \$750,000/.test(dims[5].note) && /estimate \$1,495,000/.test(dims[5].note), dims[5]);
 check('read: the change dimension counts the merged title events', /8 title events/.test(dims[6].note), dims[6]);
 
+// ---- the Secretary of State adapter, against a stubbed API (the shape from the SOS API guide v1.0.4) ----
+const { sosEntity, providerTitle } = await import('../lib/providers.js');
+check('providers: nothing runs without a key', (await providerTitle({ apn: '037-0-012-125', apn10: '0370012125', fips: '06111', state: 'CA' })) === null && (await sosEntity({ name: 'X LLC' })) === null);
+process.env.SOS_API_KEY = 'test-key';
+const realFetch = globalThis.fetch; let lastUrl = '', lastHeaders = {};
+globalThis.fetch = async (url, init) => { lastUrl = String(url); lastHeaders = (init && init.headers) || {}; return { ok: true, json: async () => ({ RecordCount: 2, EntityData: [
+  { EntityID: '202461812345', EntityType: 'Limited Liability Company', FilingDate: '2024-06-14', StatusDescription: 'Active', EntityName: '11962 SULPHUR MOUNTAIN LLC', Jurisdiction: 'CALIFORNIA', AgentName: 'REGISTERED AGENTS INC', AgentAddress1: '1401 21ST ST STE R', AgentCity: 'SACRAMENTO', AgentState: 'CA', AgentZipCode: '95811', EntityStreetAddress1: '28175 S ANCHOVY AVE', EntityCity: 'SAN PEDRO', EntityState: 'CA', EntityZipCode: '90732', MailingStreetAddress1: '28175 S ANCHOVY AVE', MailingCity: 'SAN PEDRO', MailingState: 'CA', MailingZipCode: '90732', SiFrequency: 'Biennial', StandingSOS: 'Good', StandingFTB: 'Good', StandingAgent: 'Good', StandingVCFCF: 'Good' },
+  { EntityID: '201900000001', EntityType: 'Limited Liability Company', FilingDate: '2019-01-01', StatusDescription: 'Terminated', EntityName: '11962 SULPHUR MOUNTAIN HOLDINGS LLC', Jurisdiction: 'CALIFORNIA' } ] }) }; };
+const ent = await sosEntity({ name: '11962 Sulphur Mountain LLC' });
+check('sos: calls the documented endpoint with the subscription-key header', /^https:\/\/calico\.sos\.ca\.gov\/cbc\/v1\/api\/BusinessEntityKeywordSearch\?search-term=/.test(lastUrl) && lastHeaders['Ocp-Apim-Subscription-Key'] === 'test-key', { lastUrl, lastHeaders });
+check('sos: picks the exact-name active entity and states number, type, filing date, status and standing', ent && ent.provider === 'California Secretary of State' && /^11962 Sulphur Mountain LLC · Limited Liability Company · no\. 202461812345 · California · filed June 14, 2024 · status Active \(SOS ✓ · FTB ✓ · agent ✓ · VCFCF ✓\) · 1 other entity matches the search/.test(String(ent.rows[0][1])), ent && ent.rows[0]);
+check('sos: agent, addresses and the officers note follow', ent.rows.map(r => r[2]).join() === 'entity_status,entity_agent,entity_address,entity_note' && /Registered Agents Inc\. · 1401 21st St Ste R, Sacramento, CA, 95811/.test(String(ent.rows[1][1])) && /principal 28175 S Anchovy Ave, San Pedro, CA, 90732/.test(String(ent.rows[2][1])) && /filed biennial/.test(String(ent.rows[3][1])), ent.rows.map(r => r[1]));
+globalThis.fetch = async () => ({ ok: true, json: async () => ({ RecordCount: 0, EntityData: [] }) });
+const none = await sosEntity({ name: 'Nobody Trust' });
+check('sos: no match is stated as a positive miss', /No California entity found under “Nobody Trust”/.test(String(none.rows[0][1])), none.rows[0]);
+globalThis.fetch = realFetch; delete process.env.SOS_API_KEY;
+const withEntity = composeTitle(rollRows, ev, { doc: '2024000099999', date8: '20240802', desc: 'deed (D)', total: 1078140 }, { providers: ['California Secretary of State'], rows: ent.rows });
+check('compose: provider rows sit right after the owner block', withEntity.slice(0, 7).map(r => r[2]).join() === 'owner_now,owner_mailing,owner_since,entity_status,entity_agent,entity_address,entity_note', withEntity.slice(0, 7).map(r => r[2]));
+
 // ---- the routes (the server is up: run.mjs boots it) ----
 const post = (body) => fetch(BASE + '/api/title-report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 const r1 = await post({ pin: 'x', apn: '037-0-012-125', name: 'x.pdf', data: 'JVBERi0=' });
@@ -56,4 +75,6 @@ const g1 = await (await fetch(BASE + '/api/title/0370012125')).json();
 check('route: GET /api/title/<apn10> serves the Sulphur evidence on file', g1.ok && g1.evidence && g1.evidence.apn === '037-0-012-125' && g1.evidence.owner.names.length === 1 && g1.evidence.liens.length === 3 && !JSON.stringify(g1.evidence).includes('Residents'), g1.evidence && g1.evidence.owner);
 const g2 = await fetch(BASE + '/api/title/0000000000');
 check('route: GET /api/title for a parcel without evidence is 404', g2.status === 404);
+const src = await (await fetch(BASE + '/api/sources')).json();
+check('route: GET /api/sources serves the register with tiers and verified entries', src.schema === 1 && Array.isArray(src.sources) && src.sources.length >= 20 && src.sources.every(x => x.id && x.tier && x.url && x.verified && x.atlas) && src.sources.some(x => x.id === 'ca-sos-api'), src.sources && src.sources.length);
 done('title');

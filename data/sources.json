@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "about": "The atlas's register of property-data sources: where each kind of fact about a parcel comes from, how it is reached (free web, free bulk, free API, paid bulk, paid API, human import), what it costs, how often it moves, what its terms allow, and how the atlas uses it. docs/data-sources.md is the narrative with citations; this file is the machine-readable index the atlas serves at /api/sources. Every entry names its publisher and the date it was verified. Compiled 2026-09-16 from public documentation only.",
+  "tiers": {
+    "primary": "the record keepers themselves — the assessor, the recorder, the tax collector, the Secretary of State, the courts, the federal/state GIS. Everything a vendor sells is a copy of one of these.",
+    "wholesale": "the companies that buy every county's records in bulk, key and image them, and re-index them by parcel (title plants). Not accessible to a one-county map; listed so their products are understood.",
+    "api": "vendors that resell the primary record through a documented API. Usable behind a key, under their terms.",
+    "consumer": "desks that sell a report to a person. Usable only as a human-in-the-loop import (the PropertyChecker path).",
+    "directory": "free indexes of the official desks. Link targets only."
+  },
+  "sources": [
+    {
+      "id": "vc-parcels-gis", "tier": "primary", "name": "Ventura County GIS — parcels, and ~100 county layers", "publisher": "County of Ventura (RMA GIS)",
+      "gives": "APN, APN10, geometry, plus every county layer the resolver already reads (zoning, hazards, fire, soils, water, habitat, districts, survey, permits). No owner names anywhere on the public layers.",
+      "access": "free API", "url": "https://maps.ventura.org/arcgis/rest/services", "also": ["https://venturacountydatadownloads-vcitsgis.hub.arcgis.com/", "https://services2.arcgis.com/XJ5Tb7dTYtAMoyYT/arcgis/rest/services/Parcels_Quarterly/FeatureServer"],
+      "cost": "$0", "cadence": "parcels monthly; other layers as the county publishes", "terms": "open data, no key, maxRecordCount 2000, CORS open",
+      "atlas": "live — VENTURA_SOURCES in lib/dossier.js; the parcel anchor by APN10", "verified": "2026-09-16"
+    },
+    {
+      "id": "vc-assessor-roll", "tier": "primary", "name": "Ventura County Assessor — secured roll extract (assessee names)", "publisher": "Ventura County Assessor",
+      "gives": "Assessee name and mailing address, situs, use code, land/improvement/total values, base year, exemptions — the roll is public under RTC §§ 602/1602 (BOE annotation 260.0007); property characteristics under § 408.3; the transfer list (transferor, transferee, APN, date, recording reference, consideration) under § 408.1.",
+      "access": "paid bulk", "url": "https://assessor.venturacounty.gov/assessor-data/roll-data/", "also": ["https://assessor.venturacounty.gov/assessor-data/public-records-request/", "https://codes.findlaw.com/ca/revenue-and-taxation-code/rtc-sect-408-1/", "https://codes.findlaw.com/ca/revenue-and-taxation-code/rtc-sect-408-3/", "https://sonomacounty.gov/administrative-support-and-fiscal-services/clerk-recorder-assessor/assessor/property-data-for-sale-to-the-public"],
+      "cost": "Ventura's price sheet is behind a WAF (unverified); peer county Sonoma sells the roll with values and characteristics for $180–$240 per extract and the monthly transfer list for $70 / $865 a year; the § 408.1 transfer-list inspection fee is capped by statute at $10", "cadence": "annual roll (~July) + monthly transfer list",
+      "terms": "public record; the county may attach a data agreement to the extract — read it; never commit the extract to this public repository",
+      "atlas": "planned — the keystone purchase; loads into a private store keyed by APN10 (see docs/data-sources.md, 'The plan')", "verified": "2026-09-16"
+    },
+    {
+      "id": "vc-roll-2018", "tier": "primary", "name": "Ventura County roll — public 2018 snapshot on ArcGIS Online", "publisher": "third-party copy of the county roll (ArcGIS Online item)",
+      "gives": "NAME_1/NAME_2 (assessee on the November 2018 roll), CTY_STA, DOC_NR/DOC_DT/DOC_TYPE, DT_SALE, DTS (transfer tax), BSE_YR, EXMP_CD1, SITE_USE, L_V/I_V for 262,354 parcels.",
+      "access": "free API", "url": "https://services5.arcgis.com/umIjvohPcWJU5ij6/arcgis/rest/services/Ventura_County_Parcels/FeatureServer/0",
+      "cost": "$0", "cadence": "frozen (2018-11)", "terms": "public ArcGIS Online item",
+      "atlas": "live — R_VCROLL2018 in venturaTitle(); shown as history, never as the current owner", "verified": "2026-09-16"
+    },
+    {
+      "id": "vc-recorder", "tier": "primary", "name": "Ventura County Clerk-Recorder — official records (grantor/grantee index, document images)", "publisher": "Ventura County Clerk-Recorder",
+      "gives": "Every deed, deed of trust, reconveyance, lien, notice of default, easement, lis pendens and abstract of judgment since 1873, indexed by NAME. Online search is by name or document number; APN search is in-person kiosk only.",
+      "access": "free web (index) / paid per page (images)", "url": "https://clerkrecorderselfservice.venturacounty.gov/web/user/disclaimer", "also": ["https://clerkrecorder.venturacounty.gov/county-recorder/county-recorder/official-records/ordering-a-copy-of-official-records/", "https://clerkrecorder.venturacounty.gov/wp-content/uploads/2026/06/2026.07.01-Fee-Schedule-Rev-9-10-26-1.pdf"],
+      "cost": "index free in a browser session; copies $2.25/page (2026 fee schedule), certification $7, search $5/file; documentary transfer tax $0.55 per $500 (RTC § 11911); bulk index extract not advertised — ask RecorderInfo@Ventura.Org in writing (the office already sells its voter index on USB for $55)", "cadence": "continuous",
+      "terms": "WAF-protected, session-bound portal — no scraping; the index is the statutory public finding aid (Gov. Code § 27201)",
+      "atlas": "portal link; the roll's DOC_NR/DOC_DT reconcile against imported evidence (sameDoc)", "verified": "2026-09-16"
+    },
+    {
+      "id": "vc-tax-collector", "tier": "primary", "name": "Ventura County Treasurer-Tax Collector — bill by APN, tax-defaulted list", "publisher": "Ventura County Treasurer-Tax Collector",
+      "gives": "Installments due and paid, delinquency, prior-year defaults by parcel number or address; the annual notice of impending power to sell (five years delinquent) and the Bid4Assets auction list (RTC §§ 3692, 3712).",
+      "access": "free web (per APN, browser only) / free bulk (the annual list, PDF)", "url": "https://taxpayment.venturacounty.gov/webtaxonline/index.html", "also": ["https://venturacounty.gov/ttc/", "https://s48024.pcdn.co/ttc/wp-content/uploads/sites/22/2025/01/Frequently-Asked-Questions.pdf"],
+      "cost": "$0 to look; card 2.75 % / debit 1.75 % / e-check $1.10 to pay", "cadence": "annual bill, two installments (delinquent Dec 10 / Apr 10); defaulted list annual",
+      "terms": "WAF-protected; no API; PTACS ORBIT (BrainSharp) is the system behind it",
+      "atlas": "portal link; the delinquency flag on the card comes from imported evidence until the county's list is captured annually", "verified": "2026-09-16"
+    },
+    {
+      "id": "ca-sos-api", "tier": "primary", "name": "California Secretary of State — BE Public Search API + bizfile", "publisher": "California Secretary of State",
+      "gives": "For a company on title: entity number, type, filing date, status, standing (SOS/FTB/agent/VCFCF), agent for service of process and its address, principal and mailing addresses, Statement-of-Information frequency. Officers/managers/members are NOT in the API — they are on the free SOI image at bizfile. Bulk 'Master Unload' reportedly $100 data / $800 images (third-party figure, unverified; bizfile@sos.ca.gov).",
+      "access": "free API (key) / free web", "url": "https://calico.sos.ca.gov/cbc/v1/api/", "also": ["https://calicodev.sos.ca.gov/", "https://calicodev.sos.ca.gov/content/California%20SOS%20BE%20Public%20Search%20API%20Guide%20v1.0.4.pdf", "https://bizfileonline.sos.ca.gov/search/business"],
+      "cost": "$0 (register at calicodev.sos.ca.gov; rate limits not stated in the guide)", "cadence": "entities file SOIs annually (corporations) or every two years (LLCs) — the people can be up to 24 months old",
+      "terms": "Azure APIM subscription terms shown at signup — read them",
+      "atlas": "live when SOS_API_KEY is set — sosEntity() in lib/providers.js adds the entity rows after the evidence names a company; the bizfile portal appears for every company owner", "verified": "2026-09-16"
+    },
+    {
+      "id": "vc-superior-court", "tier": "primary", "name": "Ventura County Superior Court — public case portal", "publisher": "Superior Court of California, County of Ventura",
+      "gives": "Civil, probate and small-claims case index by party name or case number; register of actions; documents after 2023-03-20. Where a recorded abstract of judgment or lis pendens came from.",
+      "access": "free web (account required)", "url": "https://ventura.ecourt.com/public-portal/", "also": ["https://ventura.courts.ca.gov/divisions/records"],
+      "cost": "online free; records desk $15 per search (max 15 names), $0.50/page, $40 certified", "cadence": "continuous", "terms": "account-gated; not automatable",
+      "atlas": "portal link", "verified": "2026-09-16"
+    },
+    {
+      "id": "vc-permits", "tier": "primary", "name": "VC Citizen Access (Accela) — permits, planning, code cases; Environmental Health OWTS records", "publisher": "Ventura County RMA",
+      "gives": "Building permits, planning entitlements, code cases, septic and well permits for the unincorporated county (City of Ojai permits are the city's); septic (ISDS) records 1978–2016 as PDFs.",
+      "access": "free web", "url": "https://vcca.venturacounty.gov/CitizenAccess/", "also": ["https://archive.vcrma.org/en/isds-record-search", "https://rma.venturacounty.gov/divisions/operations/obtain-public-information/"],
+      "cost": "$0", "cadence": "continuous", "terms": "public search; APN search unverified",
+      "atlas": "portal links; the county permits layer is already in VENTURA_SOURCES", "verified": "2026-09-16"
+    },
+    {
+      "id": "federal-state-gis", "tier": "primary", "name": "FEMA · USGS · NRCS · BLM · CGS · DWR · CAL FIRE · CEC · Census", "publisher": "federal and state agencies",
+      "gives": "Flood zones, faults, terrain, soils, public land and claims, geology and landslides, wells, fire severity and perimeters, electric service territory, county/tract lookups.",
+      "access": "free API", "url": "https://hazards.fema.gov/arcgis/rest/services/",
+      "cost": "$0", "cadence": "as published", "terms": "open data",
+      "atlas": "live — FED_SOURCES, CA_SOURCES, CA_RASTERS, soilsSDA, terrainGrid in lib/dossier.js", "verified": "2026-09-16"
+    },
+    {
+      "id": "attom", "tier": "api", "name": "ATTOM Data — Property API", "publisher": "ATTOM Data Solutions",
+      "gives": "Owner + mailing (property/detailowner), sales & deed history with document numbers and deed types (saleshistory/expandedhistory), mortgages (property/detailmortgageowner), assessment + AVM (allevents/detail), pre-foreclosure; 155M properties from recorder + assessor data over 3,140 counties.",
+      "access": "paid API (30-day trial)", "url": "https://api.developer.attomdata.com/docs", "also": ["https://api.developer.attomdata.com/legal", "https://cloud-help.attomdata.com/article/684-api-report"],
+      "endpoint": "GET https://api.gateway.attomdata.com/propertyapi/v1.0.0/property/detailowner?fips=06111&apn=<APN> · header apikey: <key> · accept: application/json · 200 calls/min",
+      "cost": "not published; ATTOM's own worked example is $1,000/month for 100,000 reports ($0.10 each); billed per report (property returned), not per call", "cadence": "daily warehouse refresh",
+      "terms": "evaluation-only developer terms; no caching over 24 hours; no 'creating, enhancing or structuring any database'; no use to 'create, replace, supplement or enhance any title, legal, vesting, ownership or encumbrance report'; no third-party use — a public ownership map needs a negotiated licence",
+      "atlas": "not wired — endpoints are official, terms forbid the intended use without a licence", "verified": "2026-09-16"
+    },
+    {
+      "id": "batchdata", "tier": "api", "name": "BatchData — Property Lookup / Search / Skip Trace", "publisher": "BatchService",
+      "gives": "155M properties, 700+ attributes: owner names, mailing, deed/transaction history, mortgages and liens, pre-foreclosure, skip tracing. Sources stated in its privacy notice: county recorder, assessor and tax authority records, court records, business filings, third-party providers, affiliates; MLS under a separate EULA.",
+      "access": "paid API (free sandbox token returns mock data)", "url": "https://developer.batchdata.com/docs/batchdata/welcome-to-batchdata", "also": ["https://batchdata.io/pricing", "https://batchdata.io/terms-of-service", "https://batchdata.io/privacy-policy"],
+      "endpoint": "POST https://api.batchdata.com/api/v1/property/lookup · Authorization: Bearer <token> · body { requests: [ { address | parcel } ] } — the APN field names live only in the rendered docs (unverified)",
+      "cost": "$1,000/month for 100,000 records at the entry tier (≈ $0.01/record); no pay-as-you-go", "cadence": "'some data in real time'",
+      "terms": "internal business use by authorised users only; caches must be refreshed every 30 days; no derivative database; no display to third parties; MLS fields never on a public map",
+      "atlas": "not wired — sandbox exists; the $1,000/month minimum is disproportionate for one county", "verified": "2026-09-16"
+    },
+    {
+      "id": "propertyradar", "tier": "api", "name": "PropertyRadar — properties, transactions (chain of title), persons, documents", "publisher": "PropertyRadar",
+      "gives": "All 58 California counties. Ventura County: assessor yes, recorder from Jan 1954, foreclosure from Jan 2002, trustee-sale tracking from Sep 2006, document images from 1977, property tax status from 2019. Chain of title with transfers, mortgages, assignments, foreclosures, liens; owner type and lien type as first-class criteria; OwnerGraph links people, entities and portfolios.",
+      "access": "paid API (5-day trial)", "url": "https://developers.propertyradar.com/", "also": ["https://www.propertyradar.com/coverage/california", "https://www.propertyradar.com/pricing", "https://www.propertyradar.com/user-agreement"],
+      "endpoint": "https://api.propertyradar.com/v1 · Authorization: Bearer <token> · /properties (criteria incl. APN) → /properties/{RadarID}/transactions, /documents/{DocumentID} — confirm the /v1 prefix in the reference console; always call with Purchase=0 or Fields=RadarID first (free), then a deliberate Purchase=1",
+      "cost": "Solo $119/mo (10,000 exports, 2¢/record over) · Team $249 · Business $599 with API listed; the API page says API is on every plan — settle with sales", "cadence": "daily",
+      "terms": "internal business purposes; no display/redistribution to third parties; derivative database only forbidden 'for resale or distribution'; no published caching limit",
+      "atlas": "planned — the best-fit paid source for Ventura (chain of title + document images); adapter after the path prefix and public-display terms are confirmed", "verified": "2026-09-16"
+    },
+    {
+      "id": "regrid", "tier": "api", "name": "Regrid — parcel API with Enhanced Ownership", "publisher": "Regrid (Loveland Technologies)",
+      "gives": "Parcel geometry + standard schema (owner, mailadd, saledate, saleprice, parval, landval, improvval, usedesc, zoning, yearbuilt…) and Enhanced Ownership (up to four owners, parsed names, deed ownership, record currency).",
+      "access": "paid API (30-day sandbox)", "url": "https://regrid.com/api", "also": ["https://support.regrid.com/docs/getting-started-api", "https://regrid.com/terms/api"],
+      "endpoint": "GET https://app.regrid.com/api/v2/parcels/apn?parcelnumb=<APN10>&path=/us/ca/ventura&token=<token> → parcels.features[].properties.fields (+ field_labels, enhanced_ownership)",
+      "cost": "plans include 2,000 records; overage $0.10 (Standard) / $0.15 (Premium) per record returned; base subscription not published; 200 requests/min", "cadence": "daily receipt, county-paced",
+      "terms": "caching of API records expressly permitted; destroy on termination; billed by records returned — constrain every query",
+      "atlas": "live when REGRID_TOKEN is set — regridTitle() in lib/providers.js", "verified": "2026-09-16"
+    },
+    {
+      "id": "propertyscout", "tier": "api", "name": "PropertyScout — Property Search / Deed & Title / People APIs", "publisher": "PropertyScout.io",
+      "gives": "Owner and resident names with contact details, sales history, AVM, tax/legal/mortgage, preliminary title reports with deeds, mortgages and involuntary liens; document downloads. Owner data purchased from Ekata (identity data), so it can lag the county roll.",
+      "access": "paid API (7-day trial, no card)", "url": "https://docs.propertyscout.io/api", "also": ["https://propertyscout.io/faqs/api/", "https://docs.propertyscout.io/files/propertyscoutio-openapi.yaml", "https://propertyscout.io/terms-and-conditions/"],
+      "endpoint": "OpenAPI spec published (propertyscoutio-openapi.yaml) — takes address, APN or parcel number; auth and base URL to be read from the spec",
+      "cost": "$0.10/query at 1,000 down to $0.07 at 50,000; People API $0.15; no minimums", "cadence": "unstated",
+      "terms": "not a consumer report; no reselling/redistribution without written permission; caching not addressed",
+      "atlas": "candidate — adapter once the spec is read (the egress proxy blocked the YAML download here)", "verified": "2026-09-16"
+    },
+    {
+      "id": "rentcast", "tier": "api", "name": "RentCast — property records API", "publisher": "RentCast",
+      "gives": "Owner names and mailing address, sale history, tax assessments and property taxes by address (APN lookup unconfirmed).",
+      "access": "free tier (50 requests/month) / paid", "url": "https://developers.rentcast.io/reference/introduction", "also": ["https://www.rentcast.io/api"],
+      "cost": "Developer $0 (50/mo) · Foundation $74/mo (1,000) · Growth $199/mo · Scale $449/mo", "cadence": "unstated",
+      "terms": "read before caching (unverified here)", "atlas": "candidate — a zero-cost start for named owners by address", "verified": "2026-09-16"
+    },
+    {
+      "id": "housecanary", "tier": "api", "name": "HouseCanary — valuation API", "publisher": "HouseCanary",
+      "gives": "AVM with confidence, value forecast, rental value, block-level context. No owner of record, no grantor/grantee, no APN lookup.",
+      "access": "paid API", "url": "https://www.housecanary.com/", "cost": "$790/yr Pro before any call, then $0.50–$4 per successful call", "cadence": "monthly",
+      "terms": "no storing to create a database; as-of date required on anything shown beyond 30 days",
+      "atlas": "no — valuation only, behind a flag if ever needed", "verified": "2026-09-16"
+    },
+    {
+      "id": "datatree", "tier": "wholesale", "name": "First American DataTree / TitleFlex (DataTrace)", "publisher": "First American",
+      "gives": "The deepest archive: 9+ billion recorded document images across 2,000+ counties, chain of title, legal & vesting, lien releases (title-plant grade). This is what a title company reads.",
+      "access": "subscription / sales-gated API; à-la-carte store", "url": "https://dna.firstam.com/", "also": ["https://dna.firstam.com/all-data"],
+      "cost": "store: $4 property detail, $22 transaction history, $15 per recorded document, $25/mo basic; API specs behind a login; TitleFlex trial 1,000 transactions/day", "cadence": "continuous",
+      "terms": "internal verification use only; no third-party use; explicit prohibition on use 'in connection with, or to enable development of machine learning… or artificial intelligence technologies'",
+      "atlas": "no adapter; the store is a legitimate one-parcel spot check", "verified": "2026-09-16"
+    },
+    {
+      "id": "wholesale-others", "tier": "wholesale", "name": "ICE Mortgage Technology (Black Knight) · Cotality (CoreLogic) · ATTOM warehouse", "publisher": "various",
+      "gives": "Nationwide public-records data from 3,100+ recorder offices refreshed daily (ICE: 160M parcels, 600M ownership/sales/assessment/mortgage records, deeds with buyer, seller, recording date, sales price, transfer tax, loan type). The suppliers of most vendors above.",
+      "access": "enterprise licence", "url": "https://mortgagetech.ice.com/products/property-data/residential/public-records",
+      "cost": "not published", "cadence": "daily", "terms": "enterprise", "atlas": "understood, not used", "verified": "2026-09-16"
+    },
+    {
+      "id": "propertychecker", "tier": "consumer", "name": "PropertyChecker (InfoPay)", "publisher": "InfoPay, Inc.",
+      "gives": "A 40-page PDF: ownership + mailing, timeline, deeds, permits, liens & judgments (address-matched), values, taxes + history, loans, residents (people-search data with 'Tahoe' ids).",
+      "access": "subscription (monthly, billed in advance); no API", "url": "https://propertychecker.com/", "also": ["https://propertychecker.com/terms"],
+      "cost": "monthly membership; reports non-refundable", "cadence": "on purchase",
+      "terms": "'use, launch, develop, or distribute any automated system, including… spider, robot… scraper' forbidden; 'systematically retrieve data… to create or compile… a collection' forbidden",
+      "atlas": "human import only — lib/title-report.js reads the PDF into dated evidence (V0.32)", "verified": "2026-09-16"
+    },
+    {
+      "id": "propertyshark", "tier": "consumer", "name": "PropertyShark (Yardi)", "publisher": "Yardi Systems",
+      "gives": "Owner and contact data, recorded documents, mortgages, liens, foreclosures, comps; LLC ownership identification on the Platinum tier ($169.95/mo). NYC-first; no Ventura County landing page.",
+      "access": "subscription; no API", "url": "https://www.propertyshark.com/", "cost": "Platinum $169.95/mo", "cadence": "unstated",
+      "terms": "forbids building a property database from its content", "atlas": "portal link at most; a manual LLC lookup on a specific parcel", "verified": "2026-09-16"
+    },
+    {
+      "id": "propstream", "tier": "consumer", "name": "PropStream (EquiMine)", "publisher": "EquiMine, Inc.",
+      "gives": "Investor lists, assessor data refreshed annually, $5 deed/mortgage images.", "access": "subscription; no API", "url": "https://www.propstream.com/",
+      "cost": "monthly subscription", "cadence": "assessor annual", "terms": "forbids automated access, compilation, resale and commercial use; monitors 'non-customary search patterns'",
+      "atlas": "no", "verified": "2026-09-16"
+    },
+    {
+      "id": "ustitlerecords", "tier": "consumer", "name": "U.S. Title Records", "publisher": "U.S. Title Records",
+      "gives": "Human-produced title reports: $29 property detail, $95 property lien report; a $385 bundle that includes a personal dossier (relatives, vehicles) — buy the property-only products.",
+      "access": "per report; no API", "url": "https://www.ustitlerecords.com/", "cost": "$29 / $95", "cadence": "on order",
+      "terms": "report licence", "atlas": "human import when one parcel needs an abstractor (same path as PropertyChecker)", "verified": "2026-09-16"
+    },
+    {
+      "id": "netronline", "tier": "directory", "name": "NETR Online — public records directory (+ Property Data Store)", "publisher": "Nationwide Environmental Title Research",
+      "gives": "Links to the official assessor, recorder and tax-collector desks for every county (Ventura links partly stale — countyofventura.org); a store selling $3.50 property detail, $5–8 flat document images, $3 parcel maps.",
+      "access": "free web", "url": "https://publicrecords.netronline.com/state/CA/county/ventura", "also": ["https://datastore.netronline.com/pricing"], "cost": "$0 (directory)", "cadence": "—", "terms": "—",
+      "atlas": "portal link (directory group)", "verified": "2026-09-16"
+    },
+    {
+      "id": "publicrecordcenter", "tier": "directory", "name": "PublicRecordCenter — free directory", "publisher": "PublicRecordCenter",
+      "gives": "Links to the county site, recorder, assessor, tax, GIS portal and Superior Court — adds the court and GIS links NETR omits.",
+      "access": "free web", "url": "https://www.publicrecordcenter.com/ventura-county-ca-public-records.html", "cost": "$0", "cadence": "—", "terms": "'We do not sell data or charge fees'",
+      "atlas": "portal link (directory group)", "verified": "2026-09-16"
+    },
+    {
+      "id": "zillow-bridge", "tier": "api", "name": "Zillow Bridge — public records", "publisher": "Zillow Group",
+      "gives": "Property records, tax assessments and transactions for ~148M properties across 3,200 counties, including ownership.",
+      "access": "application-gated API", "url": "https://www.bridgeinteractive.com/", "cost": "not published; 1,000 calls/day per dataset", "cadence": "—",
+      "terms": "'You are not permitted to store information locally' — incompatible with a resolver that caches per APN",
+      "atlas": "no", "verified": "2026-09-16"
+    }
+  ]
+}
