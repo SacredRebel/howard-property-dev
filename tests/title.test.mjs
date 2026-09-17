@@ -105,6 +105,33 @@ check('compose: provider rows sit right after the owner block', withEntity.slice
   globalThis.fetch = realFetch2; delete process.env.RENTCAST_KEY;
 }
 
+// ---- resolveCore end to end, with every network call stubbed --------------------------
+//   This is the guard that the record's own function body runs: a scope slip or a typo inside
+//   resolveCore never shows up in the route tests (they stub /api/dossier), and the local
+//   container cannot reach the county, so the county is stubbed here instead.
+{
+  const { resolveCore } = await import('../lib/dossier.js');
+  const realFetch3 = globalThis.fetch;
+  const PARCEL = { attributes: { APN10: '0370012125', APN: '037-0-012-125', SITUS: '11962 SULPHUR MOUNTAIN RD', ACREAGE: '9.47', L_V: '961860', I_V: '116280', DOC_NR: '2024000052341', DOC_DT: '20240802', DOC_TYPE: 'D', DT_V_TRF_Y: '20240802', SQ_FT_I: '1277', TRA: '05006' },
+    geometry: { rings: [[[-119.158, 34.4316], [-119.1546, 34.4316], [-119.1546, 34.4337], [-119.158, 34.4337], [-119.158, 34.4316]]] } };
+  let calls = 0;
+  globalThis.fetch = async (url) => {
+    calls++;
+    const u = String(url);
+    if (/\/query/.test(u)) return { ok: true, json: async () => ({ features: /\/Parcels\/MapServer\/0\/query/.test(u) ? [PARCEL] : [] }) };
+    if (/raw\.githubusercontent|api\.github\.com/.test(u)) return { ok: false, status: 404, json: async () => ({}) };
+    return { ok: true, json: async () => ({ results: [], features: [] }), text: async () => '' };
+  };
+  let rec = null, err = null;
+  try { rec = await resolveCore({ apn: '037-0-012-125', debug: true }); } catch (e) { err = e; }
+  globalThis.fetch = realFetch3;
+  check('resolveCore: the whole function body runs — no scope slip, no undefined reference', !err && rec && rec.apn === '037-0-012-125', err ? String(err && err.message) : 'ok');
+  check('resolveCore: the parcel anchors and the identity rows are built', rec && rec.apn10 === '0370012125' && rec.situs === '11962 SULPHUR MOUNTAIN RD' && rec.acreage === 9.47 && rec.sections.some(s => s.id === 'identity'), rec && { apn10: rec.apn10, acreage: rec.acreage });
+  check('resolveCore: the evidence on file is read beside the fan-out and composes the owner-first title section', rec && rec.evidence && rec.evidence.provider === 'PropertyChecker' && rec.sections.find(s => s.id === 'title').rows[0][2] === 'owner_now' && /11962 Sulphur Mountain LLC/.test(String(rec.sections.find(s => s.id === 'title').rows[0][1])), rec && rec.evidence);
+  check('resolveCore: the side reads are reported beside the fan-out, not as late county sources', rec && (rec.diag || []).filter(d => /beside the fan-out/.test(d[0])).length >= 2 && (rec.diag || []).find(d => d[0] === 'evidence (beside the fan-out)')[1] === 'ok', rec && (rec.diag || []).filter(d => /beside/.test(d[0])));
+  check('resolveCore: the flags name the owner and the liens from the evidence', rec && rec.flags.some(f => f.key === 'owner_named') && rec.flags.some(f => f.key === 'liens'), rec && rec.flags.map(f => f.key));
+}
+
 // ---- the routes (the server is up: run.mjs boots it) ----
 const post = (body) => fetch(BASE + '/api/title-report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 const r1 = await post({ pin: 'x', apn: '037-0-012-125', name: 'x.pdf', data: 'JVBERi0=' });
