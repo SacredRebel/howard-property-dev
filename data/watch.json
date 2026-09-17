@@ -1,13 +1,13 @@
 {
   "schema": 1,
-  "updatedAt": "2026-09-17T00:45:01.087Z",
+  "updatedAt": "2026-09-17T01:56:07.097Z",
   "parcels": {
     "0370012125": {
       "apn": "037-0-012-125",
       "county": "06111",
       "label": "Sulphur Mountain Eco-Village",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -27,7 +27,7 @@
         "acreage": 9.47,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "situs": "11962 SULPHUR MOUNTAIN RD",
       "acreage": 9.47
     },
@@ -36,7 +36,7 @@
       "county": "06111",
       "label": "Howard Property",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -56,7 +56,7 @@
         "acreage": 43.92,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "situs": "1320 BALDWIN RD",
       "acreage": 43.92
     },
@@ -65,7 +65,7 @@
       "county": "06111",
       "label": "Keri's Property",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -85,7 +85,7 @@
         "acreage": 34.88,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "situs": "14209 DE LA GARRIGUE RD",
       "acreage": 34.88
     },
@@ -94,7 +94,7 @@
       "county": "06111",
       "label": "Cher's Property",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -114,7 +114,7 @@
         "acreage": 2,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "situs": "10622 ENCINO DR",
       "acreage": 2
     },
@@ -123,7 +123,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 1 (Bk 35 Pg 02 — North Ridge)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -143,7 +143,7 @@
         "acreage": 610.41,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 610.41
     },
     "0350030055": {
@@ -151,7 +151,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 5",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -171,7 +171,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030065": {
@@ -179,7 +179,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 6",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -199,7 +199,7 @@
         "acreage": 40.02,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.02
     },
     "0350030095": {
@@ -207,7 +207,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 9",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -227,7 +227,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030085": {
@@ -235,7 +235,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 8",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -255,7 +255,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030075": {
@@ -263,7 +263,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 7",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -283,7 +283,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030105": {
@@ -291,7 +291,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 10",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -311,7 +311,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030115": {
@@ -319,7 +319,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 11",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -339,7 +339,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030125": {
@@ -347,7 +347,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 12",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -367,7 +367,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030145": {
@@ -375,7 +375,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 14",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -395,7 +395,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030155": {
@@ -403,7 +403,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 15",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -423,7 +423,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030135": {
@@ -431,7 +431,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 13",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -451,7 +451,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030165": {
@@ -459,7 +459,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 16",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -479,7 +479,7 @@
         "acreage": 40.2,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.2
     },
     "0350030185": {
@@ -487,7 +487,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 18",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -507,7 +507,7 @@
         "acreage": 40.3,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.3
     },
     "0350030175": {
@@ -515,7 +515,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 17",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -535,7 +535,7 @@
         "acreage": 40.25,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.25
     },
     "0350030205": {
@@ -543,7 +543,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 20",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -563,7 +563,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030195": {
@@ -571,7 +571,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 19",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -591,7 +591,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030215": {
@@ -599,7 +599,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 21",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -619,7 +619,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030225": {
@@ -627,7 +627,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 22",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -647,7 +647,7 @@
         "acreage": 40.09,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.09
     },
     "0350030245": {
@@ -655,7 +655,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 24",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -675,7 +675,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030235": {
@@ -683,7 +683,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 23",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -703,7 +703,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350030255": {
@@ -711,7 +711,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 25",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -731,7 +731,7 @@
         "acreage": 40.09,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.09
     },
     "0350030265": {
@@ -739,7 +739,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 26",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -759,7 +759,7 @@
         "acreage": 49.24,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 49.24
     },
     "0350030275": {
@@ -767,7 +767,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 27",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -787,7 +787,7 @@
         "acreage": 60.03,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 60.03
     },
     "0350030285": {
@@ -795,7 +795,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 28",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -815,7 +815,7 @@
         "acreage": 43.71,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 43.71
     },
     "0350030305": {
@@ -823,7 +823,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 30",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -843,7 +843,7 @@
         "acreage": 42.33,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 42.33
     },
     "0350030325": {
@@ -851,7 +851,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 32",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -871,7 +871,7 @@
         "acreage": 11.435,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 11.4348
     },
     "0350030295": {
@@ -879,7 +879,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 29",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -899,7 +899,7 @@
         "acreage": 41.01,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 41.01
     },
     "0350030335": {
@@ -907,7 +907,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 33",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -927,7 +927,7 @@
         "acreage": 280.59,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 280.59
     },
     "0350030345": {
@@ -935,7 +935,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 34",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -955,7 +955,7 @@
         "acreage": 7.958,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 7.9581
     },
     "0350350015": {
@@ -963,7 +963,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 1 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -983,7 +983,7 @@
         "acreage": 40.15,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.15
     },
     "0350350035": {
@@ -991,7 +991,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 3 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1011,7 +1011,7 @@
         "acreage": 40.09,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.09
     },
     "0350350025": {
@@ -1019,7 +1019,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 2 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1039,7 +1039,7 @@
         "acreage": 40.06,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.06
     },
     "0350350045": {
@@ -1047,7 +1047,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 4 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1067,7 +1067,7 @@
         "acreage": 40.11,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.11
     },
     "0350350055": {
@@ -1075,7 +1075,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 5 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1095,7 +1095,7 @@
         "acreage": 40.9,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.9
     },
     "0350350065": {
@@ -1103,7 +1103,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 6 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1123,7 +1123,7 @@
         "acreage": 40.02,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.02
     },
     "0350350085": {
@@ -1131,7 +1131,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 8 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1151,7 +1151,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350075": {
@@ -1159,7 +1159,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 7 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1179,7 +1179,7 @@
         "acreage": 40.02,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.02
     },
     "0350350095": {
@@ -1187,7 +1187,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 9 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1207,7 +1207,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350105": {
@@ -1215,7 +1215,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 10 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1235,7 +1235,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350115": {
@@ -1243,7 +1243,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 11 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1263,7 +1263,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350125": {
@@ -1271,7 +1271,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 12 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1291,7 +1291,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350135": {
@@ -1299,7 +1299,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 13 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1319,7 +1319,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350145": {
@@ -1327,7 +1327,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 14 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1347,7 +1347,7 @@
         "acreage": 40,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40
     },
     "0350350155": {
@@ -1355,7 +1355,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 15 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1375,7 +1375,7 @@
         "acreage": 52.23,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 52.23
     },
     "0350350165": {
@@ -1383,7 +1383,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 16 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1403,7 +1403,7 @@
         "acreage": 41,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 41
     },
     "0350350175": {
@@ -1411,7 +1411,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 17 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1431,7 +1431,7 @@
         "acreage": 88.11,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 88.11
     },
     "0350350185": {
@@ -1439,7 +1439,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 18 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1459,7 +1459,7 @@
         "acreage": 40.09,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.09
     },
     "0350350205": {
@@ -1467,7 +1467,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 20 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1487,7 +1487,7 @@
         "acreage": 40.28,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.28
     },
     "0350350195": {
@@ -1495,7 +1495,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 19 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1515,7 +1515,7 @@
         "acreage": 41.51,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 41.51
     },
     "0350350225": {
@@ -1523,7 +1523,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 22 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1543,7 +1543,7 @@
         "acreage": 40.07,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.07
     },
     "0350350215": {
@@ -1551,7 +1551,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 21 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1571,7 +1571,7 @@
         "acreage": 40.48,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.48
     },
     "0350350235": {
@@ -1579,7 +1579,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 23 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1599,7 +1599,7 @@
         "acreage": 40.09,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.09
     },
     "0350350245": {
@@ -1607,7 +1607,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 24 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1627,7 +1627,7 @@
         "acreage": 40.31,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.31
     },
     "0350350255": {
@@ -1635,7 +1635,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 25 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1655,7 +1655,7 @@
         "acreage": 40.31,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.31
     },
     "0350350265": {
@@ -1663,7 +1663,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 26 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1683,7 +1683,7 @@
         "acreage": 53.97,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 53.97
     },
     "0350350275": {
@@ -1691,7 +1691,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 27 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1711,7 +1711,7 @@
         "acreage": 54.57,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 54.57
     },
     "0350350285": {
@@ -1719,7 +1719,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 28 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1739,7 +1739,7 @@
         "acreage": 43.2,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 43.2
     },
     "0350350295": {
@@ -1747,7 +1747,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 29 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1767,7 +1767,7 @@
         "acreage": 40.41,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 40.41
     },
     "0350350305": {
@@ -1775,7 +1775,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 30 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1795,7 +1795,7 @@
         "acreage": 41.39,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 41.39
     },
     "0350350315": {
@@ -1803,7 +1803,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 31 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1823,7 +1823,7 @@
         "acreage": 43.66,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 43.66
     },
     "0350350325": {
@@ -1831,7 +1831,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 32 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1851,7 +1851,7 @@
         "acreage": 46.82,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 46.82
     },
     "0350350335": {
@@ -1859,7 +1859,7 @@
       "county": "06111",
       "label": "⛰️ Black Mtn · Lot 33 (Bk 35 Pg 35)",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1879,7 +1879,7 @@
         "acreage": 2.66,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "acreage": 2.66
     },
     "0150010120": {
@@ -1887,7 +1887,7 @@
       "county": "06111",
       "label": "Rose Valley Property",
       "firstSeen": "2026-09-17T00:45:01.087Z",
-      "checks": 1,
+      "checks": 2,
       "history": [],
       "current": {
         "doc": {
@@ -1907,7 +1907,7 @@
         "acreage": 40.016,
         "exemption": null
       },
-      "lastChecked": "2026-09-17T00:45:01.087Z",
+      "lastChecked": "2026-09-17T01:56:07.097Z",
       "situs": "7343 ROSE VALLEY RD",
       "acreage": 40.016
     }
