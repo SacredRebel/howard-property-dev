@@ -65,7 +65,45 @@ const none = await sosEntity({ name: 'Nobody Trust' });
 check('sos: no match is stated as a positive miss', /No California entity found under “Nobody Trust”/.test(String(none.rows[0][1])), none.rows[0]);
 globalThis.fetch = realFetch; delete process.env.SOS_API_KEY;
 const withEntity = composeTitle(rollRows, ev, { doc: '2024000099999', date8: '20240802', desc: 'deed (D)', total: 1078140 }, { providers: ['California Secretary of State'], rows: ent.rows });
+const noEv = composeTitle(rollRows, null, { doc: '2024000052341', date8: '20240802', desc: 'deed (D)', total: 1078140 }, { providers: ['RentCast'], rows: [['Owner of record (RentCast · county roll copy as of today)', 'Someone LLC · organization', 'owner_provider'], ['About the provider rows', 'x', 'provider_note']] });
+check('compose: without evidence a provider that names the owner leads and the roll verdict corroborates', noEv.slice(0, 3).map(r => r[2]).join() === 'owner_provider,provider_note,owner_roll' && /\(public roll\)$/.test(noEv[2][0]), noEv.slice(0, 3));
+const noEvMiss = composeTitle(rollRows, null, { doc: '2024000052341', date8: '20240802', desc: 'deed (D)', total: 1078140 }, { providers: ['RentCast'], rows: [['Owner of record (RentCast)', 'No RentCast property record matches this parcel', 'owner_provider']] });
+check('compose: a provider miss stays behind the roll verdict', noEvMiss[0][2] === 'owner_now' && noEvMiss[1][2] === 'owner_provider', noEvMiss.slice(0, 2).map(r => r[2]));
 check('compose: provider rows sit right after the owner block', withEntity.slice(0, 7).map(r => r[2]).join() === 'owner_now,owner_mailing,owner_since,entity_status,entity_agent,entity_address,entity_note', withEntity.slice(0, 7).map(r => r[2]));
+
+// ---- the RentCast adapter, against a stubbed API (the shape from developers.rentcast.io "property data schema") ----
+{
+  const { rentcastTitle, rentcastCacheClear } = await import('../lib/providers.js');
+  check('rentcast: nothing runs without a key', (await rentcastTitle({ apn10: '0370012125', lat: 34.43, lon: -119.156, situs: '11962 SULPHUR MOUNTAIN RD' })) === null);
+  process.env.RENTCAST_KEY = 'rc-test';
+  const realFetch2 = globalThis.fetch; let calls = 0, rcUrl = '', rcHeaders = {};
+  const REC = { id: '11962-Sulphur-Mountain-Rd', formattedAddress: '11962 Sulphur Mountain Rd, Ojai, CA 93023', addressLine1: '11962 Sulphur Mountain Rd', county: 'Ventura', countyFips: '111', assessorID: '037-0-012-125', legalDescription: 'PAR 2 PM 14-15', zoning: 'OS-160', lotSize: 412513, yearBuilt: 1962, propertyType: 'Single Family',
+    owner: { names: ['11962 SULPHUR MOUNTAIN LLC'], type: 'Organization', mailingAddress: { formattedAddress: '28175 S Anchovy Ave, San Pedro, CA 90732' } }, ownerOccupied: false,
+    lastSaleDate: '2024-07-29T00:00:00.000Z', lastSalePrice: 1650000,
+    taxAssessments: { '2023': { year: 2023, value: 1057000, land: 880000, improvements: 177000 }, '2024': { year: 2024, value: 1078140, land: 900000, improvements: 178140 } },
+    propertyTaxes: { '2024': { year: 2024, total: 11902 } },
+    history: { '2018-12-18': { event: 'Sale', date: '2018-12-18T00:00:00.000Z', price: 800000 }, '2024-07-29': { event: 'Sale', date: '2024-07-29T00:00:00.000Z', price: 1650000 } } };
+  const OTHER = { id: 'x', addressLine1: '11900 Sulphur Mountain Rd', assessorID: '037-0-012-120', owner: { names: ['SOMEONE ELSE'] } };
+  globalThis.fetch = async (url, init) => { calls++; rcUrl = String(url); rcHeaders = (init && init.headers) || {}; return { ok: true, json: async () => [OTHER, REC] }; };
+  const rc = await rentcastTitle({ apn: '037-0-012-125', apn10: '0370012125', lat: 34.4326, lon: -119.1564, situs: '11962 SULPHUR MOUNTAIN RD' });
+  check('rentcast: a circle search on the parcel centre with the X-Api-Key header', /^https:\/\/api\.rentcast\.io\/v1\/properties\?latitude=34\.4326&longitude=-119\.1564&radius=0\.08&limit=25$/.test(rcUrl) && rcHeaders['X-Api-Key'] === 'rc-test', { rcUrl, rcHeaders });
+  check('rentcast: the record is matched by assessor id, never by proximity alone', rc && rc.matched && rc.provider === 'RentCast' && /^11962 Sulphur Mountain LLC · organization · not owner-occupied$/.test(String(rc.rows[0][1])) && !JSON.stringify(rc.rows).includes('Someone Else'), rc && rc.rows[0]);
+  check('rentcast: owner, mailing, sale history, assessment and the provenance note, in the provider key order', rc.rows.map(r => r[2]).join() === 'owner_provider,owner_mailing_provider,sale_provider,value_provider,provider_note' && /28175 S Anchovy Ave, San Pedro, CA 90732/.test(rc.rows[1][1]) && /^\$1,650,000 on July 29, 2024 · 2 recorded events: sale July 29, 2024 \$1,650,000; sale December 18, 2018 \$800,000$/.test(rc.rows[2][1]) && /^\$1,078,140 total \(2024\) · land \$900,000 · improvements \$178,140 · tax \$11,902 \(2024\) · 2 assessment years on file$/.test(rc.rows[3][1]) && /assessor id 037-0-012-125 · PAR 2 PM 14-15 · zoning OS-160 · 412,513 sq ft lot · built 1962 · single family — matched by assessor id/.test(rc.rows[4][1]), rc.rows.map(r => r[1]));
+  const again = await rentcastTitle({ apn10: '0370012125', lat: 34.4326, lon: -119.1564 });
+  check('rentcast: the answer is held for 30 days (the free plan is 50 requests a month)', again === rc && calls === 1, calls);
+  rentcastCacheClear();
+  globalThis.fetch = async () => ({ ok: true, json: async () => [Object.assign({}, REC, { assessorID: null })] });
+  const bySitus = await rentcastTitle({ apn10: '0370012125', lat: 34.4326, lon: -119.1564, situs: '11962 SULPHUR MOUNTAIN RD' });
+  check('rentcast: without an assessor id the situs house number + street matches', bySitus.matched && /matched by situs address/.test(bySitus.rows[bySitus.rows.length - 1][1]), bySitus.rows[bySitus.rows.length - 1]);
+  rentcastCacheClear();
+  globalThis.fetch = async () => ({ ok: true, json: async () => [OTHER] });
+  const miss = await rentcastTitle({ apn10: '0370012125', lat: 34.4326, lon: -119.1564, situs: '11962 SULPHUR MOUNTAIN RD' });
+  check('rentcast: no match is a positive miss naming how many records sat nearby', !miss.matched && /No RentCast property record matches this parcel within 130 m of its centre \(1 record nearby\)/.test(miss.rows[0][1]), miss.rows[0]);
+  const both = await providerTitle({ apn: '037-0-012-125', apn10: '0370012125', fips: '06111', state: 'CA', lat: 34.4326, lon: -119.1564, situs: '11962 SULPHUR MOUNTAIN RD' });
+  check('providers: the fan-out runs only the providers whose key is set', both && both.providers.join() === 'RentCast' && both.rows.length === 1, both);
+  rentcastCacheClear();
+  globalThis.fetch = realFetch2; delete process.env.RENTCAST_KEY;
+}
 
 // ---- the routes (the server is up: run.mjs boots it) ----
 const post = (body) => fetch(BASE + '/api/title-report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
