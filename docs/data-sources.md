@@ -142,6 +142,8 @@ The user's instruction: *pull from as many sources as possible, from different a
 4. **Age is a flag, not a footnote.** Evidence older than twelve months raises `stale`; the 2018 snapshot is labelled history; SOS entity data carries its filing cadence.
 5. **Public record ≠ publishable at scale.** The atlas shows the owner *per parcel* on the record, never a reverse lookup (name → all parcels), never bulk export of names, and drops the residents list on import. Company owners are the public-interest case; natural persons appear by name only on their own parcel's record. The map carries a "not a consumer report" notice in the intake rule and must never feed an eligibility decision. A takedown address for natural persons costs nothing and is owed.
 
+6. **The roll is re-read on a schedule, not on a visit.** The county parcel layer carries a *sentinel* per APN — last instrument number, date and type, value-transfer date, assessed values, sale price, acreage (`lib/watch.js`). `.github/workflows/watch.yml` re-reads it every Monday for every property, every ranch lot and every parcel on the shared research list, logs any change with its date in `data/watch.json` (no names), and opens a GitHub issue when title or value moved — so the atlas learns of a new deed within a week without anyone visiting, and the record says *this parcel is on the weekly watch — last re-read <date>*. A change after the evidence on file raises the `moved` flag: the names, loans and liens from the report are declared possibly stale until a new report is imported.
+
 ---
 
 ## 7. What is wired, and what each key unlocks
@@ -152,6 +154,7 @@ The user's instruction: *pull from as many sources as possible, from different a
 | `SOS_API_KEY` | live Secretary of State rows for every company on title (`sosEntity`) | code live (V0.33); free key at calicodev.sos.ca.gov |
 | `REGRID_TOKEN` | live Regrid ownership/value rows (`regridTitle`) | code live (V0.32); paid |
 | — (no key) | county GIS, 2018 roll, federal/state layers, imported reports, portals | live |
+| — (no key) | **the weekly watch** of every watched parcel's roll sentinel, with a GitHub issue on change (`watch.yml`) | live (V0.34) |
 | PropertyRadar, PropertyScout, RentCast | chain of title / named owners by address | documented; adapters after their specs and display terms are confirmed |
 | ATTOM, BatchData, DataTree, HouseCanary | — | documented; terms or price rule them out for a public map today |
 

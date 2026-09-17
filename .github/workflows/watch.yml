@@ -1,0 +1,53 @@
+name: watch the county roll
+
+# Once a week (and on demand) re-read the county roll for every watched parcel — the properties,
+# the ranch lots and the shared research list — through the live site's /api/parcel, fold the
+# answers into data/watch.json (lib/watch.js) and commit it. A data-only commit: Vercel skips the
+# build (scripts/vercel-ignore.sh) and the site reads the new file at request time. When title or
+# value moved on any parcel, an issue is opened so the owner is told by email.
+on:
+  schedule:
+    - cron: '17 13 * * 1'     # Mondays 13:17 UTC (06:17 Pacific)
+  workflow_dispatch:
+    inputs:
+      apns:
+        description: 'extra APNs to check, comma-separated'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: watch-the-roll
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE: https://howard-property-dev.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Re-read the roll
+        run: node scripts/watch-records.mjs "$SITE" --summary .watch-summary.md --apns "${{ github.event.inputs.apns }}"
+      - name: Commit the log
+        run: |
+          if [ -z "$(git status --porcelain -- data/watch.json)" ]; then echo "nothing to commit"; exit 0; fi
+          git config user.name "atlas-watch"
+          git config user.email "actions@github.com"
+          git add data/watch.json
+          git commit -m "watch: the roll re-read on $(date -u +%Y-%m-%d)"
+          git push
+      - name: Open an issue when something moved
+        if: ${{ hashFiles('.watch-summary.md') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "The watch saw the county roll move ($(date -u +%Y-%m-%d))" --body-file .watch-summary.md --label watch || \
+          gh issue create --title "The watch saw the county roll move ($(date -u +%Y-%m-%d))" --body-file .watch-summary.md

@@ -9,6 +9,7 @@ import { dirname, join } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { IMAGE_URLS } from './image-urls.js';
 import { resolveCore, resolveDeep, resolveParcel, mergeRecord, readFrom, COUNTY_ADAPTERS, evidencePath, loadEvidence } from './lib/dossier.js';
+import { WATCH_PATH, EMPTY_WATCH } from './lib/watch.js';
 import { parsePdf } from './lib/title-report.js';
 import { configured as storeConfigured, pinOk, readJson, updateJson, commitFiles, cached as storeCached, remember, RESEARCH_PATH, UPLOADS_PATH, slug } from './lib/store.js';
 
@@ -8629,7 +8630,7 @@ app.get('/api/parcel', async (req, res) => {
   if (!q) return res.status(400).json({ error: 'Pass either apn, or lat and lon.' });
   try {
     const data = await resolveParcel(q);
-    res.set('Cache-Control', 'public, max-age=86400');
+    res.set('Cache-Control', req.query.refresh === '1' ? 'no-store' : 'public, max-age=86400');
     res.json(data);
   } catch (e) { res.status(e.status || 502).json({ error: e.message || 'Could not resolve this parcel.' }); }
 });
@@ -8759,6 +8760,17 @@ app.get('/api/sources', async (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
   try { const j = JSON.parse(readFileSync(join(__dirname, 'data', 'sources.json'), 'utf8')); res.json(j); }
   catch (e) { res.status(500).json({ error: 'sources_unavailable' }); }
+});
+// the watch log (data/watch.json): per watched APN the roll sentinel, the last check and the dated changes — no names
+app.get('/api/watch', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  let local = null, remote = null;
+  try { local = JSON.parse(readFileSync(join(__dirname, WATCH_PATH), 'utf8')); } catch (e) { local = null; }
+  try { remote = await readJson(WATCH_PATH, null, 300000); } catch (e) { remote = null; }
+  const pick = [local, remote].filter((w) => w && w.parcels).sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')))[0] || EMPTY_WATCH;
+  const apn = req.query.apn ? String(req.query.apn).replace(/[^0-9]/g, '') : null;
+  if (apn) { const e = (pick.parcels || {})[apn]; return e ? res.json(Object.assign({ apn10: apn }, e)) : res.status(404).json({ error: 'not_watched', apn10: apn }); }
+  res.json(pick);
 });
 app.get('/api/title/:apn', async (req, res) => {
   res.set('Cache-Control', 'no-store');

@@ -1,7 +1,7 @@
 // lib/title-report.js: the report reader on a fictional PropertyChecker-layout fixture, the evidence
 // composition into the Ownership & title rows, and the server routes' validation paths.
 import { check, done, here, BASE } from './lib.mjs';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { parseReport, monthsSince } from '../lib/title-report.js';
 import { composeTitle, evidenceStructures, readFrom } from '../lib/dossier.js';
@@ -77,4 +77,66 @@ const g2 = await fetch(BASE + '/api/title/0000000000');
 check('route: GET /api/title for a parcel without evidence is 404', g2.status === 404);
 const src = await (await fetch(BASE + '/api/sources')).json();
 check('route: GET /api/sources serves the register with tiers and verified entries', src.schema === 1 && Array.isArray(src.sources) && src.sources.length >= 20 && src.sources.every(x => x.id && x.tier && x.url && x.verified && x.atlas) && src.sources.some(x => x.id === 'ca-sos-api'), src.sources && src.sources.length);
+
+// ---- the watch (lib/watch.js): the roll sentinel, the diff, the log, the row and the flag ----
+const { sentinelFrom, diffSentinel, applyCheck, watchRow, watchFlag, summarize, EMPTY_WATCH } = await import('../lib/watch.js');
+const rollA = { APN10: '0370012125', DOC_NR: '2024000052341', DOC_DT: '20240802', DOC_TYPE: 'D', DT_V_TRF_Y: '20240802', L_V: '900000', I_V: '178140', SP: '', ACREAGE: '9.47', NAME_1: 'SHOULD NEVER APPEAR' };
+const sA = sentinelFrom('ventura', rollA);
+check('watch: the Ventura sentinel is the instrument, the dates, the values and the acreage — no names', sA.doc.nr === '2024000052341' && sA.doc.date === '2024-08-02' && sA.doc.kind === 'D' && sA.transfer === '2024-08-02' && sA.values.total === 1078140 && sA.acreage === 9.47 && !JSON.stringify(sA).includes('NEVER'), sA);
+const sLA = sentinelFrom('losangeles', { Roll_LandValue: '500000', Roll_ImpValue: '250000', Roll_Year: '2025', Roll_LandBaseYear: '2019', 'Shape.STArea()': '87120' });
+check('watch: the Los Angeles sentinel uses the base year and the roll values', sLA.doc === null && sLA.baseYear === '2019' && sLA.values.total === 750000 && sLA.acreage === 2, sLA);
+const sB = sentinelFrom('ventura', Object.assign({}, rollA, { DOC_NR: '2026000010001', DOC_DT: '20260301', DOC_TYPE: 'GD', DT_V_TRF_Y: '20260301', L_V: '1500000', I_V: '200000', SP: '1700000' }));
+const d = diffSentinel(sA, sB);
+check('watch: a new deed shows as document, date, type, transfer, value and sale changes, in that order', d.map(c => c.key).join() === 'doc.nr,doc.date,doc.kind,transfer,values.total,sale' && /last recorded document: 2024000052341 → 2026000010001/.test(d[0].text) && /assessed total: \$1,078,140 → \$1,700,000/.test(d[4].text), d.map(c => c.text));
+check('watch: a missing value on the new side is never a change, and identical sentinels diff to nothing', diffSentinel(sA, Object.assign({}, sA, { doc: null, sale: null })).length === 0 && diffSentinel(sA, JSON.parse(JSON.stringify(sA))).length === 0);
+const w = JSON.parse(JSON.stringify(EMPTY_WATCH));
+const c1 = applyCheck(w, { apn: '037-0-012-125', apn10: '0370012125', situs: '11962 SULPHUR MOUNTAIN RD', county: { fips: '06111' }, sentinel: sA }, '2026-09-21T13:17:00.000Z');
+const c2 = applyCheck(w, { apn: '037-0-012-125', apn10: '0370012125', county: { fips: '06111' }, sentinel: sA }, '2026-09-28T13:17:00.000Z');
+const c3 = applyCheck(w, { apn: '037-0-012-125', apn10: '0370012125', county: { fips: '06111' }, sentinel: sB }, '2026-10-05T13:17:00.000Z');
+const e = w.parcels['0370012125'];
+check('watch: the log keeps first seen, last checked, the count and only real changes', c1.first && !c1.changes.length && !c2.changes.length && c3.changes.length === 6 && e.firstSeen === '2026-09-21T13:17:00.000Z' && e.lastChecked === '2026-10-05T13:17:00.000Z' && e.checks === 3 && e.history.length === 1 && e.history[0].at === '2026-10-05T13:17:00.000Z' && e.current.doc.nr === '2026000010001' && w.updatedAt === '2026-10-05T13:17:00.000Z', e);
+check('watch: an answer without a sentinel is ignored', applyCheck(w, { apn10: '0000000000' }, '2026-10-05T13:17:00.000Z') === null && !w.parcels['0000000000']);
+const row = watchRow(e);
+check('watch: the title row states the last check, the count and the latest change', row && row[2] === 'title_watch' && /re-read October 5, 2026 \(3 checks since September 21, 2026\) · 1 change seen — latest October 5, 2026: last recorded document 2024000052341 → 2026000010001; document date August 2, 2024 → March 1, 2026/.test(row[1]), row);
+check('watch: a never-checked parcel has no row', watchRow(null) === null && watchRow({ history: [] }) === null);
+const fl = watchFlag(e, ev);
+check('watch: the roll moving after the evidence on file raises the `moved` flag naming the report date', fl && fl.key === 'moved' && fl.level === 'watch' && /roll move on October 5, 2026 — last recorded document 2024000052341 → 2026000010001;.*after the evidence on file \(March 16, 2025\)/.test(fl.text), fl);
+check('watch: no flag when the only change came before the report, or when nothing changed', watchFlag({ history: [{ at: '2024-09-01T00:00:00Z', changes: [{ key: 'doc.nr', from: 'a', to: 'b' }] }] }, ev) === null && watchFlag({ history: [] }, ev) === null && watchFlag({ history: [{ at: '2026-10-05T00:00:00Z', changes: [{ key: 'acreage', from: 9.47, to: 9.5 }] }] }, ev) === null);
+const sm = summarize([c1, c3], 'https://example.test/');
+check('watch: the summary names the parcel, each change and the record link', sm.changed === 1 && /### 037-0-012-125/.test(sm.text) && /- last recorded document: 2024000052341 → 2026000010001/.test(sm.text) && /https:\/\/example\.test\/\?apn=037-0-012-125/.test(sm.text), sm.text);
+// the script end to end, against a mock of the three routes it reads
+{
+  const { createServer } = await import('node:http');
+  const { spawn } = await import('node:child_process');
+  const { mkdirSync, existsSync, rmSync } = await import('node:fs');
+  let calls = [];
+  const mock = createServer((req, res) => {
+    calls.push(req.url);
+    const j = (o, code = 200) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(o)); };
+    if (req.url.startsWith('/api/properties')) return j([{ id: 'p1', name: 'One', apn: '037-0-012-125', county: '06111', lots: [{ id: 'l1', name: 'Lot 1', apn: '035-0-020-010' }] }]);
+    if (req.url.startsWith('/api/research')) return j({ items: [{ apn: '011-0-040-135', county: '06111', situs: 'SOMEWHERE' }], synced: false });
+    if (req.url.startsWith('/api/parcel')) {
+      const apn = decodeURIComponent((/apn=([^&]+)/.exec(req.url) || [])[1] || '');
+      if (apn === '011-0-040-135') return j({ error: 'nope' }, 404);
+      return j({ apn, apn10: apn.replace(/-/g, ''), situs: apn === '037-0-012-125' ? '11962 SULPHUR MOUNTAIN RD' : null, county: { fips: '06111' }, sentinel: apn === '037-0-012-125' ? sB : sA });
+    }
+    j({ error: 'not_found' }, 404);
+  });
+  await new Promise(ok => mock.listen(0, '127.0.0.1', ok));
+  const port = mock.address().port;
+  const out = join(here, 'out'); mkdirSync(out, { recursive: true });
+  const wf = join(out, 'watch.json'), sf = join(out, 'watch-summary.md');
+  if (existsSync(sf)) rmSync(sf);
+  writeFileSync(wf, JSON.stringify({ schema: 1, updatedAt: '2026-09-01T00:00:00.000Z', parcels: { '0370012125': { apn: '037-0-012-125', county: '06111', firstSeen: '2026-09-01T00:00:00.000Z', checks: 1, lastChecked: '2026-09-01T00:00:00.000Z', history: [], current: sA } } }));
+  const run = await new Promise((ok) => { const c = spawn(process.execPath, [join(here, '..', 'scripts', 'watch-records.mjs'), 'http://127.0.0.1:' + port, '--file', wf, '--summary', sf], { env: Object.assign({}, process.env, { NO_PROXY: '127.0.0.1,localhost', no_proxy: '127.0.0.1,localhost' }) }); let stdout = '', stderr = ''; c.stdout.on('data', d => stdout += d); c.stderr.on('data', d => stderr += d); const t = setTimeout(() => c.kill(), 60000); c.on('close', (status) => { clearTimeout(t); ok({ status, stdout, stderr }); }); });
+  const after = JSON.parse(readFileSync(wf, 'utf8'));
+  check('script: watches the properties, the lots and the research list, asks /api/parcel with refresh=1', run.status === 0 && calls.some(u => /^\/api\/parcel\?apn=037-0-012-125&county=06111&refresh=1$/.test(u)) && calls.some(u => /apn=035-0-020-010/.test(u)) && calls.some(u => /apn=011-0-040-135/.test(u)), { status: run.status, calls, err: run.stderr.slice(0, 300) });
+  check('script: logs the change on the known parcel, the first check on the lot, and skips the parcel the county could not find', after.parcels['0370012125'].history.length === 1 && after.parcels['0370012125'].checks === 2 && after.parcels['0370012125'].label === 'One' && after.parcels['0350020010'] && after.parcels['0350020010'].checks === 1 && after.parcels['0350020010'].label === 'One · Lot 1' && !after.parcels['0110040135'] && Object.keys(after.parcels).length === 2, Object.keys(after.parcels));
+  check('script: writes the summary for the issue only because something moved', existsSync(sf) && /### 037-0-012-125 — 11962 SULPHUR MOUNTAIN RD/.test(readFileSync(sf, 'utf8')) && /1 changed/.test(run.stdout), run.stdout.slice(-400));
+  mock.close();
+}
+const wr = await (await fetch(BASE + '/api/watch')).json();
+check('route: GET /api/watch serves the log (schema 1, a parcels map)', wr.schema === 1 && wr.parcels && typeof wr.parcels === 'object', wr);
+const wr2 = await fetch(BASE + '/api/watch?apn=999-9-999-999');
+check('route: GET /api/watch?apn= for an unwatched parcel is 404 not_watched', wr2.status === 404 && (await wr2.json()).error === 'not_watched');
 done('title');

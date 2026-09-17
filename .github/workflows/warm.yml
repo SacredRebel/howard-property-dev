@@ -11,6 +11,7 @@ on:
       - 'data/research.json'
       - 'data/uploads.json'
       - 'data/zone-positions.json'
+      - 'data/watch.json'
       - 'images/uploads/**'
       - 'docs/uploads/**'
   workflow_dispatch:
